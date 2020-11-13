@@ -35,7 +35,7 @@ namespace VRM
             }
 
             var item = m_materials[i];
-            var shaderName = item.shader;
+            var shaderName = "Shader Graphs/MToon";//item.shader;
             var shader = Shader.Find(shaderName);
             if (shader == null)
             {
@@ -58,7 +58,8 @@ namespace VRM
             //
             var material = new Material(shader);
             material.name = item.name;
-            material.renderQueue = item.renderQueue;
+            //material.renderQueue = item.renderQueue;
+            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.GeometryLast < item.renderQueue ? (int)UnityEngine.Rendering.RenderQueue.GeometryLast : item.renderQueue;
 
             foreach (var kv in item.floatProperties)
             {
