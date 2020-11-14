@@ -14,7 +14,9 @@ public class AvatarController : MonoBehaviour
     {
         OpenFileDialog open_file_dialog = new OpenFileDialog();
         open_file_dialog.Filter = "vrmファイル(.vrm)|*.vrm";
-        open_file_dialog.ShowDialog();
+
+        if (open_file_dialog.ShowDialog() == DialogResult.Cancel) return;
+        
         var _filepath = Path.GetFullPath(open_file_dialog.FileName);
         avatar_filepath = _filepath.ToString().Replace('\\', '/');
 
