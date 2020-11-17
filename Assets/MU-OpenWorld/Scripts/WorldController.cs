@@ -9,7 +9,7 @@ namespace OpenWorld
         private GameObject player;
 
         public Mesh ground_mesh;
-        public float world_scale  = 5f;
+        public float world_scale  = 0.05f;
         public int   world_width  = 32;
         public float world_height = 1f;
 
@@ -33,12 +33,15 @@ namespace OpenWorld
             var _vertices = new Vector3[world_width * world_width];
             var _triangles = new int[(world_width - 1) * (world_width - 1) * 2 * 3];
 
-            for (int i=0; i<world_width*world_width; i++)
+            for (int ix=0; ix<world_width; ix++)
             {
-                float _x = (x + i % world_width) * world_scale;
-                float _z = (z + i / world_width) * world_scale;
-                float _y = Mathf.PerlinNoise(_x, _z) * world_height;
-                _vertices[i] = new Vector3(_x, _y, _z);
+                for (int iz=0; iz<world_width; iz++)
+                {
+                    float _x = x + ix * world_scale;
+                    float _z = z + iz * world_scale;
+                    float _y = Mathf.PerlinNoise(_x, _z) * world_height;
+                    _vertices[ix * world_width + iz] = new Vector3(x + ix, _y, z + iz);
+                }
             }
             for (int i=0; i<(world_width-1)*(world_width-1); i++)
             {
