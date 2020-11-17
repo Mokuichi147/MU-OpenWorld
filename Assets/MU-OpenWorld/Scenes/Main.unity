@@ -170,9 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ground_mesh: {fileID: 1453043773871479701, guid: 371e81fc1dcebf3469b289179002a055, type: 3}
-  world_scale: 1
   world_width: 32
-  world_height: 1
 --- !u!33 &435173566
 MeshFilter:
   m_ObjectHideFlags: 0

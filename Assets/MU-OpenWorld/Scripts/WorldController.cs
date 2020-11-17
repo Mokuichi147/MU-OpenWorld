@@ -9,9 +9,9 @@ namespace OpenWorld
         private GameObject player;
 
         public Mesh ground_mesh;
-        public float world_scale  = 0.05f;
-        public int   world_width  = 32;
-        public float world_height = 1f;
+        public int world_width = 32;
+        private float world_scale = 0.02f;
+        private float world_height = 32f;
 
         void Start()
         {
@@ -43,14 +43,20 @@ namespace OpenWorld
                     _vertices[ix * world_width + iz] = new Vector3(x + ix, _y, z + iz);
                 }
             }
-            for (int i=0; i<(world_width-1)*(world_width-1); i++)
+            for (int ix=0; ix<world_width-1; ix++)
             {
-                _triangles[6*i]   = i;
-                _triangles[6*i+1] = i + 1;
-                _triangles[6*i+2] = i + world_width;
-                _triangles[6*i+3] = i + 1;
-                _triangles[6*i+4] = i + world_width + 1;
-                _triangles[6*i+5] = i + world_width;
+                for (int iz=0; iz<world_width-1; iz++)
+                {
+                    var _x  = world_width * ix;
+                    var _nx = world_width * (ix + 1);
+                    var _i = 6 * ((world_width-1) * ix + iz);
+                    _triangles[_i]   = _x  + iz;
+                    _triangles[_i+1] = _x  + iz + 1;
+                    _triangles[_i+2] = _nx + iz;
+                    _triangles[_i+3] = _nx + iz;
+                    _triangles[_i+4] = _x  + iz + 1;
+                    _triangles[_i+5] = _nx + iz + 1;
+                }
             }
             ground_mesh.vertices = _vertices;
             ground_mesh.triangles = _triangles;
