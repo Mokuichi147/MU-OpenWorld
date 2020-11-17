@@ -36,7 +36,6 @@ public class AvatarController : MonoBehaviour
         var _move = move.ReadValue<Vector2>();
         var _dx = _move.x * 0.5f;
         var _dy = _move.y * 0.5f;
-        Debug.Log(_dx);
         this.transform.position = new Vector3(_pos.x + _dx, _pos.y, _pos.z + _dy);
     }
 }
