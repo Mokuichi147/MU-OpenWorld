@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+#if UNITY_EDITOR
+using UnityEditor;
+#elif UNITY_STANDALONE_WIN
 using System.IO;
 using System.Windows.Forms;
+#endif
 using VRM;
 
 
@@ -16,16 +20,32 @@ public class AvatarController : MonoBehaviour
 
     void Start()
     {
-        OpenFileDialog open_file_dialog = new OpenFileDialog();
-        open_file_dialog.Filter = "vrmファイル(.vrm)|*.vrm";
-
-        if (open_file_dialog.ShowDialog() == DialogResult.Cancel) return;
-        
-        var _filepath = Path.GetFullPath(open_file_dialog.FileName);
-        avatar_filepath = _filepath.ToString().Replace('\\', '/');
-
+        avatar_filepath = "Assets/MU-OpenWorld/Models/Avatars/AliciaSolid.vrm";
         avatar = VRM.VRMImporter.LoadFromPath(avatar_filepath);
-        avatar.transform.parent = this.transform;
+        if (avatar != null)
+        {
+            avatar.transform.parent = this.transform;
+        }
+        else
+        {
+#if UNITY_EDITOR
+            var _filepath = EditorUtility.OpenFilePanel("vrmファイル(.vrm)", "", "vrm");
+            avatar_filepath = _filepath.ToString().Replace('\\', '/');
+#elif UNITY_STANDALONE_WIN
+            OpenFileDialog open_file_dialog = new OpenFileDialog();
+            open_file_dialog.Filter = "vrmファイル(.vrm)|*.vrm";
+
+            if (open_file_dialog.ShowDialog() == DialogResult.Cancel) return;
+        
+            var _filepath = Path.GetFullPath(open_file_dialog.FileName);
+            avatar_filepath = _filepath.ToString().Replace('\\', '/');
+#endif
+            avatar = VRM.VRMImporter.LoadFromPath(avatar_filepath);
+            if (avatar != null)
+            {
+                avatar.transform.parent = this.transform;
+            }
+        }
 
         move = this.GetComponent<PlayerInput>().currentActionMap["Move"];
     }
