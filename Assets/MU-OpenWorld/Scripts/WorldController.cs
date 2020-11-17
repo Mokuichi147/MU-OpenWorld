@@ -9,7 +9,8 @@ namespace OpenWorld
         private GameObject player;
 
         public Mesh ground_mesh;
-        public int world_width = 32;
+        public int mesh_point = 128;
+        public float mesh_width = 128f;
         private float world_scale = 0.02f;
         private float world_height = 32f;
 
@@ -30,26 +31,29 @@ namespace OpenWorld
             ground_mesh = new Mesh();
             ground_mesh.Clear();
 
-            var _vertices = new Vector3[world_width * world_width];
-            var _triangles = new int[(world_width - 1) * (world_width - 1) * 2 * 3];
+            var _vertices = new Vector3[mesh_point * mesh_point];
+            var _triangles = new int[(mesh_point - 1) * (mesh_point - 1) * 2 * 3];
 
-            for (int ix=0; ix<world_width; ix++)
+            for (int ix=0; ix<mesh_point; ix++)
             {
-                for (int iz=0; iz<world_width; iz++)
+                for (int iz=0; iz<mesh_point; iz++)
                 {
-                    float _x = x + ix * world_scale;
-                    float _z = z + iz * world_scale;
+                    float _half = (mesh_point - 1) / 2f;
+                    float _dx = (ix - _half) / _half * mesh_width + x;
+                    float _dz = (iz - _half) / _half * mesh_width + z;
+                    float _x = _dx * world_scale;
+                    float _z = _dz * world_scale;
                     float _y = Mathf.PerlinNoise(_x, _z) * world_height;
-                    _vertices[ix * world_width + iz] = new Vector3(x + ix, _y, z + iz);
+                    _vertices[ix * mesh_point + iz] = new Vector3(_dx, _y, _dz);
                 }
             }
-            for (int ix=0; ix<world_width-1; ix++)
+            for (int ix=0; ix<mesh_point-1; ix++)
             {
-                for (int iz=0; iz<world_width-1; iz++)
+                for (int iz=0; iz<mesh_point-1; iz++)
                 {
-                    var _x  = world_width * ix;
-                    var _nx = world_width * (ix + 1);
-                    var _i = 6 * ((world_width-1) * ix + iz);
+                    var _x  = mesh_point * ix;
+                    var _nx = mesh_point * (ix + 1);
+                    var _i = 6 * ((mesh_point-1) * ix + iz);
                     _triangles[_i]   = _x  + iz;
                     _triangles[_i+1] = _x  + iz + 1;
                     _triangles[_i+2] = _nx + iz;
