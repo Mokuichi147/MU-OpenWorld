@@ -25,6 +25,7 @@ public class AvatarController : MonoBehaviour
         if (avatar != null)
         {
             avatar.transform.parent = this.transform;
+            avatar.transform.localPosition = new Vector3(0f, 0f, 0f);
         }
         else
         {
@@ -44,6 +45,7 @@ public class AvatarController : MonoBehaviour
             if (avatar != null)
             {
                 avatar.transform.parent = this.transform;
+                avatar.transform.localPosition = new Vector3(0f, 0f, 0f);
             }
         }
 
