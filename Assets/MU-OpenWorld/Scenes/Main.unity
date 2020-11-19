@@ -171,7 +171,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ground_mesh: {fileID: 1453043773871479701, guid: 371e81fc1dcebf3469b289179002a055, type: 3}
   mesh_point: 128
-  mesh_width: 1024
+  mesh_width: 256
+  seed: 50000
 --- !u!33 &435173566
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -441,7 +442,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 1
 --- !u!136 &929649737
 CapsuleCollider:

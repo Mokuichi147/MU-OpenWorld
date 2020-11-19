@@ -9,10 +9,12 @@ namespace OpenWorld
         private GameObject player;
 
         public Mesh ground_mesh;
-        public int mesh_point = 128;
+        public int mesh_point = 1024;
         public float mesh_width = 128f;
-        private float world_scale = 0.02f;
-        private float world_height = 32f;
+        private float world_scale = 0.05f;
+        private float world_height = 16f;
+
+        public float seed = 5120000f;
 
         void Start()
         {
@@ -21,11 +23,24 @@ namespace OpenWorld
             CreateGround(pos.x, pos.z);
         }
 
+
         public float GetGroundHeight(float x, float z)
         {
-            var _x = x * world_scale;
-            var _z = z * world_scale;
-            return Mathf.PerlinNoise(_x, _z) * world_height;
+            float _x = (x + seed) * world_scale;
+            float _z = (z + seed) * world_scale;
+            float _y = Mathf.PerlinNoise(_x, _z);
+            float l = 0.6f;
+            float s = 0.3f;
+            float l_w = 0.7f;
+            float m_w = 0.1f;
+            float s_w = 0.5f;
+            if (_y > l)
+                _y = (_y-l) / (1f-l) * l_w + m_w + s_w;
+            else if (_y > s)
+                _y = (_y-s) / (l-s) * m_w + s_w;
+            else
+                _y = _y / s * s_w;
+            return _y * world_height;
         }
 
         private void CreateGround(float x, float z)
@@ -40,9 +55,9 @@ namespace OpenWorld
             {
                 for (int iz=0; iz<mesh_point; iz++)
                 {
-                    float _half = (mesh_point - 1) / 2f;
-                    float _dx = (ix - _half) / _half * mesh_width + x;
-                    float _dz = (iz - _half) / _half * mesh_width + z;
+                    float _half = mesh_width / 2f;
+                    float _dx = (ix / (float)(mesh_point-1) - 0.5f) * _half + x;
+                    float _dz = (iz / (float)(mesh_point-1) - 0.5f) * _half + z;
                     float _y = GetGroundHeight(_dx, _dz);
                     _vertices[ix * mesh_point + iz] = new Vector3(_dx, _y, _dz);
                 }
