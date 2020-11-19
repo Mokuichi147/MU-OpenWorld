@@ -21,9 +21,11 @@ namespace OpenWorld
             CreateGround(pos.x, pos.z);
         }
 
-        // Update is called once per frame
-        void Update()
+        public float GetGroundHeight(float x, float z)
         {
+            var _x = x * world_scale;
+            var _z = z * world_scale;
+            return Mathf.PerlinNoise(_x, _z) * world_height;
         }
 
         private void CreateGround(float x, float z)
@@ -41,9 +43,7 @@ namespace OpenWorld
                     float _half = (mesh_point - 1) / 2f;
                     float _dx = (ix - _half) / _half * mesh_width + x;
                     float _dz = (iz - _half) / _half * mesh_width + z;
-                    float _x = _dx * world_scale;
-                    float _z = _dz * world_scale;
-                    float _y = Mathf.PerlinNoise(_x, _z) * world_height;
+                    float _y = GetGroundHeight(_dx, _dz);
                     _vertices[ix * mesh_point + iz] = new Vector3(_dx, _y, _dz);
                 }
             }
