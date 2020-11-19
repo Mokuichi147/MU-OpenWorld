@@ -9,12 +9,12 @@ namespace OpenWorld
         private GameObject player;
 
         public Mesh ground_mesh;
-        public int mesh_point = 1024;
-        public float mesh_width = 128f;
-        private float world_scale = 0.05f;
-        private float world_height = 16f;
+        public int mesh_point = 128;
+        public float mesh_width = 256f;
+        private float mesh_height = 16f;
 
-        public float seed = 5120000f;
+        public float seed = 50000f;
+        private float world_scale = 0.05f;
 
         void Start()
         {
@@ -29,18 +29,24 @@ namespace OpenWorld
             float _x = (x + seed) * world_scale;
             float _z = (z + seed) * world_scale;
             float _y = Mathf.PerlinNoise(_x, _z);
+            // 0～1 s(水面下),m,l(山)の閾値
             float l = 0.6f;
             float s = 0.3f;
+            // リスケール後の最大値
             float l_w = 0.7f;
             float m_w = 0.1f;
             float s_w = 0.5f;
+
             if (_y > l)
                 _y = (_y-l) / (1f-l) * l_w + m_w + s_w;
             else if (_y > s)
                 _y = (_y-s) / (l-s) * m_w + s_w;
             else
                 _y = _y / s * s_w;
-            return _y * world_height;
+            
+            // 海面が0になるようにする
+            _y -= (s_w - 0.01f);
+            return _y * mesh_height;
         }
 
         private void CreateGround(float x, float z)
