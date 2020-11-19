@@ -31,8 +31,9 @@ namespace OpenWorld
         {
             var _pos = this.transform.position;
             var _move = move.ReadValue<Vector2>();
-            var _dx = _move.x * 0.5f;
-            var _dy = _move.y * 0.5f;
+            // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
+            var _dx = _move.x * (5f / 50f);
+            var _dy = _move.y * (5f / 50f);
             this.transform.position = new Vector3(_pos.x + _dx, _pos.y, _pos.z + _dy);
         }
 
