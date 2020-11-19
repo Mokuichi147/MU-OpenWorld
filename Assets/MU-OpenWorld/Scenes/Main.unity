@@ -172,6 +172,35 @@ MonoBehaviour:
   ground_mesh: {fileID: 1453043773871479701, guid: 371e81fc1dcebf3469b289179002a055, type: 3}
   mesh_point: 128
   mesh_width: 256
+  mesh_color:
+    serializedVersion: 2
+    key0: {r: 0, g: 0.61685514, b: 1, a: 1}
+    key1: {r: 0.11779833, g: 1, b: 0, a: 1}
+    key2: {r: 1, g: 1, b: 1, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 578
+    ctime1: 15420
+    ctime2: 65535
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 2
   seed: 50000
 --- !u!33 &435173566
 MeshFilter:
