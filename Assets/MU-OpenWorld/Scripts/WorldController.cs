@@ -11,10 +11,10 @@ namespace OpenWorld
         public Mesh ground_mesh;
         public int mesh_point = 128;
         public float mesh_width = 256f;
-        private float mesh_height = 16f;
+        static private float mesh_height = 16f;
 
-        public float seed = 50000f;
-        private float world_scale = 0.05f;
+        static public float seed = 50000f;
+        static private float world_scale = 0.05f;
 
         void Start()
         {
@@ -24,7 +24,7 @@ namespace OpenWorld
         }
 
 
-        public float GetGroundHeight(float x, float z)
+        static public float GetGroundHeight(float x, float z)
         {
             float _x = (x + seed) * world_scale;
             float _z = (z + seed) * world_scale;

@@ -45,9 +45,8 @@ namespace OpenWorld
             avatar.transform.parent = this.transform;
             avatar.transform.localPosition = new Vector3(0f, 0f, 0f);
             // 地面の高さに合わせる
-            var _player = GameObject.Find("World").GetComponent<WorldController>();
             var _pos = this.transform.position;
-            _pos.y = _player.GetGroundHeight(_pos.x, _pos.z) + 1f;
+            _pos.y = WorldController.GetGroundHeight(_pos.x, _pos.z) + 1f;
             this.transform.position = _pos;
             
             return true;
