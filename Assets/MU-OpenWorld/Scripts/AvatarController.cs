@@ -21,7 +21,7 @@ namespace OpenWorld
 
         void Start()
         {
-            avatar_filepath = "Assets/MU-OpenWorld/Models/Avatars/AliciaSolid.vrm";
+            avatar_filepath = "Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm";
             LoadAvatar();
 
             move = this.GetComponent<PlayerInput>().currentActionMap["Move"];
