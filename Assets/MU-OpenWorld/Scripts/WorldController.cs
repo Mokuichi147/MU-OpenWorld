@@ -13,8 +13,6 @@ namespace OpenWorld
         public float mesh_width = 256f;
         private float mesh_height = 16f;
 
-        public Gradient mesh_color;
-
         public float seed = 50000f;
         private float world_scale = 0.05f;
 
@@ -49,23 +47,6 @@ namespace OpenWorld
             // 海面が0になるようにする
             _y -= (s_m - 0.01f);
             return _y * mesh_height;
-        }
-
-        private Texture2D CreateTexture(Vector3[] vertices)
-        {
-            float min_height = 0f;
-            float max_height = mesh_height;
-
-            Color[] color_map = new Color[vertices.Length];
-            for (int i=0; i<vertices.Length; i++)
-            {
-                float raito = Mathf.InverseLerp(min_height, max_height, vertices[i].y);
-                color_map[i] = mesh_color.Evaluate(raito);
-            }
-            Texture2D _texture = new Texture2D(mesh_point, mesh_point);
-            _texture.SetPixels(color_map);
-            _texture.Apply();
-            return _texture;
         }
 
         private void CreateGround(float x, float z)
@@ -110,8 +91,6 @@ namespace OpenWorld
             filter.sharedMesh = ground_mesh;
             var collider = this.GetComponent<MeshCollider>();
             collider.sharedMesh = ground_mesh;
-            var renderer = this.GetComponent<MeshRenderer>();
-            renderer.sharedMaterial.mainTexture = CreateTexture(_vertices);
         }
     }
 }
