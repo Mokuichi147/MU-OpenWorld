@@ -14,7 +14,7 @@ namespace OpenWorld
         static private float mesh_height = 16f;
 
         static public float seed = 50000f;
-        static private float world_scale = 0.05f;
+        static private float world_scale = 0.025f;
 
         void Start()
         {
@@ -35,7 +35,7 @@ namespace OpenWorld
             // リスケール後の最大値
             float l_m = 0.7f;
             float m_m = 0.1f;
-            float s_m = 0.5f;
+            float s_m = 0.3f;
 
             if (_y > l)
                 _y = (_y-l) / (1f-l) * l_m + m_m + s_m;
@@ -45,7 +45,7 @@ namespace OpenWorld
                 _y = _y / s * s_m;
             
             // 海面が0になるようにする
-            _y -= (s_m - 0.01f);
+            _y -= (s_m - 0.05f);
             return _y * mesh_height;
         }
 
