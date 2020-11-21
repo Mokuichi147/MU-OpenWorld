@@ -70,7 +70,7 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     - _depth: 0.7
-    - _normal_strength: 0
+    - _normal_strength: 0.95
     - _strength: 0.4
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
