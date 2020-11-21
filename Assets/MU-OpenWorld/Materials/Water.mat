@@ -70,15 +70,17 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     - _depth: 0.7
+    - _displacement: 0.5
     - _normal_strength: 0.95
-    - _strength: 0.4
+    - _shmoothness: 0.693
+    - _strength: 0.71
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _depth_color: {r: 0.13300991, g: 0.529382, b: 0.57547164, a: 0.92156863}
-    - _shallow_color: {r: 0, g: 1, b: 0.9690397, a: 0.84313726}
+    - _depth_color: {r: 0.13333333, g: 0.5764706, b: 0.511875, a: 0.92156863}
+    - _shallow_color: {r: 0, g: 1, b: 0.86509275, a: 0.4745098}
   m_BuildTextureStacks: []
 --- !u!114 &614436829477254771
 MonoBehaviour:
