@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEditor.Animations;
 #if UNITY_EDITOR
 using UnityEditor;
 #elif UNITY_STANDALONE_WIN
@@ -14,8 +15,12 @@ namespace OpenWorld
 {
     public class AvatarController : MonoBehaviour
     {
+        public Avatar player_avatar;
+        public AnimatorController player_animator;
+
         private string avatar_filepath;
         private GameObject avatar;
+        private Animator avatar_anim;
 
         InputAction move;
 
@@ -43,12 +48,15 @@ namespace OpenWorld
             if (avatar == null) return false;
 
             avatar.transform.parent = this.transform;
-            avatar.transform.localPosition = new Vector3(0f, 0f, 0f);
+            avatar.transform.localPosition = new Vector3(0f, 1f, 0f);
             // 地面の高さに合わせる
             var _pos = this.transform.position;
             _pos.y = WorldController.GetGroundHeight(_pos.x, _pos.z) + 1f;
             this.transform.position = _pos;
-            
+            // アニメーションの設定
+            avatar_anim = avatar.GetComponent<Animator>();
+            avatar_anim.avatar = player_avatar;
+            avatar_anim.runtimeAnimatorController = player_animator;
             return true;
         }
 
