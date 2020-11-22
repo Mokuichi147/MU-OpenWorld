@@ -20,7 +20,7 @@ namespace OpenWorld
 
         private string avatar_filepath;
         private GameObject avatar;
-        private Animator avatar_anim;
+        private Animator avatar_animator;
 
         InputAction move;
 
@@ -39,6 +39,7 @@ namespace OpenWorld
             // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
             var _dx = _move.x * (5f / 50f);
             var _dy = _move.y * (5f / 50f);
+            avatar_animator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(_move.x,2f)+Mathf.Pow(_move.y,2f)), 0.1f, Time.deltaTime);
             this.transform.position = new Vector3(_pos.x + _dx, _pos.y, _pos.z + _dy);
         }
 
@@ -48,15 +49,15 @@ namespace OpenWorld
             if (avatar == null) return false;
 
             avatar.transform.parent = this.transform;
-            avatar.transform.localPosition = new Vector3(0f, 1f, 0f);
+            avatar.transform.localPosition = new Vector3(0f, 0f, 0f);
             // 地面の高さに合わせる
             var _pos = this.transform.position;
             _pos.y = WorldController.GetGroundHeight(_pos.x, _pos.z) + 1f;
             this.transform.position = _pos;
             // アニメーションの設定
-            avatar_anim = avatar.GetComponent<Animator>();
-            avatar_anim.avatar = player_avatar;
-            avatar_anim.runtimeAnimatorController = player_animator;
+            avatar_animator = avatar.GetComponent<Animator>();
+            avatar_animator.avatar = player_avatar;
+            avatar_animator.runtimeAnimatorController = player_animator;
             return true;
         }
 
