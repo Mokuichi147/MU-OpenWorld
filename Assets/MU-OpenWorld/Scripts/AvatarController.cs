@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 using UnityEditor.Animations;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -22,14 +23,39 @@ namespace OpenWorld
         private GameObject avatar;
         private Animator avatar_animator;
 
+        private Transform camera_rotate;
+
         InputAction move;
+        InputAction look;
+        InputAction esc;
+        private bool mouse_center = true;
+        private Vector2 pre_mouse_pos = new Vector2(0f, 0f);
+        private Vector2 center_pos;
+        private Vector2 max_window_size = new Vector2(Screen.width, Screen.height);
 
         void Start()
         {
             avatar_filepath = "Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm";
             LoadAvatar();
 
-            move = this.GetComponent<PlayerInput>().currentActionMap["Move"];
+            var player_input = this.GetComponent<PlayerInput>();
+            move = player_input.currentActionMap["Move"];
+            look = player_input.currentActionMap["Look"];
+
+            esc = player_input.currentActionMap["Esc"];
+            esc.performed += (callback) =>
+            {
+                Cursor.visible = !mouse_center;
+                mouse_center = !mouse_center;
+            };
+
+            camera_rotate = GameObject.Find("CameraRotate").GetComponent<Transform>();
+
+            //Cursor.lockState = CursorLockMode.Locked;
+            center_pos = new Vector2(Mathf.Round(Screen.width/2f), Mathf.Round(Screen.height/2f));
+            pre_mouse_pos = center_pos;
+            Mouse.current.WarpCursorPosition(center_pos);
+            Cursor.visible = false;
         }
 
         void FixedUpdate()
@@ -41,6 +67,19 @@ namespace OpenWorld
             var _dy = _move.y * (5f / 50f);
             avatar_animator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(_move.x,2f)+Mathf.Pow(_move.y,2f)), 0.1f, Time.deltaTime);
             this.transform.position = new Vector3(_pos.x + _dx, _pos.y, _pos.z + _dy);
+            // 視点操作
+            Quaternion camera_rot = camera_rotate.rotation;
+            if (mouse_center)
+            {
+                var mouse_pos = look.ReadValue<Vector2>();
+                var delta_pos = mouse_pos - pre_mouse_pos;
+                camera_rot *= Quaternion.Euler(0f, Mathf.Round(delta_pos.x/2f)/5f, 0f);
+
+                Mouse.current.WarpCursorPosition(center_pos);
+                pre_mouse_pos = center_pos;
+                camera_rotate.rotation = camera_rot;
+            }
+            
         }
 
         private bool LoadVRM(string file_path)
