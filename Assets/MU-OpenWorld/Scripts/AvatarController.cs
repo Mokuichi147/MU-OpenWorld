@@ -29,10 +29,10 @@ namespace OpenWorld
         InputAction look;
         InputActionTrace look_trace;
         InputAction esc;
+        Rigidbody player_rb;
         private bool mouse_center = true;
         private Vector2 pre_mouse_pos = new Vector2(0f, 0f);
         private Vector2 center_pos;
-        private Vector2 max_window_size = new Vector2(Screen.width, Screen.height);
 
         void Start()
         {
@@ -62,6 +62,7 @@ namespace OpenWorld
             };
 
             camera_rotate = this.transform;
+            player_rb = this.GetComponent<Rigidbody>();
 
             center_pos = new Vector2(Mathf.Round(Screen.width/2f), Mathf.Round(Screen.height/2f));
             pre_mouse_pos = center_pos;
@@ -88,7 +89,7 @@ namespace OpenWorld
                 pre_mouse_pos = center_pos;
                 look_trace.Clear();
             }
-            var _pos = this.transform.position;
+            var _pos = player_rb.position;
             var _move = move.ReadValue<Vector2>();
             // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
             var _dx = _move.x * (5f / 50f);
@@ -96,7 +97,7 @@ namespace OpenWorld
             avatar_animator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(_move.x,2f)+Mathf.Pow(_move.y,2f)), 0.1f, Time.deltaTime);
             var move_vec = new Vector3(_dx, 0f, _dy);
             move_vec = this.transform.rotation * move_vec;
-            this.transform.position = new Vector3(_pos.x + move_vec.x, _pos.y, _pos.z + move_vec.z);
+            player_rb.MovePosition(new Vector3(_pos.x + move_vec.x, _pos.y, _pos.z + move_vec.z));
         }
 
         private void OnApplicationQuit()
