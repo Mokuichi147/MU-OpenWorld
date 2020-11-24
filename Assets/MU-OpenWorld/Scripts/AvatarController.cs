@@ -27,6 +27,7 @@ namespace OpenWorld
 
         InputAction move;
         InputAction look;
+        InputActionTrace look_trace;
         InputAction esc;
         private bool mouse_center = true;
         private Vector2 pre_mouse_pos = new Vector2(0f, 0f);
@@ -41,17 +42,27 @@ namespace OpenWorld
             var player_input = this.GetComponent<PlayerInput>();
             move = player_input.currentActionMap["Move"];
             look = player_input.currentActionMap["Look"];
+            look_trace = new InputActionTrace();
+            look_trace.SubscribeTo(look);
 
             esc = player_input.currentActionMap["Esc"];
             esc.performed += (callback) =>
             {
-                Cursor.visible = !mouse_center;
-                mouse_center = !mouse_center;
+                if (mouse_center)
+                {
+                    Cursor.visible = true;
+                    look_trace.UnsubscribeFrom(look);
+                    mouse_center = false;
+                }
+                else
+                {
+                    look_trace.SubscribeTo(look);
+                    mouse_center = true;
+                }
             };
 
             camera_rotate = GameObject.Find("CameraRotate").GetComponent<Transform>();
 
-            //Cursor.lockState = CursorLockMode.Locked;
             center_pos = new Vector2(Mathf.Round(Screen.width/2f), Mathf.Round(Screen.height/2f));
             pre_mouse_pos = center_pos;
             Mouse.current.WarpCursorPosition(center_pos);
@@ -68,18 +79,27 @@ namespace OpenWorld
             avatar_animator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(_move.x,2f)+Mathf.Pow(_move.y,2f)), 0.1f, Time.deltaTime);
             this.transform.position = new Vector3(_pos.x + _dx, _pos.y, _pos.z + _dy);
             // 視点操作
-            Quaternion camera_rot = camera_rotate.rotation;
             if (mouse_center)
             {
-                var mouse_pos = look.ReadValue<Vector2>();
-                var delta_pos = mouse_pos - pre_mouse_pos;
-                camera_rot *= Quaternion.Euler(0f, Mathf.Round(delta_pos.x/2f)/5f, 0f);
-
+                Quaternion camera_rot = camera_rotate.rotation;
+                foreach (var _look in look_trace)
+                {
+                    var mouse_pos = _look.ReadValue<Vector2>();
+                    var delta_pos = mouse_pos - pre_mouse_pos;
+                    camera_rot *= Quaternion.Euler(0f, Mathf.Round(delta_pos.x/2f)/5f, 0f);
+                    pre_mouse_pos = mouse_pos;
+                }
                 Mouse.current.WarpCursorPosition(center_pos);
-                pre_mouse_pos = center_pos;
+                Cursor.visible = false;
                 camera_rotate.rotation = camera_rot;
+                pre_mouse_pos = center_pos;
+                look_trace.Clear();
             }
-            
+        }
+
+        private void OnApplicationQuit()
+        {
+            look_trace.Dispose();
         }
 
         private bool LoadVRM(string file_path)
