@@ -10,13 +10,13 @@ namespace OpenWorld
 
         public Mesh ground_mesh;
         public int mesh_point = 128;
-        public float mesh_width = 256f;
-        static private float mesh_height = 16f;
+        public float mesh_width = 128f;
+        static private float mesh_height = 32f;
 
         public GameObject water_surface;
 
         static public float seed = 50000f;
-        static private float world_scale = 0.025f;
+        static private float world_scale = 0.01f;
 
         void Start()
         {
@@ -63,9 +63,8 @@ namespace OpenWorld
             {
                 for (int iz=0; iz<mesh_point; iz++)
                 {
-                    float _half = mesh_width / 2f;
-                    float _dx = (ix / (float)(mesh_point-1) - 0.5f) * _half + x;
-                    float _dz = (iz / (float)(mesh_point-1) - 0.5f) * _half + z;
+                    float _dx = (ix / (float)(mesh_point-1) - 0.5f) * mesh_width + x;
+                    float _dz = (iz / (float)(mesh_point-1) - 0.5f) * mesh_width + z;
                     float _y = GetGroundHeight(_dx, _dz);
                     _vertices[ix * mesh_point + iz] = new Vector3(_dx, _y, _dz);
                 }
@@ -95,6 +94,7 @@ namespace OpenWorld
             collider.sharedMesh = ground_mesh;
 
             var water = Instantiate(water_surface, new Vector3(x, 0f, z), Quaternion.identity);
+            water.transform.localScale = new Vector3(mesh_width/10f, 1f, mesh_width/10f);
             water.transform.parent = this.transform;
         }
     }

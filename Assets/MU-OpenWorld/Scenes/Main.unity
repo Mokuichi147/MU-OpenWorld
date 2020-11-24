@@ -171,7 +171,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ground_mesh: {fileID: 1453043773871479701, guid: 371e81fc1dcebf3469b289179002a055, type: 3}
   mesh_point: 128
-  mesh_width: 256
+  mesh_width: 128
   water_surface: {fileID: 3448391514385853938, guid: e873b80db5288564fbf9039966272fa0, type: 3}
 --- !u!33 &435173566
 MeshFilter:
