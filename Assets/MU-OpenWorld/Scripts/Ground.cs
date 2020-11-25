@@ -10,7 +10,7 @@ namespace OpenWorld
         public GameObject water_surface;
 
         static public int mesh_point = 128;
-        static public float mesh_width = 128f;
+        static public float mesh_width = 64f;
         static public float mesh_height = 32f;
 
         static public float seed = 50000f;
@@ -89,10 +89,8 @@ namespace OpenWorld
             var collider = this.GetComponent<MeshCollider>();
             collider.sharedMesh = mesh;
 
-            var water = Instantiate(water_surface, new Vector3(0f, 0f, 0f), Quaternion.identity);
+            var water = this.transform.GetChild(0).gameObject;
             water.transform.localScale = new Vector3(mesh_width/10f, 1f, mesh_width/10f);
-            water.transform.parent = this.transform;
-            water.transform.localPosition = new Vector3(0f, 0f, 0f);
         }
     }
 }
