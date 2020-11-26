@@ -14,7 +14,7 @@ namespace OpenWorld
         static public float mesh_height = 32f;
 
         static public float seed = 50000f;
-        static public float scale = 0.01f;
+        static public float scale = 0.004f;
 
         static public float GetHeight(float x, float z)
         {
@@ -22,11 +22,11 @@ namespace OpenWorld
             float _z = (z + seed) * scale;
             float _y = Mathf.PerlinNoise(_x, _z);
             // 0～1 s(水面下),m,l(山)の閾値
-            float l = 0.6f;
-            float s = 0.3f;
+            float l = 0.55f;
+            float s = 0.40f;
             // リスケール後の最大値
-            float l_m = 0.7f;
-            float m_m = 0.1f;
+            float l_m = 1.5f;
+            float m_m = 0.2f;
             float s_m = 0.3f;
 
             if (_y > l)
@@ -37,7 +37,7 @@ namespace OpenWorld
                 _y = _y / s * s_m;
             
             // 海面が0になるようにする
-            _y -= (s_m - 0.05f);
+            _y -= (s_m - 0.001f);
             return _y * mesh_height;
         }
         
