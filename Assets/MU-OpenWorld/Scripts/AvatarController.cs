@@ -4,10 +4,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 using UnityEditor.Animations;
+using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
 #elif UNITY_STANDALONE_WIN
-using System.IO;
 using System.Windows.Forms;
 #endif
 using VRM;
@@ -105,9 +105,20 @@ namespace OpenWorld
             look_trace.Dispose();
         }
 
+        private GameObject LoadFromPath(string file_path)
+        {
+            var bytes = File.ReadAllBytes(file_path);
+            var context = new VRMImporterContext();
+            context.ParseGlb(bytes);
+            var meta = context.ReadMeta(false);
+            context.Load();
+            context.ShowMeshes();
+            return context.Root;
+        }
+
         private bool LoadVRM(string file_path)
         {
-            avatar = VRM.VRMImporter.LoadFromPath(file_path);
+            avatar = LoadFromPath(file_path);
             if (avatar == null) return false;
 
             avatar.transform.parent = this.transform;
