@@ -25,8 +25,8 @@ namespace OpenWorld
             float l = 0.55f;
             float s = 0.40f;
             // リスケール後の最大値
-            float l_m = 1.5f;
-            float m_m = 0.2f;
+            float l_m = 1.3f;
+            float m_m = 0.15f;
             float s_m = 0.3f;
 
             if (_y > l)
