@@ -104,7 +104,7 @@ namespace OpenWorld
                 {
                     ""name"": """",
                     ""id"": ""722f1624-dd6d-424d-b9a3-677e17831595"",
-                    ""path"": ""<Mouse>/position"",
+                    ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

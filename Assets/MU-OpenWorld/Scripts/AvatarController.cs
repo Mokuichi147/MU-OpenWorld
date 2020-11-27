@@ -19,6 +19,8 @@ namespace OpenWorld
         public Avatar player_avatar;
         public AnimatorController player_animator;
 
+        public float look_sensitivity = 50f;
+
         private string avatar_filepath;
         private GameObject avatar;
         private Animator avatar_animator;
@@ -31,7 +33,6 @@ namespace OpenWorld
         InputAction esc;
         Rigidbody player_rb;
         private bool mouse_center = true;
-        private Vector2 pre_mouse_pos = new Vector2(0f, 0f);
         private Vector2 center_pos;
 
         void Start()
@@ -65,7 +66,6 @@ namespace OpenWorld
             player_rb = this.GetComponent<Rigidbody>();
 
             center_pos = new Vector2(Mathf.Round(Screen.width/2f), Mathf.Round(Screen.height/2f));
-            pre_mouse_pos = center_pos;
             Mouse.current.WarpCursorPosition(center_pos);
             Cursor.visible = false;
         }
@@ -78,15 +78,12 @@ namespace OpenWorld
                 Quaternion camera_rot = camera_rotate.rotation;
                 foreach (var _look in look_trace)
                 {
-                    var mouse_pos = _look.ReadValue<Vector2>();
-                    var delta_pos = mouse_pos - pre_mouse_pos;
-                    camera_rot *= Quaternion.Euler(0f, Mathf.Round(delta_pos.x/2f)/5f, 0f);
-                    pre_mouse_pos = mouse_pos;
+                    var delta_pos = _look.ReadValue<Vector2>();
+                    camera_rot *= Quaternion.Euler(0f, delta_pos.x/(100f-look_sensitivity)*2f, 0f);
                 }
                 Mouse.current.WarpCursorPosition(center_pos);
                 Cursor.visible = false;
                 camera_rotate.rotation = camera_rot;
-                pre_mouse_pos = center_pos;
                 look_trace.Clear();
             }
             var _pos = player_rb.position;
