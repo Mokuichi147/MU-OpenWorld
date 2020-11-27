@@ -79,15 +79,21 @@ namespace OpenWorld
                 foreach (var _look in look_trace)
                 {
                     var delta_pos = _look.ReadValue<Vector2>();
-                    camera_rot *= Quaternion.Euler(0f, delta_pos.x/(100f-look_sensitivity)*2f, 0f);
+                    camera_rot *= Quaternion.Euler(0f, delta_pos.x/(120f-look_sensitivity)*2f, 0f);
                 }
                 Mouse.current.WarpCursorPosition(center_pos);
                 Cursor.visible = false;
                 camera_rotate.rotation = camera_rot;
                 look_trace.Clear();
             }
-            var _pos = player_rb.position;
+
             var _move = move.ReadValue<Vector2>();
+            if (_move.x == 0f && _move.y == 0f)
+            {
+                avatar_animator.SetFloat("speed", 0f, 0.1f, Time.deltaTime);
+                return;
+            }
+            var _pos = player_rb.position;
             // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
             var _dx = _move.x * (5f / 50f);
             var _dy = _move.y * (5f / 50f);
