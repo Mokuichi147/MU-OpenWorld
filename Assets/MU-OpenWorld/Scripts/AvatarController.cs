@@ -16,28 +16,30 @@ namespace OpenWorld
 {
     public class AvatarController : MonoBehaviour
     {
+        // アニメーション関連
         public Avatar player_avatar;
         public AnimatorController player_animator;
 
         public float look_sensitivity = 50f;
+        public string filepath = "Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm";
 
-        private string avatar_filepath;
+        private Rigidbody rb;
         private GameObject avatar;
         private Animator avatar_animator;
-
+        private Transform avater_rotate;
         private Transform camera_rotate;
 
-        InputAction move;
-        InputAction look;
-        InputActionTrace look_trace;
-        InputAction esc;
-        Rigidbody player_rb;
+        private InputAction move;
+        private InputAction look;
+        private InputActionTrace look_trace;
+        private InputAction esc;
         private bool mouse_center = true;
         private Vector2 center_pos;
+        static float delta_time = 0.02f;
+        private float time_scale = 10f;
 
         void Start()
         {
-            avatar_filepath = "Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm";
             LoadAvatar();
 
             var player_input = this.GetComponent<PlayerInput>();
@@ -62,8 +64,8 @@ namespace OpenWorld
                 }
             };
 
-            camera_rotate = this.transform;
-            player_rb = this.GetComponent<Rigidbody>();
+            camera_rotate = GameObject.Find("CameraRotate").GetComponent<Transform>();
+            rb = this.GetComponent<Rigidbody>();
 
             center_pos = new Vector2(Mathf.Round(Screen.width/2f), Mathf.Round(Screen.height/2f));
             Mouse.current.WarpCursorPosition(center_pos);
@@ -90,17 +92,19 @@ namespace OpenWorld
             var _move = move.ReadValue<Vector2>();
             if (_move.x == 0f && _move.y == 0f)
             {
-                avatar_animator.SetFloat("speed", 0f, 0.1f, Time.deltaTime);
+                avatar_animator.SetFloat("speed", 0f, 0.1f, delta_time);
                 return;
             }
-            var _pos = player_rb.position;
+            var _pos = rb.position;
+            avatar_animator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(_move.x,2f)+Mathf.Pow(_move.y,2f)), 0.1f, delta_time);
             // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
             var _dx = _move.x * (5f / 50f);
             var _dy = _move.y * (5f / 50f);
-            avatar_animator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(_move.x,2f)+Mathf.Pow(_move.y,2f)), 0.1f, Time.deltaTime);
             var move_vec = new Vector3(_dx, 0f, _dy);
-            move_vec = this.transform.rotation * move_vec;
-            player_rb.MovePosition(new Vector3(_pos.x + move_vec.x, _pos.y, _pos.z + move_vec.z));
+            move_vec = camera_rotate.rotation * move_vec;
+            var _rot = avater_rotate.rotation;
+            avater_rotate.rotation = Quaternion.Lerp(_rot, Quaternion.LookRotation(move_vec), delta_time * time_scale);
+            rb.MovePosition(new Vector3(_pos.x + move_vec.x, _pos.y, _pos.z + move_vec.z));
         }
 
         private void OnApplicationQuit()
@@ -126,6 +130,7 @@ namespace OpenWorld
 
             avatar.transform.parent = this.transform;
             avatar.transform.localPosition = new Vector3(0f, 0f, 0f);
+            avater_rotate = avatar.GetComponent<Transform>();
             // 地面の高さに合わせる
             var _pos = this.transform.position;
             _pos.y = Ground.GetHeight(_pos.x, _pos.z) + 1f;
@@ -139,11 +144,11 @@ namespace OpenWorld
 
         private void LoadAvatar()
         {
-            if (LoadVRM(avatar_filepath)) return;
+            if (LoadVRM(filepath)) return;
 
     #if UNITY_EDITOR
             var _filepath = EditorUtility.OpenFilePanel("vrmファイル(.vrm)", "", "vrm");
-            avatar_filepath = _filepath.ToString().Replace('\\', '/');
+            filepath = _filepath.ToString().Replace('\\', '/');
     #elif UNITY_STANDALONE_WIN
             OpenFileDialog open_file_dialog = new OpenFileDialog();
             open_file_dialog.Filter = "vrmファイル(.vrm)|*.vrm";
@@ -151,9 +156,9 @@ namespace OpenWorld
             if (open_file_dialog.ShowDialog() == DialogResult.Cancel) return;
 
             var _filepath = Path.GetFullPath(open_file_dialog.FileName);
-            avatar_filepath = _filepath.ToString().Replace('\\', '/');
+            filepath = _filepath.ToString().Replace('\\', '/');
     #endif
-            if (LoadVRM(avatar_filepath)) return;
+            if (LoadVRM(filepath)) return;
         }
     }
 }
