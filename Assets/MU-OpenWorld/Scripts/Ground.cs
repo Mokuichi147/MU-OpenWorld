@@ -9,8 +9,8 @@ namespace OpenWorld
         public Mesh mesh;
         public GameObject water_surface;
 
-        static public int mesh_point = 128;
-        static public float mesh_width = 128f;
+        static public int mesh_point = 16;
+        static public float mesh_width = 64f;
         static public float mesh_height = 32f;
 
         static public float seed = 50000f;
@@ -45,6 +45,12 @@ namespace OpenWorld
         {
             var pos = this.transform.position;
             Create(pos.x, pos.z);
+        }
+
+        void OnDestroy()
+        {
+            mesh.Clear();
+            Destroy(water_surface);
         }
 
         private void Create(float x, float z)
@@ -89,8 +95,8 @@ namespace OpenWorld
             var collider = this.GetComponent<MeshCollider>();
             collider.sharedMesh = mesh;
 
-            var water = this.transform.GetChild(0).gameObject;
-            water.transform.localScale = new Vector3(mesh_width/10f, 1f, mesh_width/10f);
+            water_surface = this.transform.GetChild(0).gameObject;
+            water_surface.transform.localScale = new Vector3(mesh_width/10f, 1f, mesh_width/10f);
         }
     }
 }
