@@ -57,8 +57,7 @@ namespace OpenWorld
             {
                 var z_diff = z - world_distance;
                 var _pos = new Vector3(Ground.mesh_width*x_diff+reference_pos.x, 0f, Ground.mesh_width*z_diff+reference_pos.z);
-                grounds[z] = Instantiate(ground, _pos, Quaternion.identity);
-                grounds[z].transform.parent = this.transform;
+                grounds[z] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
             }
         }
 
@@ -76,8 +75,7 @@ namespace OpenWorld
             {
                 var z_diff = z - _x - world_distance;
                 var _pos = new Vector3(Ground.mesh_width*x_diff+reference_pos.x, 0f, Ground.mesh_width*z_diff+reference_pos.z);
-                grounds[z] = Instantiate(ground, _pos, Quaternion.identity);
-                grounds[z].transform.parent = this.transform;
+                grounds[z] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
             }
         }
 
@@ -95,8 +93,7 @@ namespace OpenWorld
             {
                 var x_diff = x - world_distance;
                 var _pos = new Vector3(Ground.mesh_width*x_diff+reference_pos.x, 0f, Ground.mesh_width*z_diff+reference_pos.z);
-                grounds[x*world_size] = Instantiate(ground, _pos, Quaternion.identity);
-                grounds[x*world_size].transform.parent = this.transform;
+                grounds[x*world_size] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
             }
         }
 
@@ -114,8 +111,7 @@ namespace OpenWorld
             {
                 var x_diff = x - world_distance;
                 var _pos = new Vector3(Ground.mesh_width*x_diff+reference_pos.x, 0f, Ground.mesh_width*z_diff+reference_pos.z);
-                grounds[x*world_size+world_size-1] = Instantiate(ground, _pos, Quaternion.identity);
-                grounds[x*world_size+world_size-1].transform.parent = this.transform;
+                grounds[x*world_size+world_size-1] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
             }
         }
 
@@ -129,8 +125,7 @@ namespace OpenWorld
                 {
                     var z_diff = z - world_distance;
                     var _pos = new Vector3(Ground.mesh_width*x_diff+reference_pos.x, 0f, Ground.mesh_width*z_diff+reference_pos.z);
-                    grounds[_x+z] = Instantiate(ground, _pos, Quaternion.identity);
-                    grounds[_x+z].transform.parent = this.transform;
+                    grounds[_x+z] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
                 }
             }
         }
