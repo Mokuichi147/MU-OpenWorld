@@ -49,7 +49,7 @@ namespace OpenWorld
 
         void OnDestroy()
         {
-            mesh.Clear();
+            Destroy(mesh);
             Destroy(water_surface);
         }
 
