@@ -157,7 +157,7 @@
 #ifdef _MAIN_LIGHT_SHADOWS
                 output.shadowCoord = GetShadowCoord(vertexInput);
 #endif
-                output.positionCS = input.positionOS;//vertexInput.positionOS;
+                output.positionCS = input.positionOS;
                 return output;
             }
 
@@ -195,11 +195,13 @@
                 float4 p3 = float4(_Width* 1, height*2, 0.0f, 0.0f);
                 float4 p4 = float4(     0.0f, height*3, 0.0f, 0.0f);
 
+                float sx = ((_SinTime.w + 1.0f) * 0.5f - 0.5f) * 5.0f;
+
                 stream.Append(geom_stream(input[0], cp + width_n4 * _Width * -3, cn));
                 stream.Append(geom_stream(input[0], cp + width_n4 * _Width * 3, cn));
-                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * -2 + height_n4 * _Height, cn));
-                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * 2 + height_n4 * _Height * 2, cn));
-                stream.Append(geom_stream(input[0], cp + width_n4 * _Width + height_n4 * _Height * 3, cn));
+                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * (1+sx) * -1 + height_n4 * _Height, cn));
+                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * (1-sx) * 2 + height_n4 * _Height * 2, cn));
+                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * -3*sx + height_n4 * _Height * 3, cn));
                 //stream.RestartStrip();
             }
 
