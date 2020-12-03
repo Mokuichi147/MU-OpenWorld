@@ -5,7 +5,7 @@
         _TopColor ("TopColor", Color) = (0,1,0,1)
         [MainColor] _BaseColor ("Color", Color) = (0,0.3,0,1)
         _Height ("Height", Range(0,1)) = 0.3
-        _Width ("Width", Range(0,1)) = 0.03
+        _Width ("Width", Range(0,0.1)) = 0.03
 
         // Specular vs Metallic workflow
         [HideInInspector] _WorkflowMode("WorkflowMode", Float) = 1.0
@@ -53,7 +53,7 @@
     SubShader
     {
         Tags { "RenderType"="Opaque" "RenderPipeline"="UniversalRenderPipeline" }
-        LOD 300
+        LOD 200
         Pass
         {
             Name "Grass"
@@ -160,6 +160,12 @@
                 return output;
             }
 
+            inline float random(float2 uv, float2 seed)
+            {
+                float2 map = uv + seed;
+                return frac(sin(dot(uv, float2(12.9898,78.233))) * 43758.5453);
+            }
+
             inline Varyings geom_stream(Varyings v, float4 positionCS, half3 normalWS)
             {
                 Varyings output = v;
@@ -169,35 +175,27 @@
             }
             
             // 3(三角面の頂点数) * 3(三角面の数) * 1(草の数)
-            [maxvertexcount(9)]
+            [maxvertexcount(5)]
             void geom(triangle Varyings input[3], inout TriangleStream<Varyings> stream)
             {
                 float4 center_p = (input[0].positionCS + input[1].positionCS + input[2].positionCS) / 3.0f;
                 half3  center_n = (input[0].normalWS + input[1].normalWS + input[2].normalWS) / 3.0f;
 
+                float height = max(_Height * random(input[0].uv, float2(0.0f, 1.0f)), 0.2f);
+                float dx = random(input[0].uv, float2(3.0f, 5.0f)) * 0.1f;
+                float dz = random(input[0].uv, float2(7.0f, 11.0f)) * 0.1f;
 
-                float4 p0 = float4(_Width *  3, 0.0f,         0.0f, 0.0f);
-                float4 p1 = float4(_Width * -3, 0.0f,         0.0f, 0.0f);
-                float4 p2 = float4(_Width *  2, _Height * -1, 0.0f, 0.0f);
-                float4 p3 = float4(_Width * -1, _Height * -2, 0.0f, 0.0f);
-                float4 p4 = float4(0.0f,        _Height * -3, 0.0f, 0.0f);
+                float4 p0 = float4(_Width*-3+dx,     0.0f, dz, 0.0f);
+                float4 p1 = float4(_Width* 3+dx,     0.0f, dz, 0.0f);
+                float4 p2 = float4(_Width*-2+dx, height  , dz, 0.0f);
+                float4 p3 = float4(_Width* 1+dx, height*2, dz, 0.0f);
+                float4 p4 = float4(          dx, height*3, dz, 0.0f);
 
-                float4 c0 = _BottomColor;
-                float4 c1 = lerp(_BottomColor, _TopColor, 0.3);
-                float4 c2 = lerp(_BottomColor, _TopColor, 0.6);
-                float4 c3 = _TopColor;
-
-                stream.Append(geom_stream(input[0], center_p + p1, center_n));
-                stream.Append(geom_stream(input[0], center_p + p2, center_n));
-                stream.Append(geom_stream(input[0], center_p + p0, center_n));
-
-                stream.Append(geom_stream(input[0], center_p + p1, center_n));
-                stream.Append(geom_stream(input[0], center_p + p2, center_n));
-                stream.Append(geom_stream(input[0], center_p + p3, center_n));
-
-                stream.Append(geom_stream(input[0], center_p + p2, center_n));
-                stream.Append(geom_stream(input[0], center_p + p4, center_n));
-                stream.Append(geom_stream(input[0], center_p + p3, center_n));
+                stream.Append(geom_stream(input[0], center_p - p0, center_n));
+                stream.Append(geom_stream(input[0], center_p - p1, center_n));
+                stream.Append(geom_stream(input[0], center_p - p2, center_n));
+                stream.Append(geom_stream(input[0], center_p - p3, center_n));
+                stream.Append(geom_stream(input[0], center_p - p4, center_n));
                 //stream.RestartStrip();
             }
 
