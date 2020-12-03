@@ -3,9 +3,52 @@
     Properties
     {
         _TopColor ("TopColor", Color) = (0,1,0,1)
-        _BottomColor ("BottomColor", Color) = (0,0.3,0,1)
+        [MainColor] _BaseColor ("Color", Color) = (0,0.3,0,1)
         _Height ("Height", Range(0,1)) = 0.3
-        _Width ("Width", Range(0,1)) = 0.1
+        _Width ("Width", Range(0,1)) = 0.03
+
+        // Specular vs Metallic workflow
+        [HideInInspector] _WorkflowMode("WorkflowMode", Float) = 1.0
+
+        [MainTexture] _BaseMap("Albedo", 2D) = "white" {}
+
+        _Cutoff("Alpha Cutoff", Range(0.0, 1.0)) = 0.5
+
+        _Smoothness("Smoothness", Range(0.0, 1.0)) = 0.5
+        _GlossMapScale("Smoothness Scale", Range(0.0, 1.0)) = 1.0
+        _SmoothnessTextureChannel("Smoothness texture channel", Float) = 0
+
+        [Gamma] _Metallic("Metallic", Range(0.0, 1.0)) = 0.0
+        _MetallicGlossMap("Metallic", 2D) = "white" {}
+
+        _SpecColor("Specular", Color) = (0.2, 0.2, 0.2)
+        _SpecGlossMap("Specular", 2D) = "white" {}
+
+        [ToggleOff] _SpecularHighlights("Specular Highlights", Float) = 1.0
+        [ToggleOff] _EnvironmentReflections("Environment Reflections", Float) = 1.0
+
+        _BumpScale("Scale", Float) = 1.0
+        _BumpMap("Normal Map", 2D) = "bump" {}
+
+        _OcclusionStrength("Strength", Range(0.0, 1.0)) = 1.0
+        _OcclusionMap("Occlusion", 2D) = "white" {}
+
+        _EmissionColor("Color", Color) = (0,0,0)
+        _EmissionMap("Emission", 2D) = "white" {}
+
+        // Blending state
+        [HideInInspector] _Surface("__surface", Float) = 0.0
+        [HideInInspector] _Blend("__blend", Float) = 0.0
+        [HideInInspector] _AlphaClip("__clip", Float) = 0.0
+        [HideInInspector] _SrcBlend("__src", Float) = 1.0
+        [HideInInspector] _DstBlend("__dst", Float) = 0.0
+        [HideInInspector] _ZWrite("__zw", Float) = 1.0
+        [HideInInspector] _Cull("__cull", Float) = 2.0
+
+        _ReceiveShadows("Receive Shadows", Float) = 1.0
+
+        // Editmode props
+        [HideInInspector] _QueueOffset("Queue offset", Float) = 0.0
     }
     SubShader
     {
@@ -74,15 +117,15 @@
                 float4 positionWSAndFogFactor : TEXCOORD2;
                 half3  normalWS               : TEXCOORD3;
 #if _NORMALMAP
-                half3 tangentWS                 : TEXCOORD4;
-                half3 bitangentWS               : TEXCOORD5;
+                half3 tangentWS               : TEXCOORD4;
+                half3 bitangentWS             : TEXCOORD5;
 #endif
 
 #ifdef _MAIN_LIGHT_SHADOWS
                 // compute shadow coord per-vertex for the main light
-                float4 shadowCoord              : TEXCOORD6;
+                float4 shadowCoord            : TEXCOORD6;
 #endif
-                float4 positionCS               : SV_POSITION;
+                float4 positionCS             : SV_POSITION;
             };
 
 
@@ -117,58 +160,96 @@
                 return output;
             }
 
-            inline Varyings cp2stream(Varyings v, float4 vertex, float4 color)
+            inline Varyings geom_stream(Varyings v, float4 positionCS, half3 normalWS)
             {
-                Varyings p = v;
-                p.positionCS = float4(vertex.xyz, 1.0f);
-                return p;
+                Varyings output = v;
+                output.positionCS = positionCS;
+                output.normalWS = normalWS;
+                return output;
             }
             
             // 3(三角面の頂点数) * 3(三角面の数) * 1(草の数)
-            [maxvertexcount(3)]
-            void geom (triangle Varyings input[3], inout TriangleStream<Varyings> stream)
+            [maxvertexcount(9)]
+            void geom(triangle Varyings input[3], inout TriangleStream<Varyings> stream)
             {
-                /*
-                float3 input_p0 = input[0].positionCS.xyz;
-                float3 input_p1 = input[1].positionCS.xyz;
-                float3 input_p2 = input[2].positionCS.xyz;
+                float4 center_p = (input[0].positionCS + input[1].positionCS + input[2].positionCS) / 3.0f;
+                half3  center_n = (input[0].normalWS + input[1].normalWS + input[2].normalWS) / 3.0f;
 
-                float3 center_p = (input_p0 + input_p1 + input_p2) / 3;
 
-                float4 p0 = float4(center_p.x, center_p.y, center_p.z - _Width * 3, 1.0f);
-                float4 p1 = float4(center_p.x, center_p.y, center_p.z + _Width * 3, 1.0f);
-                float4 p2 = float4(center_p.x, center_p.y + _Height, center_p.z - _Width * 2, 1.0f);
-                float4 p3 = float4(center_p.x, center_p.y + _Height * 2, center_p.z + _Width, 1.0f);
-                float4 p4 = float4(center_p.x, center_p.y + _Height * 3, center_p.z, 1.0f);
+                float4 p0 = float4(_Width *  3, 0.0f,         0.0f, 0.0f);
+                float4 p1 = float4(_Width * -3, 0.0f,         0.0f, 0.0f);
+                float4 p2 = float4(_Width *  2, _Height * -1, 0.0f, 0.0f);
+                float4 p3 = float4(_Width * -1, _Height * -2, 0.0f, 0.0f);
+                float4 p4 = float4(0.0f,        _Height * -3, 0.0f, 0.0f);
 
                 float4 c0 = _BottomColor;
                 float4 c1 = lerp(_BottomColor, _TopColor, 0.3);
                 float4 c2 = lerp(_BottomColor, _TopColor, 0.6);
                 float4 c3 = _TopColor;
 
-                stream.Append(cp2stream(input[0], c0, p0));
-                stream.Append(cp2stream(input[0], c1, p2));
-                stream.Append(cp2stream(input[0], c0, p1));
-                stream.RestartStrip();
-                stream.Append(cp2stream(input[0], c0, p1));
-                stream.Append(cp2stream(input[0], c1, p2));
-                stream.Append(cp2stream(input[0], c2, p3));
-                stream.RestartStrip();
-                stream.Append(cp2stream(input[0], c1, p2));
-                stream.Append(cp2stream(input[0], c3, p4));
-                stream.Append(cp2stream(input[0], c2, p3));
-                stream.RestartStrip();
-                */
-                stream.Append(input[0]);
-                stream.Append(input[1]);
-                stream.Append(input[2]);
+                stream.Append(geom_stream(input[0], center_p + p1, center_n));
+                stream.Append(geom_stream(input[0], center_p + p2, center_n));
+                stream.Append(geom_stream(input[0], center_p + p0, center_n));
+
+                stream.Append(geom_stream(input[0], center_p + p1, center_n));
+                stream.Append(geom_stream(input[0], center_p + p2, center_n));
+                stream.Append(geom_stream(input[0], center_p + p3, center_n));
+
+                stream.Append(geom_stream(input[0], center_p + p2, center_n));
+                stream.Append(geom_stream(input[0], center_p + p4, center_n));
+                stream.Append(geom_stream(input[0], center_p + p3, center_n));
                 //stream.RestartStrip();
             }
 
-            float4 frag (Varyings input) : SV_Target
+            half4 frag(Varyings input) : SV_Target
             {
-                float4 output = _TopColor;
-                return output;
+                SurfaceData surfaceData;
+                InitializeStandardLitSurfaceData(input.uv, surfaceData);
+
+#if _NORMALMAP
+                half3 normalWS = TransformTangentToWorld(surfaceData.normalTS,
+                    half3x3(input.tangentWS, input.bitangentWS, input.normalWS));
+#else
+                half3 normalWS = input.normalWS;
+#endif
+                normalWS = normalize(normalWS);
+
+#ifdef LIGHTMAP_ON
+                half3 bakedGI = SampleLightmap(input.uvLM, normalWS);
+#else
+                half3 bakedGI = SampleSH(normalWS);
+#endif
+
+                float3 positionWS = input.positionWSAndFogFactor.xyz;
+                half3 viewDirectionWS = SafeNormalize(GetCameraPositionWS() - positionWS);
+
+                BRDFData brdfData;
+                InitializeBRDFData(surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.alpha, brdfData);
+
+#ifdef _MAIN_LIGHT_SHADOWS
+                Light mainLight = GetMainLight(input.shadowCoord);
+#else
+                Light mainLight = GetMainLight();
+#endif
+                half3 color = GlobalIllumination(brdfData, bakedGI, surfaceData.occlusion, normalWS, viewDirectionWS);
+
+                color += LightingPhysicallyBased(brdfData, mainLight, normalWS, viewDirectionWS);
+
+#ifdef _ADDITIONAL_LIGHTS
+                int additionalLightsCount = GetAdditionalLightsCount();
+                for (int i = 0; i < additionalLightsCount; ++i)
+                {
+                    Light light = GetAdditionalLight(i, positionWS);
+
+                    color += LightingPhysicallyBased(brdfData, light, normalWS, viewDirectionWS);
+                }
+#endif
+                color += surfaceData.emission;
+
+                float fogFactor = input.positionWSAndFogFactor.w;
+
+                color = MixFog(color, fogFactor);
+                return half4(color, surfaceData.alpha);
             }
             ENDHLSL
         }
