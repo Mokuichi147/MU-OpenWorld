@@ -54,6 +54,7 @@
     {
         Tags { "RenderType"="Opaque" "RenderPipeline"="UniversalRenderPipeline" }
         LOD 200
+        Cull off
         Pass
         {
             Name "Grass"
@@ -156,7 +157,7 @@
 #ifdef _MAIN_LIGHT_SHADOWS
                 output.shadowCoord = GetShadowCoord(vertexInput);
 #endif
-                output.positionCS = vertexInput.positionCS;
+                output.positionCS = input.positionOS;//vertexInput.positionOS;
                 return output;
             }
 
@@ -166,10 +167,13 @@
                 return frac(sin(dot(uv, float2(12.9898,78.233))) * 43758.5453);
             }
 
-            inline Varyings geom_stream(Varyings v, float4 positionCS, half3 normalWS)
+            Varyings geom_stream(Varyings v, float4 positionOS, half3 normalWS)
             {
                 Varyings output = v;
-                output.positionCS = positionCS;
+                VertexPositionInputs vertexInput = GetVertexPositionInputs(positionOS.xyz);
+                float dx = random(v.uv, float2(3.0f, 5.0f)) * 0.12f;
+                float dz = random(v.uv, float2(7.0f, 11.0f)) * 0.12f;
+                output.positionCS = vertexInput.positionCS + float4(dx, 0.0f, dz, 0.0f);
                 output.normalWS = normalWS;
                 return output;
             }
@@ -178,24 +182,24 @@
             [maxvertexcount(5)]
             void geom(triangle Varyings input[3], inout TriangleStream<Varyings> stream)
             {
-                float4 center_p = (input[0].positionCS + input[1].positionCS + input[2].positionCS) / 3.0f;
-                half3  center_n = (input[0].normalWS + input[1].normalWS + input[2].normalWS) / 3.0f;
+                float4 cp = (input[0].positionCS + input[1].positionCS + input[2].positionCS) / 3.0f;
+                half3  cn = (input[0].normalWS + input[1].normalWS + input[2].normalWS) / 3.0f;
+                float4 height_n4 = float4(cn, 1.0f);
+                float4 width_n4 = float4(normalize(input[2].positionCS*random(input[0].uv,float2(13.0f,17.0f)) - input[0].positionCS*random(input[0].uv,float2(23.0f,31.0f))).xyz, 1.0f);
 
-                float height = max(_Height * random(input[0].uv, float2(0.0f, 1.0f)), 0.2f);
-                float dx = random(input[0].uv, float2(3.0f, 5.0f)) * 0.1f;
-                float dz = random(input[0].uv, float2(7.0f, 11.0f)) * 0.1f;
+                float height = max(_Height * random(input[0].uv, float2(0.0f, 1.0f)), 0.01f) * 5.0f;
 
-                float4 p0 = float4(_Width*-3+dx,     0.0f, dz, 0.0f);
-                float4 p1 = float4(_Width* 3+dx,     0.0f, dz, 0.0f);
-                float4 p2 = float4(_Width*-2+dx, height  , dz, 0.0f);
-                float4 p3 = float4(_Width* 1+dx, height*2, dz, 0.0f);
-                float4 p4 = float4(          dx, height*3, dz, 0.0f);
+                float4 p0 = float4(_Width*-3,     0.0f, 0.0f, 0.0f);
+                float4 p1 = float4(_Width* 3,     0.0f, 0.0f, 0.0f);
+                float4 p2 = float4(_Width*-2,   height, 0.0f, 0.0f);
+                float4 p3 = float4(_Width* 1, height*2, 0.0f, 0.0f);
+                float4 p4 = float4(     0.0f, height*3, 0.0f, 0.0f);
 
-                stream.Append(geom_stream(input[0], center_p - p0, center_n));
-                stream.Append(geom_stream(input[0], center_p - p1, center_n));
-                stream.Append(geom_stream(input[0], center_p - p2, center_n));
-                stream.Append(geom_stream(input[0], center_p - p3, center_n));
-                stream.Append(geom_stream(input[0], center_p - p4, center_n));
+                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * -3, cn));
+                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * 3, cn));
+                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * -2 + height_n4 * _Height, cn));
+                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * 2 + height_n4 * _Height * 2, cn));
+                stream.Append(geom_stream(input[0], cp + width_n4 * _Width + height_n4 * _Height * 3, cn));
                 //stream.RestartStrip();
             }
 
