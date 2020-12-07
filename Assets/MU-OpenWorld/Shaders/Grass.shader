@@ -5,7 +5,7 @@
         _TopColor ("TopColor", Color) = (0,1,0,1)
         [MainColor] _BaseColor ("Color", Color) = (0,0.3,0,1)
         _Height ("Height", Range(0,1)) = 0.3
-        _Width ("Width", Range(0,0.1)) = 0.03
+        _Width ("Width", Range(0,0.5)) = 0.03
 
         // Specular vs Metallic workflow
         [HideInInspector] _WorkflowMode("WorkflowMode", Float) = 1.0
@@ -126,6 +126,7 @@
                 // compute shadow coord per-vertex for the main light
                 float4 shadowCoord            : TEXCOORD6;
 #endif
+                float3 positionWS             : TEXCOORD7;
                 float4 positionCS             : SV_POSITION;
             };
 
@@ -157,7 +158,8 @@
 #ifdef _MAIN_LIGHT_SHADOWS
                 output.shadowCoord = GetShadowCoord(vertexInput);
 #endif
-                output.positionCS = input.positionOS;
+                output.positionWS = vertexInput.positionWS;
+                output.positionCS = vertexInput.positionCS;
                 return output;
             }
 
@@ -167,42 +169,66 @@
                 return frac(sin(dot(uv, float2(12.9898,78.233))) * 43758.5453);
             }
 
-            Varyings geom_stream(Varyings v, float4 positionOS, half3 normalWS)
+            inline float pmrandom(float2 uv, float2 seed)
+            {
+                // -1.0f ～ 1.0f
+                return (random(uv, seed) - 0.5f) * 2.0f;
+            }
+
+            inline float3 dir_random(float2 uv)
+            {
+                float3 vec1 = float3(random(uv,float2(0,10)), 0, pmrandom(uv,float2(10,11)));
+                return normalize(vec1);
+            }
+
+            Varyings geom_stream(Varyings v, float3 pos)
             {
                 Varyings output = v;
-                VertexPositionInputs vertexInput = GetVertexPositionInputs(positionOS.xyz);
-                float dx = random(v.uv, float2(3.0f, 5.0f)) * 0.12f;
-                float dz = random(v.uv, float2(7.0f, 11.0f)) * 0.12f;
-                output.positionCS = vertexInput.positionCS + float4(dx, 0.0f, dz, 0.0f);
-                output.normalWS = normalWS;
+                output.positionWS = pos;
+                output.positionCS = TransformWorldToHClip(pos);
                 return output;
             }
             
             // 3(三角面の頂点数) * 3(三角面の数) * 1(草の数)
-            [maxvertexcount(5)]
+            [maxvertexcount(5*3*2)]
             void geom(triangle Varyings input[3], inout TriangleStream<Varyings> stream)
             {
-                float4 cp = (input[0].positionCS + input[1].positionCS + input[2].positionCS) / 3.0f;
+                float3 cp = (input[0].positionWS + input[1].positionWS + input[2].positionWS) / 3.0f;
+                float3 ccp[3];
+                ccp[0] = (input[0].positionWS + input[1].positionWS) / 2.0f;
+                ccp[1] = (input[1].positionWS + input[2].positionWS) / 2.0f;
+                ccp[2] = (input[0].positionWS + input[2].positionWS) / 2.0f;
                 half3  cn = (input[0].normalWS + input[1].normalWS + input[2].normalWS) / 3.0f;
-                float4 height_n4 = float4(cn, 1.0f);
-                float4 width_n4 = float4(normalize(input[2].positionCS*random(input[0].uv,float2(13.0f,17.0f)) - input[0].positionCS*random(input[0].uv,float2(23.0f,31.0f))).xyz, 1.0f);
-
-                float height = max(_Height * random(input[0].uv, float2(0.0f, 1.0f)), 0.01f) * 5.0f;
-
-                float4 p0 = float4(_Width*-3,     0.0f, 0.0f, 0.0f);
-                float4 p1 = float4(_Width* 3,     0.0f, 0.0f, 0.0f);
-                float4 p2 = float4(_Width*-2,   height, 0.0f, 0.0f);
-                float4 p3 = float4(_Width* 1, height*2, 0.0f, 0.0f);
-                float4 p4 = float4(     0.0f, height*3, 0.0f, 0.0f);
+                half3 height_n3 = cn;
 
                 float sx = ((_SinTime.w + 1.0f) * 0.5f - 0.5f) * 5.0f;
 
-                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * -3, cn));
-                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * 3, cn));
-                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * (1+sx) * -1 + height_n4 * _Height, cn));
-                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * (1-sx) * 2 + height_n4 * _Height * 2, cn));
-                stream.Append(geom_stream(input[0], cp + width_n4 * _Width * -3*sx + height_n4 * _Height * 3, cn));
-                //stream.RestartStrip();
+                [unroll]
+                for (int i=0; i<3; i++)
+                {
+                    float3 width_n3 = dir_random(cp.xy);
+                    float height = _Height + 0.02 * pmrandom(cp.xy, float2(0,0));
+                    float3 p = lerp(cp, input[i].positionWS, 0.5 + 0.2*pmrandom(cp.xy, float2(0,0)));
+                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * -3));
+                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * 3));
+                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * (1+sx) * -1 + height_n3 * height));
+                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * (1-sx) * 2 + height_n3 * height * 2));
+                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * -3*sx + height_n3 * height * 3));
+                    stream.RestartStrip();
+                }
+                [unroll]
+                for (int i=0; i<3; i++)
+                {
+                    float3 width_n3 = dir_random(cp.xy);
+                    float height = _Height + 0.02 * pmrandom(cp.xy, float2(0,0));
+                    float3 p = lerp(cp, ccp[i/3], 0.5 + 0.2*pmrandom(cp.xy, float2(0,0)));
+                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * -3));
+                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * 3));
+                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * (1+sx) * -1 + height_n3 * height));
+                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * (1-sx) * 2 + height_n3 * height * 2));
+                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * -3*sx + height_n3 * height * 3));
+                    stream.RestartStrip();
+                }
             }
 
             half4 frag(Varyings input) : SV_Target
