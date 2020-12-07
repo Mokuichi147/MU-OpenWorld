@@ -58,6 +58,8 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _GrowHeight: 5
+    - _GrowRange: 4
     - _Height: 0.202
     - _Metallic: 0
     - _OcclusionStrength: 1

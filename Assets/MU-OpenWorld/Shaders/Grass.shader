@@ -6,6 +6,8 @@
         [MainColor] _BaseColor ("Color", Color) = (0,0.3,0,1)
         _Height ("Height", Range(0,1)) = 0.3
         _Width ("Width", Range(0,0.5)) = 0.03
+        _GrowHeight ("GrowHeight", Float) = 0.0
+        _GrowRange ("GrowRange", Float) = 1.0
 
         // Specular vs Metallic workflow
         [HideInInspector] _WorkflowMode("WorkflowMode", Float) = 1.0
@@ -132,7 +134,7 @@
 
 
             float4 _TopColor, _BottomColor;
-            float _Height, _Width;
+            float _Height, _Width, _GrowHeight, _GrowRange;
 
             Varyings vert(Attributes input)
             {
@@ -203,8 +205,10 @@
 
                 float sx = ((_SinTime.w + 1.0f) * 0.5f - 0.5f) * 5.0f;
 
+                float grow = _GrowHeight + _GrowRange * pmrandom(cp.xy, float2(0,0));
+
                 [unroll]
-                for (int i=0; i<3; i++)
+                for (int i=0; (i<3 && cp.y > grow); i++)
                 {
                     float3 width_n3 = dir_random(cp.xy);
                     float height = _Height + 0.02 * pmrandom(cp.xy, float2(0,0));
@@ -217,10 +221,10 @@
                     stream.RestartStrip();
                 }
                 [unroll]
-                for (int i=0; i<3; i++)
+                for (int i=0; (i<3 && cp.y > grow); i++)
                 {
                     float3 width_n3 = dir_random(cp.xy);
-                    float height = _Height + 0.02 * pmrandom(cp.xy, float2(0,0));
+                    float height = _Height + 0.05 * pmrandom(cp.xy, float2(0,0));
                     float3 p = lerp(cp, ccp[i/3], 0.5 + 0.2*pmrandom(cp.xy, float2(0,0)));
                     stream.Append(geom_stream(input[i], p + width_n3 * _Width * -3));
                     stream.Append(geom_stream(input[i], p + width_n3 * _Width * 3));
