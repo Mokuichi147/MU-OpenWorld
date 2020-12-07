@@ -41,9 +41,10 @@ namespace OpenWorld
             return _y * mesh_height;
         }
         
-        void Start()
+        void Awake()
         {
             var pos = this.transform.position;
+            this.name = $"Ground_{pos.x}_{pos.z}";
             Create(pos.x, pos.z);
         }
 
@@ -56,6 +57,7 @@ namespace OpenWorld
         private void Create(float x, float z)
         {
             mesh = new Mesh();
+            mesh.name = $"GroundMesh_{x}_{z}";
             mesh.Clear();
 
             var _vertices = new Vector3[mesh_point * mesh_point];
@@ -96,6 +98,7 @@ namespace OpenWorld
             collider.sharedMesh = mesh;
 
             water_surface = this.transform.GetChild(0).gameObject;
+            water_surface.name = $"WaterSurface_{x}_{z}";
             water_surface.transform.localScale = new Vector3(mesh_width/10f, 1f, mesh_width/10f);
         }
     }
