@@ -171,6 +171,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ground: {fileID: 9140462846861877879, guid: 78baffc2eec83844b9bf4ee783c49fcb, type: 3}
   grounds: []
+  grass: {fileID: 2100000, guid: 1d2152a8bdf062a4dad8cb6781bd3fde, type: 2}
+  grasses: []
 --- !u!33 &435173566
 MeshFilter:
   m_ObjectHideFlags: 0
