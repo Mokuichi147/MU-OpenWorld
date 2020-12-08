@@ -16,6 +16,8 @@ namespace OpenWorld
         static public float seed = 50000f;
         static public float scale = 0.004f;
 
+        static int[] _triangles = null;
+
         static public float GetHeight(float x, float z)
         {
             float _x = (x + seed) * scale;
@@ -61,7 +63,6 @@ namespace OpenWorld
             mesh.Clear();
 
             var _vertices = new Vector3[mesh_point * mesh_point];
-            var _triangles = new int[(mesh_point - 1) * (mesh_point - 1) * 2 * 3];
 
             for (int ix=0; ix<mesh_point; ix++)
             {
@@ -73,21 +74,26 @@ namespace OpenWorld
                     _vertices[ix * mesh_point + iz] = new Vector3(_dx, _y, _dz);
                 }
             }
-            for (int ix=0; ix<mesh_point-1; ix++)
+            if (_triangles == null)
             {
-                for (int iz=0; iz<mesh_point-1; iz++)
+                _triangles = new int[(mesh_point - 1) * (mesh_point - 1) * 2 * 3];
+                for (int ix=0; ix<mesh_point-1; ix++)
                 {
-                    var _x  = mesh_point * ix;
-                    var _nx = mesh_point * (ix + 1);
-                    var _i = 6 * ((mesh_point-1) * ix + iz);
-                    _triangles[_i]   = _x  + iz;
-                    _triangles[_i+1] = _x  + iz + 1;
-                    _triangles[_i+2] = _nx + iz;
-                    _triangles[_i+3] = _nx + iz;
-                    _triangles[_i+4] = _x  + iz + 1;
-                    _triangles[_i+5] = _nx + iz + 1;
+                    for (int iz=0; iz<mesh_point-1; iz++)
+                    {
+                        var _x  = mesh_point * ix;
+                        var _nx = mesh_point * (ix + 1);
+                        var _i = 6 * ((mesh_point-1) * ix + iz);
+                        _triangles[_i]   = _x  + iz;
+                        _triangles[_i+1] = _x  + iz + 1;
+                        _triangles[_i+2] = _nx + iz;
+                        _triangles[_i+3] = _nx + iz;
+                        _triangles[_i+4] = _x  + iz + 1;
+                        _triangles[_i+5] = _nx + iz + 1;
+                    }
                 }
             }
+            
             mesh.vertices = _vertices;
             mesh.triangles = _triangles;
 
