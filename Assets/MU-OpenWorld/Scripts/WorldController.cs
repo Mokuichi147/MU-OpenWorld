@@ -158,7 +158,6 @@ namespace OpenWorld
                     Debug.Log("grass shift error!");
                     return;
             }
-            Debug.Log(world_point);
             grasses[grass_point] = grounds[world_point].GetComponent<MeshRenderer>();
             SetGrassMaterial(grass_point);
         }
