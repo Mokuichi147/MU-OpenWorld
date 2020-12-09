@@ -71,8 +71,8 @@ Material:
     - _ZWrite: 1
     - _depth: 0.7
     - _displacement: 0.1
-    - _normal_strength: 0.661
-    - _shmoothness: 1
+    - _normal_strength: 0.545
+    - _shmoothness: 0.95
     - _strength: 0.46
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
