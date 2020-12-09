@@ -9,8 +9,8 @@ namespace OpenWorld
         public Mesh mesh;
         public GameObject water_surface;
 
-        static public int mesh_point = 128;
-        static public float mesh_width = 64f;
+        static public int mesh_point = 64;
+        static public float mesh_width = 32f;
         static public float mesh_height = 32f;
 
         static public float seed = 50000f;

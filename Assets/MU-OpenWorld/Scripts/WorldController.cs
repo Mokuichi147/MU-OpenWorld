@@ -22,10 +22,10 @@ namespace OpenWorld
 
     public class WorldController : MonoBehaviour
     {
-        private int world_distance = 5;
+        private int world_distance = 10;
         private int world_size;
 
-        private int grass_distance = 2;
+        private int grass_distance = 4;
         private int grass_size;
 
         private GameObject player;
