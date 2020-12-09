@@ -28,6 +28,9 @@ namespace OpenWorld
         private int grass_distance = 4;
         private int grass_size;
 
+        private int collider_distance = 1;
+        private int collider_size;
+
         private GameObject player;
         private Vector3 player_pos;
 
@@ -36,6 +39,7 @@ namespace OpenWorld
         public GameObject[] grounds;
         public Material grass;
         public MeshRenderer[] grasses;
+        public MeshCollider[] colliders;
 
         private List<WorldShift> world_shift;
 
@@ -44,8 +48,10 @@ namespace OpenWorld
         {
             world_size = world_distance * 2 + 1;
             grass_size = grass_distance * 2 + 1;
+            collider_size = collider_distance * 2 + 1;
             grounds = new GameObject[world_size * world_size];
             grasses = new MeshRenderer[grass_size * grass_size];
+            colliders = new MeshCollider[collider_size * collider_size];
 
             world_shift = new List<WorldShift>();
         }
@@ -105,7 +111,6 @@ namespace OpenWorld
                         }
                     }
                 }
-                
                 world_shift.AddRange(world_shift_temp);
             }
 
@@ -132,6 +137,52 @@ namespace OpenWorld
             grasses[index].sharedMaterials = _materials;
         }
 
+        private void ColiderShift(Axis axis, int world_index)
+        {
+            if (Mathf.Abs(world_index - world_distance) > collider_distance)
+                return;
+            
+            int world_point, collider_point;
+            int collider_index = world_index - world_distance + collider_distance;
+            int collider_diff = world_distance - collider_distance;
+
+            switch (axis)
+            {
+                case Axis.Xplus:
+                    colliders[collider_index].enabled = false;
+                    for (int x=1; x<collider_size; x++)
+                        System.Array.Copy(colliders, collider_index+x*collider_size, colliders, collider_index+(x-1)*collider_size, 1);
+                    collider_point = (collider_size-1) * collider_size + collider_index;
+                    world_point = (collider_diff+collider_size-1)*world_size + collider_diff + collider_index;
+                    break;
+                case Axis.Xminus:
+                    colliders[(collider_size-1)*collider_size+collider_index].enabled = false;
+                    for (int x=collider_size-1; x>0; x--)
+                        System.Array.Copy(colliders, collider_index+(x-1)*collider_size, colliders, collider_index+x*collider_size, 1);
+                    collider_point = collider_index;
+                    world_point = collider_diff*world_size + collider_diff + collider_index;
+                    break;
+                case Axis.Zplus:
+                    colliders[collider_index*collider_size].enabled = false;
+                    System.Array.Copy(colliders, collider_index*collider_size+1, colliders, collider_index*collider_size, collider_size-1);
+                    collider_point = (collider_index+1) * collider_size - 1;
+                    world_point = collider_diff*world_size + 2*collider_diff*collider_index + collider_diff + collider_point;
+                    break;
+                case Axis.Zminus:
+                    colliders[(collider_index+1)*collider_size-1].enabled = false;
+                    System.Array.Copy(colliders, collider_index*collider_size, colliders, collider_index*collider_size+1, collider_size-1);
+                    collider_point = collider_index * collider_size;
+                    world_point = collider_diff*world_size + 2*collider_diff*collider_index + collider_diff + collider_point;
+                    break;
+                default:
+                    Debug.Log("grass shift error!");
+                    return;
+
+            }
+            colliders[collider_point] = grounds[world_point].GetComponent<MeshCollider>();
+            colliders[collider_point].enabled = true;
+        }
+
         private void GrassShift(Axis axis, int world_index)
         {
             if (Mathf.Abs(world_index - world_distance) > grass_distance)
@@ -139,7 +190,7 @@ namespace OpenWorld
             
             int world_point, grass_point;
             int grass_index = world_index - world_distance + grass_distance;
-            int world_diff = world_distance - grass_distance;
+            int grass_diff = world_distance - grass_distance;
             
             switch (axis)
             {
@@ -148,26 +199,26 @@ namespace OpenWorld
                     for (int x=1; x<grass_size; x++)
                         System.Array.Copy(grasses, grass_index+x*grass_size, grasses, grass_index+(x-1)*grass_size, 1);
                     grass_point = (grass_size-1) * grass_size + grass_index;
-                    world_point = (world_diff+grass_size-1)*world_size + world_diff + grass_index;
+                    world_point = (grass_diff+grass_size-1)*world_size + grass_diff + grass_index;
                     break;
                 case Axis.Xminus:
                     SetNoneMaterial((grass_size-1)*grass_size+grass_index);
                     for (int x=grass_size-1; x>0; x--)
                         System.Array.Copy(grasses, grass_index+(x-1)*grass_size, grasses, grass_index+x*grass_size, 1);
                     grass_point = grass_index;
-                    world_point = world_diff*world_size + world_diff + grass_index;
+                    world_point = grass_diff*world_size + grass_diff + grass_index;
                     break;
                 case Axis.Zplus:
                     SetNoneMaterial(grass_index*grass_size);
                     System.Array.Copy(grasses, grass_index*grass_size+1, grasses, grass_index*grass_size, grass_size-1);
                     grass_point = (grass_index+1) * grass_size - 1;
-                    world_point = world_diff*world_size + 2*world_diff*grass_index + world_diff + grass_point;
+                    world_point = grass_diff*world_size + 2*grass_diff*grass_index + grass_diff + grass_point;
                     break;
                 case Axis.Zminus:
                     SetNoneMaterial((grass_index+1)*grass_size-1);
                     System.Array.Copy(grasses, grass_index*grass_size, grasses, grass_index*grass_size+1, grass_size-1);
                     grass_point = grass_index * grass_size;
-                    world_point = world_diff*world_size + 2*world_diff*grass_index + world_diff + grass_point;
+                    world_point = grass_diff*world_size + 2*grass_diff*grass_index + grass_diff + grass_point;
                     break;
                 default:
                     Debug.Log("grass shift error!");
@@ -217,6 +268,7 @@ namespace OpenWorld
             }
             grounds[create_index] = Instantiate(ground, add_diff_pos, Quaternion.identity, this.transform);
             GrassShift(axis, index);
+            ColiderShift(axis, index);
         }
 
         private void GenerateWorld()
@@ -238,6 +290,14 @@ namespace OpenWorld
                         var grass_z = z_diff + grass_distance;
                         grasses[grass_x*grass_size + grass_z] = grounds[_x+z].GetComponent<MeshRenderer>();
                         SetGrassMaterial(grass_x*grass_size + grass_z);
+                    }
+                    // メッシュコライダー切替用
+                    if (Mathf.Abs(x_diff) <= collider_distance && Mathf.Abs(z_diff) <= collider_distance)
+                    {
+                        var collider_x = x_diff + collider_distance;
+                        var collider_z = z_diff + collider_distance;
+                        colliders[collider_x*collider_size + collider_z] = grounds[_x+z].GetComponent<MeshCollider>();
+                        colliders[collider_x*collider_size + collider_z].enabled = true;
                     }
                 }
             }
