@@ -56,6 +56,22 @@ namespace OpenWorld
             Destroy(water_surface);
         }
 
+        private Vector3[] MeshPoint(float x, float z, int count, float width)
+        {
+            Vector3[] _mesh_vertices = new Vector3[count * count];
+            for (int ix=0; ix<count; ix++)
+            {
+                for (int iz=0; iz<count; iz++)
+                {
+                    float _dx = (ix / (float)(count-1) - 0.5f) * width;
+                    float _dz = (iz / (float)(count-1) - 0.5f) * width;
+                    float _y = GetHeight(_dx + x, _dz + z);
+                    _mesh_vertices[ix * count + iz] = new Vector3(_dx, _y, _dz);
+                }
+            }
+            return _mesh_vertices;
+        }
+
         private void Create(float x, float z)
         {
             mesh = new Mesh();
@@ -64,16 +80,8 @@ namespace OpenWorld
 
             var _vertices = new Vector3[mesh_point * mesh_point];
 
-            for (int ix=0; ix<mesh_point; ix++)
-            {
-                for (int iz=0; iz<mesh_point; iz++)
-                {
-                    float _dx = (ix / (float)(mesh_point-1) - 0.5f) * mesh_width;
-                    float _dz = (iz / (float)(mesh_point-1) - 0.5f) * mesh_width;
-                    float _y = GetHeight(_dx + x, _dz + z);
-                    _vertices[ix * mesh_point + iz] = new Vector3(_dx, _y, _dz);
-                }
-            }
+            _vertices = MeshPoint(x, z, mesh_point, mesh_width);
+
             if (_triangles == null)
             {
                 _triangles = new int[(mesh_point - 1) * (mesh_point - 1) * 2 * 3];
