@@ -6,11 +6,11 @@ namespace OpenWorld
 {
     enum Axis
     {
-        None,
-        Xplus,
-        Xminus,
-        Zplus,
-        Zminus
+        None   =  0,
+        Xplus  =  1,
+        Xminus = -1,
+        Zplus  =  2,
+        Zminus = -2
     }
 
     struct WorldShift
@@ -86,12 +86,27 @@ namespace OpenWorld
 
             if (axis != Axis.None)    
             {
-                world_shift.Add(new WorldShift() {reference_pos=reference_pos, axis=axis, index=world_distance});
+                var world_shift_temp = new List<WorldShift>();
+                world_shift_temp.Add(new WorldShift() {reference_pos=reference_pos, axis=axis, index=world_distance});
                 for (int i=1; i<=world_distance; i++)
                 {
-                    world_shift.Add(new WorldShift() {reference_pos=reference_pos, axis=axis, index=world_distance+i});
-                    world_shift.Add(new WorldShift() {reference_pos=reference_pos, axis=axis, index=world_distance-i});
+                    world_shift_temp.Add(new WorldShift() {reference_pos=reference_pos, axis=axis, index=world_distance+i});
+                    world_shift_temp.Add(new WorldShift() {reference_pos=reference_pos, axis=axis, index=world_distance-i});
                 }
+                var max_count = world_shift.Count;
+                if (max_count != 0)
+                {
+                    if ((int)world_shift[max_count-1].axis == -1 * (int)axis && world_shift[max_count-1].index == 0)
+                    {
+                        for (int i=1; i<=System.Math.Min(world_size, max_count); i++)
+                        {
+                            world_shift.RemoveAt(max_count - i);
+                            world_shift_temp.RemoveAt(world_size - i);
+                        }
+                    }
+                }
+                
+                world_shift.AddRange(world_shift_temp);
             }
 
             if (world_shift.Count == 0)
