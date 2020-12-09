@@ -4,6 +4,22 @@ using UnityEngine;
 
 namespace OpenWorld
 {
+    enum Axis
+    {
+        None,
+        Xplus,
+        Xminus,
+        Zplus,
+        Zminus
+    }
+
+    struct WorldShift
+    {
+        public Vector3 reference_pos;
+        public Axis axis;
+        public int index;
+    }
+
     public class WorldController : MonoBehaviour
     {
         private int world_distance = 5;
@@ -21,12 +37,17 @@ namespace OpenWorld
         public Material grass;
         public MeshRenderer[] grasses;
 
+        private List<WorldShift> world_shift;
+
+
         void Awake()
         {
             world_size = world_distance * 2 + 1;
             grass_size = grass_distance * 2 + 1;
             grounds = new GameObject[world_size * world_size];
             grasses = new MeshRenderer[grass_size * grass_size];
+
+            world_shift = new List<WorldShift>();
         }
 
         void Start()
@@ -41,14 +62,45 @@ namespace OpenWorld
         void FixedUpdate()
         {
             player_pos = player.transform.position;
-            if (player_pos.x < reference_pos.x - Ground.mesh_width / 2f)
-                GroundShiftX_Minus();
-            else if (player_pos.x > reference_pos.x + Ground.mesh_width / 2f)
-                GroundShiftX_Plus();
-            else if (player_pos.z < reference_pos.z - Ground.mesh_width / 2f)
-                GroundShiftZ_Minus();
+            Axis axis = Axis.None;
+            if (player_pos.x > reference_pos.x + Ground.mesh_width / 2f)
+            {
+                axis = Axis.Xplus;
+                reference_pos.x += Ground.mesh_width;
+            }
+            else if (player_pos.x < reference_pos.x - Ground.mesh_width / 2f)
+            {
+                axis = Axis.Xminus;
+                reference_pos.x -= Ground.mesh_width;
+            }
             else if (player_pos.z > reference_pos.z + Ground.mesh_width / 2f)
-                GroundShiftZ_Plus();
+            {
+                axis = Axis.Zplus;
+                reference_pos.z += Ground.mesh_width;
+            }
+            else if (player_pos.z < reference_pos.z - Ground.mesh_width / 2f)
+            {
+                axis = Axis.Zminus;
+                reference_pos.z -= Ground.mesh_width;
+            }
+
+            if (axis != Axis.None)    
+            {
+                world_shift.Add(new WorldShift() {reference_pos=reference_pos, axis=axis, index=world_distance});
+                for (int i=1; i<=world_distance; i++)
+                {
+                    world_shift.Add(new WorldShift() {reference_pos=reference_pos, axis=axis, index=world_distance+i});
+                    world_shift.Add(new WorldShift() {reference_pos=reference_pos, axis=axis, index=world_distance-i});
+                }
+            }
+
+            if (world_shift.Count == 0)
+                return;
+
+            var shift_data = world_shift[0];
+            world_shift.RemoveAt(0);
+
+            GroundShift(shift_data.reference_pos, shift_data.axis, shift_data.index);
         }
 
         private void SetNoneMaterial(int index)
@@ -65,127 +117,92 @@ namespace OpenWorld
             grasses[index].sharedMaterials = _materials;
         }
 
-        private void GroundShiftX_Minus()
+        private void GrassShift(Axis axis, int world_index)
         {
-            reference_pos.x -= Ground.mesh_width;
-            for (int z=(world_size-1)*world_size; z<world_size*world_size; z++)
-                Destroy(grounds[z]);
+            if (Mathf.Abs(world_index - world_distance) > grass_distance)
+                return;
             
-            for (int z=(grass_size-1)*grass_size; z<grass_size*grass_size; z++)
-                SetNoneMaterial(z);
-
-            System.Array.Copy(grounds, 0, grounds, world_size, (world_size-1)*world_size);
-            System.Array.Copy(grasses, 0, grasses, grass_size, (grass_size-1)*grass_size);
-
-            var x_diff = -world_distance;
-            for (int z=0; z<world_size; z++)
+            int world_point, grass_point;
+            int grass_index = world_index - world_distance + grass_distance;
+            int world_diff = world_distance - grass_distance;
+            
+            switch (axis)
             {
-                var z_diff = z - world_distance;
-                var _pos = new Vector3(Ground.mesh_width*x_diff+reference_pos.x, 0f, Ground.mesh_width*z_diff+reference_pos.z);
-                grounds[z] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
+                case Axis.Xplus:
+                    SetNoneMaterial(grass_index);
+                    for (int x=1; x<grass_size; x++)
+                        System.Array.Copy(grasses, grass_index+x*grass_size, grasses, grass_index+(x-1)*grass_size, 1);
+                    grass_point = (grass_size-1) * grass_size + grass_index;
+                    world_point = (world_diff+grass_size-1)*world_size + world_diff + grass_index;
+                    break;
+                case Axis.Xminus:
+                    SetNoneMaterial((grass_size-1)*grass_size+grass_index);
+                    for (int x=grass_size-1; x>0; x--)
+                        System.Array.Copy(grasses, grass_index+(x-1)*grass_size, grasses, grass_index+x*grass_size, 1);
+                    grass_point = grass_index;
+                    world_point = world_diff*world_size + world_diff + grass_index;
+                    break;
+                case Axis.Zplus:
+                    SetNoneMaterial(grass_index*grass_size);
+                    System.Array.Copy(grasses, grass_index*grass_size+1, grasses, grass_index*grass_size, grass_size-1);
+                    grass_point = (grass_index+1) * grass_size - 1;
+                    world_point = world_diff*world_size + 2*world_diff*grass_index + world_diff + grass_point;
+                    break;
+                case Axis.Zminus:
+                    SetNoneMaterial((grass_index+1)*grass_size-1);
+                    System.Array.Copy(grasses, grass_index*grass_size, grasses, grass_index*grass_size+1, grass_size-1);
+                    grass_point = grass_index * grass_size;
+                    world_point = world_diff*world_size + 2*world_diff*grass_index + world_diff + grass_point;
+                    break;
+                default:
+                    Debug.Log("grass shift error!");
+                    return;
             }
-
-            var grass_x_diff = world_distance - grass_distance;
-            for (int z=0; z<grass_size; z++)
-            {
-                var grass_z_diff = z - grass_distance;
-                grasses[z] = grounds[grass_x_diff*world_size + grass_x_diff + z].GetComponent<MeshRenderer>();
-                SetGrassMaterial(z);
-            }
+            Debug.Log(world_point);
+            grasses[grass_point] = grounds[world_point].GetComponent<MeshRenderer>();
+            SetGrassMaterial(grass_point);
         }
 
-        private void GroundShiftX_Plus()
+        private void GroundShift(Vector3 r_pos, Axis axis, int index)
         {
-            reference_pos.x += Ground.mesh_width;
-            for (int z=0; z<world_size; z++)
-                Destroy(grounds[z]);
-            
-            for (int z=0; z<grass_size; z++)
-                SetNoneMaterial(z);
+            Vector3 add_diff_pos;
+            int create_index;
+            float index_diff = index - world_distance;
 
-            System.Array.Copy(grounds, world_size, grounds, 0, (world_size-1)*world_size);
-            System.Array.Copy(grasses, grass_size, grasses, 0, (grass_size-1)*grass_size);
-
-            var _x = (world_size-1) * world_size;
-            var x_diff = world_distance;
-            for (int z=_x; z<world_size*world_size; z++)
+            switch (axis)
             {
-                var z_diff = z - _x - world_distance;
-                var _pos = new Vector3(Ground.mesh_width*x_diff+reference_pos.x, 0f, Ground.mesh_width*z_diff+reference_pos.z);
-                grounds[z] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
+                case Axis.Xplus:
+                    Destroy(grounds[index]);
+                    for (int x=1; x<world_size; x++)
+                        System.Array.Copy(grounds, index+x*world_size, grounds, index+(x-1)*world_size, 1);
+                    add_diff_pos = new Vector3((float)world_distance, 0f, index_diff) * Ground.mesh_width + r_pos;
+                    create_index = (world_size - 1) * world_size + index;
+                    break;
+                case Axis.Xminus:
+                    Destroy(grounds[(world_size-1)*world_size+index]);
+                    for (int x=world_size-1; x>0; x--)
+                        System.Array.Copy(grounds, index+(x-1)*world_size, grounds, index+x*world_size, 1);
+                    add_diff_pos = new Vector3((float)(-1*world_distance), 0f, index_diff) * Ground.mesh_width + r_pos;
+                    create_index = index;
+                    break;
+                case Axis.Zplus:
+                    Destroy(grounds[index*world_size]);
+                    System.Array.Copy(grounds, index*world_size+1, grounds, index*world_size, world_size-1);
+                    add_diff_pos = new Vector3(index_diff, 0f, (float)world_distance) * Ground.mesh_width + r_pos;
+                    create_index = (index + 1) * world_size - 1;
+                    break;
+                case Axis.Zminus:
+                    Destroy(grounds[(index+1)*world_size-1]);
+                    System.Array.Copy(grounds, index*world_size, grounds, index*world_size+1, world_size-1);
+                    add_diff_pos = new Vector3(index_diff, 0f, (float)(-1*world_distance)) * Ground.mesh_width + r_pos;
+                    create_index = index * world_size;
+                    break;
+                default:
+                    Debug.Log("ground shift error!");
+                    return;
             }
-
-            var grass_x_diff = (world_distance - grass_distance) + grass_size;
-            var _grass_x = (grass_x_diff-1)*world_size + (world_distance-grass_distance);
-            for (int z=(grass_size-1)*grass_size; z<grass_size*grass_size; z++)
-            {
-                var z_diff = z - (grass_size-1)*grass_size;
-                grasses[z] = grounds[_grass_x + z_diff].GetComponent<MeshRenderer>();
-                SetGrassMaterial(z);
-            }
-        }
-
-        private void GroundShiftZ_Minus()
-        {
-            reference_pos.z -= Ground.mesh_width;
-            for (int x=0; x<world_size; x++)
-                Destroy(grounds[x*world_size + world_size-1]);
-            
-            for (int z=0; z<grass_size; z++)
-                SetNoneMaterial(z*grass_size + grass_size-1);
-
-            for (int x=0; x<world_size; x++)
-                System.Array.Copy(grounds, x*world_size, grounds, x*world_size+1, world_size-1);
-            
-            for (int x=0; x<grass_size; x++)
-                System.Array.Copy(grasses, x*grass_size, grasses, x*grass_size+1, grass_size-1);
-
-            var z_diff = -world_distance;
-            for (int x=0; x<world_size; x++)
-            {
-                var x_diff = x - world_distance;
-                var _pos = new Vector3(Ground.mesh_width*x_diff+reference_pos.x, 0f, Ground.mesh_width*z_diff+reference_pos.z);
-                grounds[x*world_size] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
-            }
-
-            var grass_x_diff = (world_distance-grass_distance);
-            var grass_z_diff = (world_distance-grass_distance);
-            for (int x=0; x<grass_size; x++)
-            {
-                grasses[x*grass_size] = grounds[(grass_x_diff+x)*world_size + grass_z_diff].GetComponent<MeshRenderer>();
-                SetGrassMaterial(x*grass_size);
-            }
-        }
-
-        private void GroundShiftZ_Plus()
-        {
-            reference_pos.z += Ground.mesh_width;
-            for (int x=0; x<world_size; x++)
-                Destroy(grounds[x*world_size]);
-
-            for (int x=0; x<grass_size; x++)
-                SetNoneMaterial(x*grass_size);
-
-            for (int x=0; x<world_size; x++)
-                System.Array.Copy(grounds, x*world_size+1, grounds, x*world_size, world_size-1);
-            for (int x=0; x<grass_size; x++)
-                System.Array.Copy(grasses, x*grass_size+1, grasses, x*grass_size, grass_size-1);
-
-            var z_diff = world_distance;
-            for (int x=0; x<world_size; x++)
-            {
-                var x_diff = x - world_distance;
-                var _pos = new Vector3(Ground.mesh_width*x_diff+reference_pos.x, 0f, Ground.mesh_width*z_diff+reference_pos.z);
-                grounds[x*world_size+world_size-1] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
-            }
-
-            var grass_x_diff = (world_distance-grass_distance);
-            var grass_z_diff = (world_distance-grass_distance) + (grass_size-1);
-            for (int x=0; x<grass_size; x++)
-            {
-                grasses[x*grass_size+grass_size-1] = grounds[(grass_x_diff+x)*world_size + grass_z_diff].GetComponent<MeshRenderer>();
-                SetGrassMaterial(x*grass_size+grass_size-1);
-            }
+            grounds[create_index] = Instantiate(ground, add_diff_pos, Quaternion.identity, this.transform);
+            GrassShift(axis, index);
         }
 
         private void GenerateWorld()
