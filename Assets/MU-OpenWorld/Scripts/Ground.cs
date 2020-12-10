@@ -9,8 +9,12 @@ namespace OpenWorld
         public Mesh mesh;
         public GameObject water_surface;
 
-        static public int mesh_point = 64;
-        static public float mesh_width = 32f;
+        static public int mesh_zpoint = 65;
+        static public float mesh_zwidth = 32f;
+        static private float triangle_scale = mesh_zwidth / (mesh_zpoint - 1);
+        static Vector3 triangle_diff = new Vector3(Mathf.Sqrt(3) / 2f * triangle_scale, 0f, triangle_scale);
+        static private int mesh_xpoint = (int)Mathf.Round(mesh_zwidth / triangle_diff.x) + 1;
+        static public float mesh_xwidth = triangle_diff.x * (mesh_xpoint - 1);
         static public float mesh_height = 32f;
 
         static public float seed = 50000f;
@@ -56,17 +60,18 @@ namespace OpenWorld
             Destroy(water_surface);
         }
 
-        private Vector3[] MeshPoint(float x, float z, int count, float width)
+        private Vector3[] MeshPoint(float x, float z)
         {
-            Vector3[] _mesh_vertices = new Vector3[count * count];
-            for (int ix=0; ix<count; ix++)
+            Vector3[] _mesh_vertices = new Vector3[mesh_xpoint * mesh_zpoint];
+
+            for (int ix=0; ix<mesh_xpoint; ix++)
             {
-                for (int iz=0; iz<count; iz++)
+                float _dx = mesh_xwidth/-2f + ix*triangle_diff.x;
+                for (int iz=0; iz<mesh_zpoint; iz++)
                 {
-                    float _dx = (ix / (float)(count-1) - 0.5f) * width;
-                    float _dz = (iz / (float)(count-1) - 0.5f) * width;
+                    float _dz = mesh_zwidth/-2f + iz*triangle_diff.z + ix%2 * (triangle_diff.z/2f);
                     float _y = GetHeight(_dx + x, _dz + z);
-                    _mesh_vertices[ix * count + iz] = new Vector3(_dx, _y, _dz);
+                    _mesh_vertices[ix * mesh_zpoint + iz] = new Vector3(_dx, _y, _dz);
                 }
             }
             return _mesh_vertices;
@@ -78,26 +83,38 @@ namespace OpenWorld
             mesh.name = $"GroundMesh_{x}_{z}";
             mesh.Clear();
 
-            var _vertices = new Vector3[mesh_point * mesh_point];
+            var _vertices = new Vector3[mesh_xpoint * mesh_zpoint];
 
-            _vertices = MeshPoint(x, z, mesh_point, mesh_width);
+            _vertices = MeshPoint(x, z);
 
             if (_triangles == null)
             {
-                _triangles = new int[(mesh_point - 1) * (mesh_point - 1) * 2 * 3];
-                for (int ix=0; ix<mesh_point-1; ix++)
+                _triangles = new int[(mesh_xpoint - 1) * (mesh_zpoint - 1) * 2 * 3];
+                for (int ix=0; ix<mesh_xpoint-1; ix++)
                 {
-                    for (int iz=0; iz<mesh_point-1; iz++)
+                    for (int iz=0; iz<mesh_zpoint-1; iz++)
                     {
-                        var _x  = mesh_point * ix;
-                        var _nx = mesh_point * (ix + 1);
-                        var _i = 6 * ((mesh_point-1) * ix + iz);
-                        _triangles[_i]   = _x  + iz;
-                        _triangles[_i+1] = _x  + iz + 1;
-                        _triangles[_i+2] = _nx + iz;
-                        _triangles[_i+3] = _nx + iz;
-                        _triangles[_i+4] = _x  + iz + 1;
-                        _triangles[_i+5] = _nx + iz + 1;
+                        var _x  = mesh_zpoint * ix;
+                        var _nx = mesh_zpoint * (ix + 1);
+                        var _i = 6 * ((mesh_zpoint-1) * ix + iz);
+                        if (ix % 2 == 0)
+                        {
+                            _triangles[_i]   = _x  + iz;
+                            _triangles[_i+1] = _x  + iz + 1;
+                            _triangles[_i+2] = _nx + iz;
+                            _triangles[_i+3] = _nx + iz;
+                            _triangles[_i+4] = _x  + iz + 1;
+                            _triangles[_i+5] = _nx + iz + 1;
+                        }
+                        else
+                        {
+                            _triangles[_i]   = _nx  + iz;
+                            _triangles[_i+1] = _x  + iz;
+                            _triangles[_i+2] = _nx + iz + 1;
+                            _triangles[_i+3] = _x + iz;
+                            _triangles[_i+4] = _x  + iz + 1;
+                            _triangles[_i+5] = _nx + iz + 1;
+                        }
                     }
                 }
             }
@@ -113,7 +130,7 @@ namespace OpenWorld
 
             water_surface = this.transform.GetChild(0).gameObject;
             water_surface.name = $"WaterSurface_{x}_{z}";
-            water_surface.transform.localScale = new Vector3(mesh_width/10f, 1f, mesh_width/10f);
+            water_surface.transform.localScale = new Vector3(mesh_xwidth/10f, 1f, mesh_zwidth/10f);
         }
     }
 }

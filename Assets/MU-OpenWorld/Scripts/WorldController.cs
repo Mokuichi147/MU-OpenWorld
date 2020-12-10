@@ -69,25 +69,25 @@ namespace OpenWorld
         {
             player_pos = player.transform.position;
             Axis axis = Axis.None;
-            if (player_pos.x > reference_pos.x + Ground.mesh_width / 2f)
+            if (player_pos.x > reference_pos.x + Ground.mesh_xwidth / 2f)
             {
                 axis = Axis.Xplus;
-                reference_pos.x += Ground.mesh_width;
+                reference_pos.x += Ground.mesh_xwidth;
             }
-            else if (player_pos.x < reference_pos.x - Ground.mesh_width / 2f)
+            else if (player_pos.x < reference_pos.x - Ground.mesh_xwidth / 2f)
             {
                 axis = Axis.Xminus;
-                reference_pos.x -= Ground.mesh_width;
+                reference_pos.x -= Ground.mesh_xwidth;
             }
-            else if (player_pos.z > reference_pos.z + Ground.mesh_width / 2f)
+            else if (player_pos.z > reference_pos.z + Ground.mesh_zwidth / 2f)
             {
                 axis = Axis.Zplus;
-                reference_pos.z += Ground.mesh_width;
+                reference_pos.z += Ground.mesh_zwidth;
             }
-            else if (player_pos.z < reference_pos.z - Ground.mesh_width / 2f)
+            else if (player_pos.z < reference_pos.z - Ground.mesh_zwidth / 2f)
             {
                 axis = Axis.Zminus;
-                reference_pos.z -= Ground.mesh_width;
+                reference_pos.z -= Ground.mesh_zwidth;
             }
 
             if (axis != Axis.None)    
@@ -240,26 +240,26 @@ namespace OpenWorld
                     Destroy(grounds[index]);
                     for (int x=1; x<world_size; x++)
                         System.Array.Copy(grounds, index+x*world_size, grounds, index+(x-1)*world_size, 1);
-                    add_diff_pos = new Vector3((float)world_distance, 0f, index_diff) * Ground.mesh_width + r_pos;
+                    add_diff_pos = new Vector3((float)world_distance * Ground.mesh_xwidth, 0f, index_diff * Ground.mesh_zwidth) + r_pos;
                     create_index = (world_size - 1) * world_size + index;
                     break;
                 case Axis.Xminus:
                     Destroy(grounds[(world_size-1)*world_size+index]);
                     for (int x=world_size-1; x>0; x--)
                         System.Array.Copy(grounds, index+(x-1)*world_size, grounds, index+x*world_size, 1);
-                    add_diff_pos = new Vector3((float)(-1*world_distance), 0f, index_diff) * Ground.mesh_width + r_pos;
+                    add_diff_pos = new Vector3((float)(-1*world_distance) * Ground.mesh_xwidth, 0f, index_diff * Ground.mesh_zwidth) + r_pos;
                     create_index = index;
                     break;
                 case Axis.Zplus:
                     Destroy(grounds[index*world_size]);
                     System.Array.Copy(grounds, index*world_size+1, grounds, index*world_size, world_size-1);
-                    add_diff_pos = new Vector3(index_diff, 0f, (float)world_distance) * Ground.mesh_width + r_pos;
+                    add_diff_pos = new Vector3(index_diff * Ground.mesh_xwidth, 0f, (float)world_distance * Ground.mesh_zwidth) + r_pos;
                     create_index = (index + 1) * world_size - 1;
                     break;
                 case Axis.Zminus:
                     Destroy(grounds[(index+1)*world_size-1]);
                     System.Array.Copy(grounds, index*world_size, grounds, index*world_size+1, world_size-1);
-                    add_diff_pos = new Vector3(index_diff, 0f, (float)(-1*world_distance)) * Ground.mesh_width + r_pos;
+                    add_diff_pos = new Vector3(index_diff * Ground.mesh_xwidth, 0f, (float)(-1*world_distance) * Ground.mesh_zwidth) + r_pos;
                     create_index = index * world_size;
                     break;
                 default:
@@ -280,7 +280,7 @@ namespace OpenWorld
                 for (int z=0; z<world_size; z++)
                 {
                     var z_diff = z - world_distance;
-                    var _pos = new Vector3(Ground.mesh_width*x_diff+reference_pos.x, 0f, Ground.mesh_width*z_diff+reference_pos.z);
+                    var _pos = new Vector3(Ground.mesh_xwidth*x_diff+reference_pos.x, 0f, Ground.mesh_zwidth*z_diff+reference_pos.z);
                     grounds[_x+z] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
 
                     // 草の表示切替用
