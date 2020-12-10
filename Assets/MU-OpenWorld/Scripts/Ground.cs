@@ -9,7 +9,7 @@ namespace OpenWorld
         public Mesh mesh;
         public GameObject water_surface;
 
-        static public int mesh_zpoint = 79;
+        static public int mesh_zpoint = 65;
         static public float mesh_zwidth = 32f;
         static private float triangle_scale = mesh_zwidth / (mesh_zpoint - 1);
         static Vector3 triangle_diff = new Vector3(Mathf.Sqrt(3) / 2f * triangle_scale, 0f, triangle_scale);

@@ -56,7 +56,8 @@
     {
         Tags { "RenderType"="Opaque" "RenderPipeline"="UniversalRenderPipeline" }
         LOD 200
-        Cull off
+        // 両面表示
+        //Cull off
         Pass
         {
             Name "Grass"
@@ -165,13 +166,12 @@
                 return output;
             }
 
-            inline float random(float2 uv, float2 seed)
+            inline float random(float2 uv, int seed)
             {
-                float2 map = uv + seed;
-                return frac(sin(dot(uv, float2(12.9898,78.233))) * 43758.5453);
+                return frac(sin(dot(uv, float2(12.9898,78.233)) + seed) * 43758.5453);
             }
 
-            inline float pmrandom(float2 uv, float2 seed)
+            inline float pmrandom(float2 uv, int seed)
             {
                 // -1.0f ～ 1.0f
                 return (random(uv, seed) - 0.5f) * 2.0f;
@@ -179,7 +179,7 @@
 
             inline float3 dir_random(float2 uv)
             {
-                float3 vec1 = float3(random(uv,float2(0,10)), 0, pmrandom(uv,float2(10,11)));
+                float3 vec1 = float3(pmrandom(uv,0), 0, pmrandom(uv,3));
                 return normalize(vec1);
             }
 
@@ -205,31 +205,31 @@
 
                 float sx = ((_SinTime.w + 1.0f) * 0.5f - 0.5f) * 2.0f;
 
-                float grow = _GrowHeight + _GrowRange * pmrandom(cp.xy, float2(0,0));
+                float grow = _GrowHeight + _GrowRange * pmrandom(cp.xy, 0);
 
                 float3 p[9];
                 uint i;
 
-                [unroll]
+                //[unroll]
                 for (i=0; i<9; i++)
                 {
-                    float _r1 = random(cp.xy, float2((i+1)*2, i));
+                    float _r1 = random(cp.xy, 2*i);
                     p[i] = lerp(input[0].positionWS, input[1].positionWS, _r1);
-                    float _r2 = random(cp.xy, float2((i+1)*3, i));
+                    float _r2 = random(cp.xy, 2*(i+1));
                     p[i] = lerp(p[i], input[2].positionWS, _r2);
                 }
 
-                [loop]
+                //[loop]
                 for (i=0; (i<9 && p[i].y > grow); i++)
                 {
-                    float3 width_n3 = dir_random(p[i].xy);
-                    float height = _Height + 0.05 * pmrandom(p[i].xy, float2(0,0));
-                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3));
-                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * 3));
-                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1+sx) * -1 + height_n3 * height));
-                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1-sx) * 2 + height_n3 * height * 2));
-                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3*sx + height_n3 * height * 3));
-                    stream.RestartStrip();
+                float3 width_n3 = dir_random(p[i].xy);
+                float height = _Height + 0.05 * pmrandom(p[i].xy, 0);
+                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3));
+                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * 3));
+                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1+sx) * -1 + height_n3 * height));
+                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1-sx) * 2 + height_n3 * height * 2));
+                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3*sx + height_n3 * height * 3));
+                stream.RestartStrip();
                 }
             }
 

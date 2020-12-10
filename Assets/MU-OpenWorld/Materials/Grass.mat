@@ -60,7 +60,7 @@ Material:
     - _GlossyReflections: 0
     - _GrowHeight: 5
     - _GrowRange: 4
-    - _Height: 0.202
+    - _Height: 0.189
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _QueueOffset: 0
@@ -70,7 +70,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
-    - _Width: 0.0232
+    - _Width: 0.029
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
