@@ -191,8 +191,8 @@
                 return output;
             }
             
-            // 3(三角面の頂点数) * 3(三角面の数) * 1(草の数)
-            [maxvertexcount(5*3*2)]
+            // (三角面の頂点数) * (草の数)
+            [maxvertexcount(5*9)]
             void geom(triangle Varyings input[3], inout TriangleStream<Varyings> stream)
             {
                 float3 cp = (input[0].positionWS + input[1].positionWS + input[2].positionWS) / 3.0f;
@@ -203,34 +203,32 @@
                 half3  cn = (input[0].normalWS + input[1].normalWS + input[2].normalWS) / 3.0f;
                 half3 height_n3 = cn;
 
-                float sx = ((_SinTime.w + 1.0f) * 0.5f - 0.5f) * 5.0f;
+                float sx = ((_SinTime.w + 1.0f) * 0.5f - 0.5f) * 2.0f;
 
                 float grow = _GrowHeight + _GrowRange * pmrandom(cp.xy, float2(0,0));
 
+                float3 p[9];
+                uint i;
+
                 [unroll]
-                for (int i=0; (i<3 && cp.y > grow); i++)
+                for (i=0; i<9; i++)
                 {
-                    float3 width_n3 = dir_random(cp.xy);
-                    float height = _Height + 0.02 * pmrandom(cp.xy, float2(0,0));
-                    float3 p = lerp(cp, input[i].positionWS, 0.5 + 0.2*pmrandom(cp.xy, float2(0,0)));
-                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * -3));
-                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * 3));
-                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * (1+sx) * -1 + height_n3 * height));
-                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * (1-sx) * 2 + height_n3 * height * 2));
-                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * -3*sx + height_n3 * height * 3));
-                    stream.RestartStrip();
+                    float _r1 = random(cp.xy, float2((i+1)*2, i));
+                    p[i] = lerp(input[0].positionWS, input[1].positionWS, _r1);
+                    float _r2 = random(cp.xy, float2((i+1)*3, i));
+                    p[i] = lerp(p[i], input[2].positionWS, _r2);
                 }
-                [unroll]
-                for (int i=0; (i<3 && cp.y > grow); i++)
+
+                [loop]
+                for (i=0; (i<9 && p[i].y > grow); i++)
                 {
-                    float3 width_n3 = dir_random(cp.xy);
-                    float height = _Height + 0.05 * pmrandom(cp.xy, float2(0,0));
-                    float3 p = lerp(cp, ccp[i/3], 0.5 + 0.2*pmrandom(cp.xy, float2(0,0)));
-                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * -3));
-                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * 3));
-                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * (1+sx) * -1 + height_n3 * height));
-                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * (1-sx) * 2 + height_n3 * height * 2));
-                    stream.Append(geom_stream(input[i], p + width_n3 * _Width * -3*sx + height_n3 * height * 3));
+                    float3 width_n3 = dir_random(p[i].xy);
+                    float height = _Height + 0.05 * pmrandom(p[i].xy, float2(0,0));
+                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3));
+                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * 3));
+                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1+sx) * -1 + height_n3 * height));
+                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1-sx) * 2 + height_n3 * height * 2));
+                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3*sx + height_n3 * height * 3));
                     stream.RestartStrip();
                 }
             }
