@@ -5,6 +5,7 @@
         _TopColor ("TopColor", Color) = (0,1,0,1)
         [MainColor] _BaseColor ("Color", Color) = (0,0.3,0,1)
         _Height ("Height", Range(0,1)) = 0.3
+        _HeightRange ("HeightRange", Float) = 0.05
         _Width ("Width", Range(0,0.5)) = 0.03
         _GrowHeight ("GrowHeight", Float) = 0.0
         _GrowRange ("GrowRange", Float) = 1.0
@@ -135,7 +136,7 @@
 
 
             float4 _TopColor, _BottomColor;
-            float _Height, _Width, _GrowHeight, _GrowRange;
+            float _Height, _HeightRange, _Width, _GrowHeight, _GrowRange;
 
             Varyings vert(Attributes input)
             {
@@ -223,7 +224,7 @@
                 for (i=0; (i<9 && p[i].y > grow); i++)
                 {
                 float3 width_n3 = dir_random(p[i].xy);
-                float height = _Height + 0.05 * pmrandom(p[i].xy, 0);
+                float height = _Height + _HeightRange * pmrandom(p[i].xy, i);
                 stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3));
                 stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * 3));
                 stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1+sx) * -1 + height_n3 * height));
