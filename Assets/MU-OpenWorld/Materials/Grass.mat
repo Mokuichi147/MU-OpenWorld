@@ -60,7 +60,8 @@ Material:
     - _GlossyReflections: 0
     - _GrowHeight: 5
     - _GrowRange: 4
-    - _Height: 0.189
+    - _Height: 0.18
+    - _HeightRange: 0.07
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _QueueOffset: 0
