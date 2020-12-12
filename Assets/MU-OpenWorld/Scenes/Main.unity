@@ -168,7 +168,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ground: {fileID: 9140462846861877879, guid: 78baffc2eec83844b9bf4ee783c49fcb, type: 3}
   grounds: []
-  grass: {fileID: 2100000, guid: 1d2152a8bdf062a4dad8cb6781bd3fde, type: 2}
+  grass_low: {fileID: 2100000, guid: b16d5ff947a9a8445acb6b78e5becef1, type: 2}
+  grass_medium: {fileID: 2100000, guid: 23c0ed4a260190a4ba65e5dd59ba58dd, type: 2}
+  grass_high: {fileID: 2100000, guid: 4f377227a97bca542a9cc5fc5b4a7078, type: 2}
   grasses: []
   colliders: []
 --- !u!1 &589482133
