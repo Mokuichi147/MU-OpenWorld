@@ -20,7 +20,8 @@ namespace OpenWorld
         public Avatar player_avatar;
         public AnimatorController player_animator;
 
-        public float look_sensitivity = 50f;
+        [Range(0f, 200f)]
+        public float look_sensitivity = 100f;
         public string filepath = "Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm";
 
         private Rigidbody rb;
@@ -81,7 +82,7 @@ namespace OpenWorld
                 foreach (var _look in look_trace)
                 {
                     var delta_pos = _look.ReadValue<Vector2>();
-                    camera_rot *= Quaternion.Euler(0f, delta_pos.x/(120f-look_sensitivity)*2f, 0f);
+                    camera_rot *= Quaternion.Euler(0f, delta_pos.x/Mathf.Pow((200f-look_sensitivity)/100f*0.26f+1.138f, 10f)*2f, 0f);
                 }
                 Mouse.current.WarpCursorPosition(center_pos);
                 Cursor.visible = false;

@@ -353,7 +353,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player_avatar: {fileID: 9000000, guid: 7e5bbe81312935b40a796873e5b622ab, type: 2}
   player_animator: {fileID: 9100000, guid: dd21dd21e31d9d04392184b602484678, type: 2}
-  look_sensitivity: 50
+  look_sensitivity: 100
   filepath: Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm
 --- !u!114 &929649734
 MonoBehaviour:
