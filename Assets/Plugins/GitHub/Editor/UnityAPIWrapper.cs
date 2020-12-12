@@ -10,7 +10,7 @@ namespace GitHub.Unity
     {
         static UnityAPIWrapper()
         {
-#if UNITY_2018_2_OR_NEWER
+#if UNITY_2018_2_OR_NEWER && !UNITY_EDITOR_OSX && !UNITY_STANDALONE_OSX
             Editor.finishedDefaultHeaderGUI += editor => {
                 UnityShim.Raise_Editor_finishedDefaultHeaderGUI(editor);
             };
