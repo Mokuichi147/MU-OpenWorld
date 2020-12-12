@@ -4,6 +4,13 @@ using UnityEngine;
 
 namespace OpenWorld
 {
+    enum LOD
+    {
+        Low    = 0,
+        Medium = 1,
+        High   = 2
+    }
+
     enum Axis
     {
         None   =  0,
@@ -25,7 +32,8 @@ namespace OpenWorld
         private int world_distance = 10;
         private int world_size;
 
-        private int grass_distance = 3;
+        private int grass_distance = 2;
+        private int grass_high_distance = 1;
         private int grass_size;
 
         private int collider_distance = 1;
@@ -37,7 +45,10 @@ namespace OpenWorld
         private Vector3 reference_pos;
         public GameObject ground;
         public GameObject[] grounds;
-        public Material grass;
+        public Material grass_low;
+        public Material grass_medium;
+        public Material grass_high;
+        private Material[] grass;
         public MeshRenderer[] grasses;
         public MeshCollider[] colliders;
 
@@ -46,6 +57,11 @@ namespace OpenWorld
 
         void Awake()
         {
+            grass = new Material[3];
+            grass[0] = grass_low;
+            grass[1] = grass_medium;
+            grass[2] = grass_high;
+
             world_size = world_distance * 2 + 1;
             grass_size = grass_distance * 2 + 1;
             collider_size = collider_distance * 2 + 1;
@@ -123,17 +139,33 @@ namespace OpenWorld
             GroundShift(shift_data.reference_pos, shift_data.axis, shift_data.index);
         }
 
-        private void SetNoneMaterial(int index)
+        static int GetArrayPoint(Axis axis, int index, int distance, int distance_diff=0, bool invert=false)
         {
-            Material[] _materials = grasses[index].sharedMaterials;
-            _materials[1] = null;
-            grasses[index].sharedMaterials = _materials;
+            if (invert)
+                axis = (Axis)(-1 * (int)axis);
+
+            int size = (distance + distance_diff) * 2 + 1;
+
+            switch (axis)
+            {
+                case Axis.Xplus:
+                    return ((size - 1) - distance_diff) * size + distance_diff + index;
+                case Axis.Xminus:
+                    return distance_diff * size + distance_diff + index;
+                case Axis.Zplus:
+                    return (distance_diff + index) * size + (size - 1) - distance_diff;
+                case Axis.Zminus:
+                    return (distance_diff + index) * size + distance_diff;
+                default:
+                    Debug.Log("get array point error!");
+                    return -1;
+            }
         }
 
-        private void SetGrassMaterial(int index)
+        private void SetGrassLOD(int index, LOD lod)
         {
             Material[] _materials = grasses[index].sharedMaterials;
-            _materials[1] = grass;
+            _materials[1] = grass[(int)lod];
             grasses[index].sharedMaterials = _materials;
         }
 
@@ -191,31 +223,38 @@ namespace OpenWorld
             int world_point, grass_point;
             int grass_index = world_index - world_distance + grass_distance;
             int grass_diff = world_distance - grass_distance;
+
+            if (Mathf.Abs(world_index - world_distance) <= grass_high_distance)
+            {
+                int high_index = grass_index - grass_distance + grass_high_distance;
+                int high_diff = grass_distance - grass_high_distance;
+                SetGrassLOD(GetArrayPoint(axis, high_index, grass_high_distance, distance_diff: high_diff, invert: true), LOD.Medium);
+            }
             
             switch (axis)
             {
                 case Axis.Xplus:
-                    SetNoneMaterial(grass_index);
+                    SetGrassLOD(grass_index, LOD.Low);
                     for (int x=1; x<grass_size; x++)
                         System.Array.Copy(grasses, grass_index+x*grass_size, grasses, grass_index+(x-1)*grass_size, 1);
                     grass_point = (grass_size-1) * grass_size + grass_index;
                     world_point = (grass_diff+grass_size-1)*world_size + grass_diff + grass_index;
                     break;
                 case Axis.Xminus:
-                    SetNoneMaterial((grass_size-1)*grass_size+grass_index);
+                    SetGrassLOD((grass_size-1)*grass_size+grass_index, LOD.Low);
                     for (int x=grass_size-1; x>0; x--)
                         System.Array.Copy(grasses, grass_index+(x-1)*grass_size, grasses, grass_index+x*grass_size, 1);
                     grass_point = grass_index;
                     world_point = grass_diff*world_size + grass_diff + grass_index;
                     break;
                 case Axis.Zplus:
-                    SetNoneMaterial(grass_index*grass_size);
+                    SetGrassLOD(grass_index*grass_size, LOD.Low);
                     System.Array.Copy(grasses, grass_index*grass_size+1, grasses, grass_index*grass_size, grass_size-1);
                     grass_point = (grass_index+1) * grass_size - 1;
                     world_point = grass_diff*world_size + 2*grass_diff*grass_index + grass_diff + grass_point;
                     break;
                 case Axis.Zminus:
-                    SetNoneMaterial((grass_index+1)*grass_size-1);
+                    SetGrassLOD((grass_index+1)*grass_size-1, LOD.Low);
                     System.Array.Copy(grasses, grass_index*grass_size, grasses, grass_index*grass_size+1, grass_size-1);
                     grass_point = grass_index * grass_size;
                     world_point = grass_diff*world_size + 2*grass_diff*grass_index + grass_diff + grass_point;
@@ -225,7 +264,14 @@ namespace OpenWorld
                     return;
             }
             grasses[grass_point] = grounds[world_point].GetComponent<MeshRenderer>();
-            SetGrassMaterial(grass_point);
+            SetGrassLOD(grass_point, LOD.Medium);
+
+            if (Mathf.Abs(world_index - world_distance) <= grass_high_distance)
+            {
+                int high_index = grass_index - grass_distance + grass_high_distance;
+                int high_diff = grass_distance - grass_high_distance;
+                SetGrassLOD(GetArrayPoint(axis, high_index, grass_high_distance, distance_diff: high_diff), LOD.High);
+            }
         }
 
         private void GroundShift(Vector3 r_pos, Axis axis, int index)
@@ -284,12 +330,19 @@ namespace OpenWorld
                     grounds[_x+z] = Instantiate(ground, _pos, Quaternion.identity, this.transform);
 
                     // 草の表示切替用
-                    if (Mathf.Abs(x_diff) <= grass_distance && Mathf.Abs(z_diff) <= grass_distance)
+                    if (Mathf.Abs(x_diff) <= grass_high_distance && Mathf.Abs(z_diff) <= grass_high_distance)
                     {
                         var grass_x = x_diff + grass_distance;
                         var grass_z = z_diff + grass_distance;
                         grasses[grass_x*grass_size + grass_z] = grounds[_x+z].GetComponent<MeshRenderer>();
-                        SetGrassMaterial(grass_x*grass_size + grass_z);
+                        SetGrassLOD(grass_x*grass_size + grass_z, LOD.High);
+                    }
+                    else if (Mathf.Abs(x_diff) <= grass_distance && Mathf.Abs(z_diff) <= grass_distance)
+                    {
+                        var grass_x = x_diff + grass_distance;
+                        var grass_z = z_diff + grass_distance;
+                        grasses[grass_x*grass_size + grass_z] = grounds[_x+z].GetComponent<MeshRenderer>();
+                        SetGrassLOD(grass_x*grass_size + grass_z, LOD.Medium);
                     }
                     // メッシュコライダー切替用
                     if (Mathf.Abs(x_diff) <= collider_distance && Mathf.Abs(z_diff) <= collider_distance)
