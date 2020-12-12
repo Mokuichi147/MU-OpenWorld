@@ -29,14 +29,17 @@ namespace OpenWorld
 
     public class WorldController : MonoBehaviour
     {
-        private int world_distance = 10;
+        [Range(1, 64)]
+        public int world_distance = 10;
         private int world_size;
 
-        private int grass_distance = 2;
-        private int grass_high_distance = 1;
+        [Range(0, 32)]
+        public int grass_distance = 2;
+        [Range(0, 16)]
+        public int grass_high_distance = 1;
         private int grass_size;
 
-        private int collider_distance = 1;
+        public int collider_distance = 1;
         private int collider_size;
 
         private GameObject player;
