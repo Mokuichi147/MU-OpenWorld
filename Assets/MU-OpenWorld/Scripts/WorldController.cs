@@ -81,7 +81,7 @@ namespace OpenWorld
             GenerateWorld();
         }
 
-        void FixedUpdate()
+        void Update()
         {
             player_pos = player.transform.position;
             Axis axis = Axis.None;
