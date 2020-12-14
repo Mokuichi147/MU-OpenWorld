@@ -26,7 +26,7 @@ namespace OpenWorld
         {
             float _x = (x + seed) * scale;
             float _z = (z + seed) * scale;
-            float _y = Mathf.PerlinNoise(_x, _z);
+            float _y = 0.97f * Mathf.PerlinNoise(_x, _z) + 0.03f * Mathf.PerlinNoise(_x * 10f, _z * 10f);
             // 0～1 s(水面下),m,l(山)の閾値
             float l = 0.55f;
             float s = 0.40f;
