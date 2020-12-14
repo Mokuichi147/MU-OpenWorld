@@ -51,12 +51,12 @@ Material:
     m_Floats:
     - _CutOff: 0.5
     - _OutlineWidth: 0.193
-    - _ShadeShift: -0.3
+    - _ShadeShift: -0.6
     - _ShadeToony: 0
     - _ToonyLighting: 1
     m_Colors:
-    - _Color: {r: 0.1764706, g: 0.21176471, b: 0.4509804, a: 1}
+    - _Color: {r: 0.10895334, g: 0.08083841, b: 0.25105095, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
     - _OutlineColor: {r: 0.27450982, g: 0.09019608, b: 0.1254902, a: 1}
-    - _ShadeColor: {r: 0.11213955, g: 0.12066467, b: 0.2264151, a: 1}
+    - _ShadeColor: {r: 0.09205069, g: 0.08008951, b: 0.181198, a: 1}
   m_BuildTextureStacks: []

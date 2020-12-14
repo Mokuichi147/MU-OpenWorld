@@ -51,7 +51,7 @@ Material:
     m_Floats:
     - _CutOff: 0.5
     - _OutlineWidth: 0.165
-    - _ShadeShift: -0.3
+    - _ShadeShift: -0.6
     - _ShadeToony: 0
     - _ToonyLighting: 1
     m_Colors:

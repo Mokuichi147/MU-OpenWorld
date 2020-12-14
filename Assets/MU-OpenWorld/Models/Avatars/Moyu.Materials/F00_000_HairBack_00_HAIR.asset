@@ -55,8 +55,8 @@ Material:
     - _ShadeToony: 0
     - _ToonyLighting: 1
     m_Colors:
-    - _Color: {r: 0.9495789, g: 0.9495789, b: 0.9495789, a: 1}
-    - _EmissionColor: {r: 0.9642848, g: 0.9642848, b: 0.9642848, a: 1}
-    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
-    - _ShadeColor: {r: 0.9716377, g: 0.9716377, b: 0.9716377, a: 1}
+    - _Color: {r: 0.94642884, g: 0.94642884, b: 0.94642884, a: 1}
+    - _EmissionColor: {r: 0.96113473, g: 0.96113473, b: 0.96113473, a: 1}
+    - _OutlineColor: {r: 0.16315152, g: 0.16315152, b: 0.18539944, a: 1}
+    - _ShadeColor: {r: 0.8876053, g: 0.8876053, b: 0.8876053, a: 1}
   m_BuildTextureStacks: []
