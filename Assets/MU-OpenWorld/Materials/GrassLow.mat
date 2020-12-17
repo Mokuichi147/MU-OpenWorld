@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Grass_Low
+  m_Name: GrassLow
   m_Shader: {fileID: 4800000, guid: de228d9545af301459affb6f1176bec7, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
