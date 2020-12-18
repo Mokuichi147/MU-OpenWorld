@@ -385,10 +385,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d845521120e7417488c6be0bc5871ddc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player_avatar: {fileID: 9000000, guid: a5c50b3e5ee906c4fad3e2777bb9d5a4, type: 2}
-  player_animator: {fileID: 9100000, guid: dd21dd21e31d9d04392184b602484678, type: 2}
-  look_sensitivity: 100
-  filepath: Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm
+  PlayerAvatar: {fileID: 9000000, guid: a5c50b3e5ee906c4fad3e2777bb9d5a4, type: 2}
+  PlayerAnimator: {fileID: 9100000, guid: dd21dd21e31d9d04392184b602484678, type: 2}
+  LookSensitivity: 100
+  avatarFilePath: Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm
 --- !u!114 &929649734
 MonoBehaviour:
   m_ObjectHideFlags: 0
