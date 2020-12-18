@@ -62,11 +62,13 @@ namespace OpenWorld
 
         void Awake()
         {
+            // クオリティ別の草シェーダを設定する
             grassMaterialArray = new Material[3];
             grassMaterialArray[0] = GrassLowMaterial;
             grassMaterialArray[1] = GrassMediumMaterial;
             grassMaterialArray[2] = GrassHighMaterial;
 
+            // 配列の大きさを計算する
             worldSize = WorldDistance * 2 + 1;
             grassSize = GrassDistance * 2 + 1;
             colliderSize = ColliderDistance * 2 + 1;
@@ -88,6 +90,7 @@ namespace OpenWorld
 
         void Update()
         {
+            // マップの更新が必要か
             playerPosition = player.transform.position;
             Axis axis = Axis.None;
             if (playerPosition.x > referencePosition.x + Ground.XWidth / 2f)
@@ -111,6 +114,7 @@ namespace OpenWorld
                 referencePosition.z -= Ground.ZWidth;
             }
 
+            // ワールドの境界を行き来した場合に何度も更新しないための処理
             if (axis != Axis.None)    
             {
                 var worldShiftTempArray = new List<WorldShift>();
@@ -135,17 +139,20 @@ namespace OpenWorld
                 worldShiftList.AddRange(worldShiftTempArray);
             }
 
+            // マップを更新する必要がない場合
             if (worldShiftList.Count == 0)
                 return;
 
+            // ワールドを更新する
             var shiftData = worldShiftList[0];
             worldShiftList.RemoveAt(0);
 
-            GroundShift(shiftData.ReferencePosition, shiftData.Axis, shiftData.Index);
+            GroundArrayShift(shiftData.ReferencePosition, shiftData.Axis, shiftData.Index);
         }
 
         static int GetArrayPoint(Axis axis, int index, int distance, int distanceDiff=0, bool invert=false)
         {
+            /* 二次元配列の座標から一次元配列の座標の位置を返す */
             if (invert)
                 axis = (Axis)(-1 * (int)axis);
 
@@ -169,13 +176,15 @@ namespace OpenWorld
 
         private void SetGrassLOD(int index, LOD lod)
         {
+            /* 草のシェーダーを切り替える */
             Material[] materialArray = GrassMeshRendererArray[index].sharedMaterials;
             materialArray[1] = grassMaterialArray[(int)lod];
             GrassMeshRendererArray[index].sharedMaterials = materialArray;
         }
 
-        private void ColiderShift(Axis axis, int worldIndex)
+        private void ColliderArrayShift(Axis axis, int worldIndex)
         {
+            /* コライダーを管理する配列の中で指定した行か列を更新する */
             if (Mathf.Abs(worldIndex - WorldDistance) > ColliderDistance)
                 return;
             
@@ -220,8 +229,9 @@ namespace OpenWorld
             MeshColliderArray[colliderPoint].enabled = true;
         }
 
-        private void GrassShift(Axis axis, int worldIndex)
+        private void GrassArrayShift(Axis axis, int worldIndex)
         {
+            /* 草のシェーダを管理する配列の中で指定した行か列を更新する */
             if (Mathf.Abs(worldIndex - WorldDistance) > GrassDistance)
                 return;
             
@@ -279,8 +289,9 @@ namespace OpenWorld
             }
         }
 
-        private void GroundShift(Vector3 referencePos, Axis axis, int index)
+        private void GroundArrayShift(Vector3 referencePos, Axis axis, int index)
         {
+            /* 地面のオブジェクトを管理する配列の中で指定した行か列を更新する */
             Vector3 addPositionDiff;
             int createIndex;
             float indexDiff = index - WorldDistance;
@@ -318,12 +329,13 @@ namespace OpenWorld
                     return;
             }
             GroundObjectArray[createIndex] = Instantiate(GroundObject, addPositionDiff, Quaternion.identity, this.transform);
-            GrassShift(axis, index);
-            ColiderShift(axis, index);
+            GrassArrayShift(axis, index);
+            ColliderArrayShift(axis, index);
         }
 
         private void GenerateWorld()
         {
+            /* ワールドを生成する */
             for (int x=0; x<worldSize; x++)
             {
                 var _x = x * worldSize;
