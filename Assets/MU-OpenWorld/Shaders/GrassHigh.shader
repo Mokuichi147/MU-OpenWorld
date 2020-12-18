@@ -2,13 +2,13 @@
 {
     Properties
     {
-        _TopColor ("TopColor", Color) = (0,1,0,1)
-        [MainColor] _BaseColor ("Color", Color) = (0,0.3,0,1)
-        _Height ("Height", Range(0,1)) = 0.3
-        _HeightRange ("HeightRange", Float) = 0.05
-        _Width ("Width", Range(0,0.5)) = 0.03
-        _GrowHeight ("GrowHeight", Float) = 0.0
-        _GrowRange ("GrowRange", Float) = 1.0
+        _TopColor ("TopColor", Color) = (0.525, 1.000, 0.525, 1.0)
+        _BottomColor ("Color", Color) = (0.176, 0.737, 0.176, 1.0)
+        _Height ("Height", Range(0,1)) = 0.18
+        _HeightRange ("HeightRange", Float) = 0.07
+        _Width ("Width", Range(0,0.5)) = 0.029
+        _GrowHeight ("GrowHeight", Float) = 5.0
+        _GrowRange ("GrowRange", Float) = 4.0
 
         // Specular vs Metallic workflow
         [HideInInspector] _WorkflowMode("WorkflowMode", Float) = 1.0
@@ -133,10 +133,12 @@
 #endif
                 float3 positionWS             : TEXCOORD7;
                 float4 positionCS             : SV_POSITION;
+
+                half4 color                   : COLOR;
             };
 
 
-            float4 _TopColor, _BottomColor;
+            half4 _TopColor, _BottomColor;
             float _Height, _HeightRange, _Width, _GrowHeight, _GrowRange;
 
             Varyings vert(Attributes input)
@@ -165,6 +167,7 @@
 #endif
                 output.positionWS = vertexInput.positionWS;
                 output.positionCS = vertexInput.positionCS;
+                output.color = _TopColor;
                 return output;
             }
 
@@ -185,16 +188,17 @@
                 return normalize(vec1);
             }
 
-            Varyings geom_stream(Varyings v, float3 pos)
+            Varyings geom_stream(Varyings v, float3 pos, float colorRate)
             {
                 Varyings output = v;
                 output.positionWS = pos;
                 output.positionCS = TransformWorldToHClip(pos);
+                output.color = lerp(_BottomColor, _TopColor, colorRate);
                 return output;
             }
             
             // (三角面の頂点数) * (草の数)
-            [maxvertexcount(5*9)]
+            [maxvertexcount(5*7)]
             void geom(triangle Varyings input[3], inout TriangleStream<Varyings> stream)
             {
                 float3 cp = (input[0].positionWS + input[1].positionWS + input[2].positionWS) / 3.0f;
@@ -205,11 +209,11 @@
 
                 float grow = _GrowHeight + _GrowRange * pmrandom(cp.xy, 0);
 
-                float3 p[9];
+                float3 p[7];
                 uint i;
 
                 //[unroll]
-                for (i=0; i<9; i++)
+                for (i=0; i<7; i++)
                 {
                     float _r1 = random(cp.xy, 2*i);
                     p[i] = lerp(input[0].positionWS, input[1].positionWS, _r1);
@@ -218,15 +222,15 @@
                 }
 
                 //[loop]
-                for (i=0; (i<9 && p[i].y > grow); i++)
+                for (i=0; (i<7 && p[i].y > grow); i++)
                 {
                 float3 width_n3 = dir_random(p[i].xy);
                 float height = _Height + _HeightRange * pmrandom(p[i].xy, i);
-                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3));
-                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * 3));
-                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1+sx) * -1 + height_n3 * height));
-                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1-sx) * 2 + height_n3 * height * 2));
-                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3*sx + height_n3 * height * 3));
+                stream.Append(geom_stream(input[i/3], p[i] + width_n3*_Width * -3, 0.0f));
+                stream.Append(geom_stream(input[i/3], p[i] + width_n3*_Width * 3,  0.0f));
+                stream.Append(geom_stream(input[i/3], p[i] + width_n3*_Width * (1+sx) * -1 + height_n3 * height, 0.33f));
+                stream.Append(geom_stream(input[i/3], p[i] + width_n3*_Width * (1-sx) * 2 + height_n3 * height * 2, 0.66f));
+                stream.Append(geom_stream(input[i/3], p[i] + width_n3*_Width * -3*sx + height_n3 * height * 3, 1.0f));
                 stream.RestartStrip();
                 }
             }
@@ -254,6 +258,7 @@
                 half3 viewDirectionWS = SafeNormalize(GetCameraPositionWS() - positionWS);
 
                 BRDFData brdfData;
+                surfaceData.albedo = input.color.xyz;
                 InitializeBRDFData(surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.alpha, brdfData);
 
 #ifdef _MAIN_LIGHT_SHADOWS

@@ -128,8 +128,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23b54cb52df89ee4a9b7b3ffec10c874, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mesh: {fileID: 0}
-  water_surface: {fileID: 3448391514385853938, guid: e873b80db5288564fbf9039966272fa0, type: 3}
+  MeshObject: {fileID: 0}
+  WaterSurfaceObject: {fileID: 0}
 --- !u!33 &9140462846861877882
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -158,7 +158,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 524e74fdacd311e42ab0dedf767f85b8, type: 2}
-  - {fileID: 2100000, guid: b16d5ff947a9a8445acb6b78e5becef1, type: 2}
+  - {fileID: 2100000, guid: 7f2c4e31a1077014fb660887c45e15c3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

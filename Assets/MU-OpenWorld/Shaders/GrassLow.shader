@@ -2,13 +2,13 @@
 {
     Properties
     {
-        _TopColor ("TopColor", Color) = (0,1,0,1)
-        [MainColor] _BaseColor ("Color", Color) = (0,0.3,0,1)
-        _Height ("Height", Range(0,1)) = 0.3
-        _HeightRange ("HeightRange", Float) = 0.05
-        _Width ("Width", Range(0,0.5)) = 0.03
-        _GrowHeight ("GrowHeight", Float) = 0.0
-        _GrowRange ("GrowRange", Float) = 1.0
+        _TopColor ("TopColor", Color) = (0.525, 1.000, 0.525, 1.0)
+        _BottomColor ("Color", Color) = (0.176, 0.737, 0.176, 1.0)
+        _Height ("Height", Range(0,1)) = 0.18
+        _HeightRange ("HeightRange", Float) = 0.07
+        _Width ("Width", Range(0,0.5)) = 0.029
+        _GrowHeight ("GrowHeight", Float) = 5.0
+        _GrowRange ("GrowRange", Float) = 4.0
 
         // Specular vs Metallic workflow
         [HideInInspector] _WorkflowMode("WorkflowMode", Float) = 1.0
@@ -133,10 +133,12 @@
 #endif
                 float3 positionWS             : TEXCOORD7;
                 float4 positionCS             : SV_POSITION;
+
+                half4 color                   : COLOR;
             };
 
 
-            float4 _TopColor, _BottomColor;
+            half4 _TopColor, _BottomColor;
             float _Height, _HeightRange, _Width, _GrowHeight, _GrowRange;
 
             Varyings vert(Attributes input)
@@ -165,6 +167,8 @@
 #endif
                 output.positionWS = vertexInput.positionWS;
                 output.positionCS = vertexInput.positionCS;
+
+                output.color = lerp(_BottomColor, _TopColor, 0.5f);;
                 return output;
             }
 
@@ -246,6 +250,7 @@
                 half3 viewDirectionWS = SafeNormalize(GetCameraPositionWS() - positionWS);
 
                 BRDFData brdfData;
+                surfaceData.albedo = input.color.xyz;
                 InitializeBRDFData(surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.alpha, brdfData);
 
 #ifdef _MAIN_LIGHT_SHADOWS
