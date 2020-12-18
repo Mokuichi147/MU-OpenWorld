@@ -31,7 +31,7 @@ namespace OpenWorld
     {
         [Range(1, 64)]
         public int WorldDistance = 10;
-        private int worldSizs;
+        private int worldSize;
 
         [Range(0, 32)]
         public int GrassDistance = 2;
@@ -67,10 +67,10 @@ namespace OpenWorld
             grassMaterialArray[1] = GrassMediumMaterial;
             grassMaterialArray[2] = GrassHighMaterial;
 
-            worldSizs = WorldDistance * 2 + 1;
+            worldSize = WorldDistance * 2 + 1;
             grassSize = GrassDistance * 2 + 1;
             colliderSize = ColliderDistance * 2 + 1;
-            GroundObjectArray = new GameObject[worldSizs * worldSizs];
+            GroundObjectArray = new GameObject[worldSize * worldSize];
             GrassMeshRendererArray = new MeshRenderer[grassSize * grassSize];
             MeshColliderArray = new MeshCollider[colliderSize * colliderSize];
 
@@ -125,10 +125,10 @@ namespace OpenWorld
                 {
                     if ((int)worldShiftList[maxCount-1].Axis == -1 * (int)axis && worldShiftList[maxCount-1].Index == 0)
                     {
-                        for (int i=1; i<=System.Math.Min(worldSizs, maxCount); i++)
+                        for (int i=1; i<=System.Math.Min(worldSize, maxCount); i++)
                         {
                             worldShiftList.RemoveAt(maxCount - i);
-                            worldShiftTempArray.RemoveAt(worldSizs - i);
+                            worldShiftTempArray.RemoveAt(worldSize - i);
                         }
                     }
                 }
@@ -190,26 +190,26 @@ namespace OpenWorld
                     for (int x=1; x<colliderSize; x++)
                         System.Array.Copy(MeshColliderArray, colliderIndex+x*colliderSize, MeshColliderArray, colliderIndex+(x-1)*colliderSize, 1);
                     colliderPoint = (colliderSize-1) * colliderSize + colliderIndex;
-                    worldPoint = (colliderDiff+colliderSize-1)*worldSizs + colliderDiff + colliderIndex;
+                    worldPoint = (colliderDiff+colliderSize-1)*worldSize + colliderDiff + colliderIndex;
                     break;
                 case Axis.Xminus:
                     MeshColliderArray[(colliderSize-1)*colliderSize+colliderIndex].enabled = false;
                     for (int x=colliderSize-1; x>0; x--)
                         System.Array.Copy(MeshColliderArray, colliderIndex+(x-1)*colliderSize, MeshColliderArray, colliderIndex+x*colliderSize, 1);
                     colliderPoint = colliderIndex;
-                    worldPoint = colliderDiff*worldSizs + colliderDiff + colliderIndex;
+                    worldPoint = colliderDiff*worldSize + colliderDiff + colliderIndex;
                     break;
                 case Axis.Zplus:
                     MeshColliderArray[colliderIndex*colliderSize].enabled = false;
                     System.Array.Copy(MeshColliderArray, colliderIndex*colliderSize+1, MeshColliderArray, colliderIndex*colliderSize, colliderSize-1);
                     colliderPoint = (colliderIndex+1) * colliderSize - 1;
-                    worldPoint = colliderDiff*worldSizs + 2*colliderDiff*colliderIndex + colliderDiff + colliderPoint;
+                    worldPoint = colliderDiff*worldSize + 2*colliderDiff*colliderIndex + colliderDiff + colliderPoint;
                     break;
                 case Axis.Zminus:
                     MeshColliderArray[(colliderIndex+1)*colliderSize-1].enabled = false;
                     System.Array.Copy(MeshColliderArray, colliderIndex*colliderSize, MeshColliderArray, colliderIndex*colliderSize+1, colliderSize-1);
                     colliderPoint = colliderIndex * colliderSize;
-                    worldPoint = colliderDiff*worldSizs + 2*colliderDiff*colliderIndex + colliderDiff + colliderPoint;
+                    worldPoint = colliderDiff*worldSize + 2*colliderDiff*colliderIndex + colliderDiff + colliderPoint;
                     break;
                 default:
                     Debug.Log("grassMaterialArray shift error!");
@@ -243,26 +243,26 @@ namespace OpenWorld
                     for (int x=1; x<grassSize; x++)
                         System.Array.Copy(GrassMeshRendererArray, grassIndex+x*grassSize, GrassMeshRendererArray, grassIndex+(x-1)*grassSize, 1);
                     grassPoint = (grassSize-1) * grassSize + grassIndex;
-                    worldPoint = (grassDiff+grassSize-1)*worldSizs + grassDiff + grassIndex;
+                    worldPoint = (grassDiff+grassSize-1)*worldSize + grassDiff + grassIndex;
                     break;
                 case Axis.Xminus:
                     SetGrassLOD((grassSize-1)*grassSize+grassIndex, LOD.Low);
                     for (int x=grassSize-1; x>0; x--)
                         System.Array.Copy(GrassMeshRendererArray, grassIndex+(x-1)*grassSize, GrassMeshRendererArray, grassIndex+x*grassSize, 1);
                     grassPoint = grassIndex;
-                    worldPoint = grassDiff*worldSizs + grassDiff + grassIndex;
+                    worldPoint = grassDiff*worldSize + grassDiff + grassIndex;
                     break;
                 case Axis.Zplus:
                     SetGrassLOD(grassIndex*grassSize, LOD.Low);
                     System.Array.Copy(GrassMeshRendererArray, grassIndex*grassSize+1, GrassMeshRendererArray, grassIndex*grassSize, grassSize-1);
                     grassPoint = (grassIndex+1) * grassSize - 1;
-                    worldPoint = grassDiff*worldSizs + 2*grassDiff*grassIndex + grassDiff + grassPoint;
+                    worldPoint = grassDiff*worldSize + 2*grassDiff*grassIndex + grassDiff + grassPoint;
                     break;
                 case Axis.Zminus:
                     SetGrassLOD((grassIndex+1)*grassSize-1, LOD.Low);
                     System.Array.Copy(GrassMeshRendererArray, grassIndex*grassSize, GrassMeshRendererArray, grassIndex*grassSize+1, grassSize-1);
                     grassPoint = grassIndex * grassSize;
-                    worldPoint = grassDiff*worldSizs + 2*grassDiff*grassIndex + grassDiff + grassPoint;
+                    worldPoint = grassDiff*worldSize + 2*grassDiff*grassIndex + grassDiff + grassPoint;
                     break;
                 default:
                     Debug.Log("grassMaterialArray shift error!");
@@ -289,29 +289,29 @@ namespace OpenWorld
             {
                 case Axis.Xplus:
                     Destroy(GroundObjectArray[index]);
-                    for (int x=1; x<worldSizs; x++)
-                        System.Array.Copy(GroundObjectArray, index+x*worldSizs, GroundObjectArray, index+(x-1)*worldSizs, 1);
+                    for (int x=1; x<worldSize; x++)
+                        System.Array.Copy(GroundObjectArray, index+x*worldSize, GroundObjectArray, index+(x-1)*worldSize, 1);
                     addPositionDiff = new Vector3((float)WorldDistance * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + referencePos;
-                    createIndex = (worldSizs - 1) * worldSizs + index;
+                    createIndex = (worldSize - 1) * worldSize + index;
                     break;
                 case Axis.Xminus:
-                    Destroy(GroundObjectArray[(worldSizs-1)*worldSizs+index]);
-                    for (int x=worldSizs-1; x>0; x--)
-                        System.Array.Copy(GroundObjectArray, index+(x-1)*worldSizs, GroundObjectArray, index+x*worldSizs, 1);
+                    Destroy(GroundObjectArray[(worldSize-1)*worldSize+index]);
+                    for (int x=worldSize-1; x>0; x--)
+                        System.Array.Copy(GroundObjectArray, index+(x-1)*worldSize, GroundObjectArray, index+x*worldSize, 1);
                     addPositionDiff = new Vector3((float)(-1*WorldDistance) * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + referencePos;
                     createIndex = index;
                     break;
                 case Axis.Zplus:
-                    Destroy(GroundObjectArray[index*worldSizs]);
-                    System.Array.Copy(GroundObjectArray, index*worldSizs+1, GroundObjectArray, index*worldSizs, worldSizs-1);
+                    Destroy(GroundObjectArray[index*worldSize]);
+                    System.Array.Copy(GroundObjectArray, index*worldSize+1, GroundObjectArray, index*worldSize, worldSize-1);
                     addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, (float)WorldDistance * Ground.ZWidth) + referencePos;
-                    createIndex = (index + 1) * worldSizs - 1;
+                    createIndex = (index + 1) * worldSize - 1;
                     break;
                 case Axis.Zminus:
-                    Destroy(GroundObjectArray[(index+1)*worldSizs-1]);
-                    System.Array.Copy(GroundObjectArray, index*worldSizs, GroundObjectArray, index*worldSizs+1, worldSizs-1);
+                    Destroy(GroundObjectArray[(index+1)*worldSize-1]);
+                    System.Array.Copy(GroundObjectArray, index*worldSize, GroundObjectArray, index*worldSize+1, worldSize-1);
                     addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, (float)(-1*WorldDistance) * Ground.ZWidth) + referencePos;
-                    createIndex = index * worldSizs;
+                    createIndex = index * worldSize;
                     break;
                 default:
                     Debug.Log("GroundObject shift error!");
@@ -324,11 +324,11 @@ namespace OpenWorld
 
         private void GenerateWorld()
         {
-            for (int x=0; x<worldSizs; x++)
+            for (int x=0; x<worldSize; x++)
             {
-                var _x = x * worldSizs;
+                var _x = x * worldSize;
                 var xDiff = x - WorldDistance;
-                for (int z=0; z<worldSizs; z++)
+                for (int z=0; z<worldSize; z++)
                 {
                     var zDiff = z - WorldDistance;
                     var position = new Vector3(Ground.XWidth*xDiff+referencePosition.x, 0f, Ground.ZWidth*zDiff+referencePosition.z);
