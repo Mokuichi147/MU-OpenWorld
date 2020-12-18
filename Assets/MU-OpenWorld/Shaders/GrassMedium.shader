@@ -1,4 +1,4 @@
-﻿Shader "Custom/Grass_Medium"
+﻿Shader "Custom/GrassMedium"
 {
     Properties
     {

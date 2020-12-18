@@ -1,4 +1,4 @@
-﻿Shader "Custom/Grass_High"
+﻿Shader "Custom/GrassLow"
 {
     Properties
     {
@@ -53,13 +53,13 @@
         // Editmode props
         [HideInInspector] _QueueOffset("Queue offset", Float) = 0.0
     }
-    
+
     SubShader
     {
         Tags { "RenderType"="Opaque" "RenderPipeline"="UniversalRenderPipeline" }
-        LOD 300
+        LOD 100
         // 両面表示
-        //Cull off
+        Cull off
         Pass
         {
             Name "Grass"
@@ -194,40 +194,32 @@
             }
             
             // (三角面の頂点数) * (草の数)
-            [maxvertexcount(5*9)]
+            [maxvertexcount(3)]
             void geom(triangle Varyings input[3], inout TriangleStream<Varyings> stream)
             {
                 float3 cp = (input[0].positionWS + input[1].positionWS + input[2].positionWS) / 3.0f;
                 half3  cn = (input[0].normalWS + input[1].normalWS + input[2].normalWS) / 3.0f;
                 half3 height_n3 = cn;
 
-                float sx = ((_SinTime.w + 1.0f) * 0.5f - 0.5f) * 2.0f;
-
                 float grow = _GrowHeight + _GrowRange * pmrandom(cp.xy, 0);
 
-                float3 p[9];
+                float3 p;
                 uint i;
 
                 //[unroll]
-                for (i=0; i<9; i++)
-                {
-                    float _r1 = random(cp.xy, 2*i);
-                    p[i] = lerp(input[0].positionWS, input[1].positionWS, _r1);
-                    float _r2 = random(cp.xy, 2*(i+1));
-                    p[i] = lerp(p[i], input[2].positionWS, _r2);
-                }
+                float _r1 = random(cp.xy, 0);
+                p = lerp(input[0].positionWS, input[1].positionWS, _r1);
+                float _r2 = random(cp.xy, 2);
+                p = lerp(p, input[2].positionWS, _r2);
 
                 //[loop]
-                for (i=0; (i<9 && p[i].y > grow); i++)
+                if (p.y > grow)
                 {
-                float3 width_n3 = dir_random(p[i].xy);
-                float height = _Height + _HeightRange * pmrandom(p[i].xy, i);
-                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3));
-                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * 3));
-                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1+sx) * -1 + height_n3 * height));
-                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * (1-sx) * 2 + height_n3 * height * 2));
-                stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3*sx + height_n3 * height * 3));
-                stream.RestartStrip();
+                    float3 width_n3 = dir_random(p.xy);
+                    stream.Append(geom_stream(input[0], p + width_n3 * _Width * -6));
+                    stream.Append(geom_stream(input[0], p + height_n3 * _Height * 3.0));
+                    stream.Append(geom_stream(input[0], p + width_n3 * _Width *  6));
+                    stream.RestartStrip();
                 }
             }
 
