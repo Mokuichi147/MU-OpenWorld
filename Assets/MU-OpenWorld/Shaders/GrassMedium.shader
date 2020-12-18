@@ -228,7 +228,7 @@
                     float3 width_n3 = dir_random(p[i].xy);
                     float height = _Height + _HeightRange * pmrandom(p[i].xy, i);
                     stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3, 0.0f));
-                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * -3*sx + height_n3 * height * 3, 1.0f));
+                    stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * 3*sx + height_n3 * height * 3, 1.0f));
                     stream.Append(geom_stream(input[i/3], p[i] + width_n3 * _Width * 3, 0.0f));
                     stream.RestartStrip();
                 }
