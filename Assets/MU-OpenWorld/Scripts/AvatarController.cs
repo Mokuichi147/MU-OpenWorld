@@ -55,14 +55,16 @@ namespace OpenWorld
                 if (isMouseCenter)
                 {
                     Cursor.visible = true;
+                    Cursor.lockState = CursorLockMode.None;
                     lookActionTrace.UnsubscribeFrom(lookAction);
-                    isMouseCenter = false;
                 }
                 else
                 {
+                    Cursor.visible = false;
+                    Cursor.lockState = CursorLockMode.Locked;
                     lookActionTrace.SubscribeTo(lookAction);
-                    isMouseCenter = true;
                 }
+                isMouseCenter = !isMouseCenter;
             };
 
             cameraTransform = GameObject.Find("CameraRotate").GetComponent<Transform>();
@@ -84,8 +86,6 @@ namespace OpenWorld
                     var delta_pos = look.ReadValue<Vector2>();
                     camera_rot *= Quaternion.Euler(0f, delta_pos.x/Mathf.Pow((200f-LookSensitivity)/100f*0.26f+1.138f, 10f)*2f, 0f);
                 }
-                Mouse.current.WarpCursorPosition(centerPosition);
-                Cursor.visible = false;
                 cameraTransform.rotation = camera_rot;
                 lookActionTrace.Clear();
             }
