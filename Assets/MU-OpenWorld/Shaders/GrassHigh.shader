@@ -205,7 +205,7 @@
                 half3  cn = (input[0].normalWS + input[1].normalWS + input[2].normalWS) / 3.0f;
                 half3 height_n3 = cn;
 
-                float sx = ((_SinTime.w + 1.0f) * 0.5f - 0.5f) * 2.0f;
+                float sx = ((sin(_Time.z + cp.x + cp.z/8.0f) + 1.0f) * 0.5f - 0.5f) * 2.0f;
 
                 float grow = _GrowHeight + _GrowRange * pmrandom(cp.xy, 0);
 
