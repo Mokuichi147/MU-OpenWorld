@@ -21,17 +21,20 @@ namespace OpenWorld
         public string avatarFilePath = "Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm";
 
         private Rigidbody playerRigidbody;
+
+        [System.NonSerialized]
         public GameObject AvatarObject;
+        [System.NonSerialized]
         public Animator AvatarAnimator;
+        [System.NonSerialized]
         public Transform AvatarTransform;
-        private Transform cameraTransform;
 
         void Awake()
         {
             LoadAvatar();
         }
 
-        private GameObject LoadFromPath(string filePath)
+        static private GameObject LoadFromPath(string filePath)
         {
             /* パスからVRMモデルを読み込む */
             var bytes = File.ReadAllBytes(filePath);
@@ -43,30 +46,47 @@ namespace OpenWorld
             return context.Root;
         }
 
+        static public Transform InitPosition(GameObject avatarObject, Transform parent, float addHeight=1f)
+        {
+            avatarObject.transform.parent = parent;
+            avatarObject.transform.localPosition = new Vector3(0f, 0f, 0f);
+            var avatarTransform = avatarObject.GetComponent<Transform>();
+
+            // 地面の高さに合わせる
+            var position = parent.position;
+            position.y = Ground.GetHeight(position.x, position.z) + addHeight;
+            parent.position = position;
+
+            return avatarTransform;
+        }
+
+        static public Animator InitAnimator(GameObject avatarObject, Avatar avatar, AnimatorController animator)
+        {
+            var avatarAnimator = avatarObject.GetComponent<Animator>();
+            avatarAnimator.avatar = avatar;
+            avatarAnimator.runtimeAnimatorController = animator;
+
+            return avatarAnimator;
+        }
+
         private GameObject LoadVRM(string filePath)
         {
             /* VRMモデルを配置する */
-            AvatarObject = LoadFromPath(filePath);
-            if (AvatarObject == null) return null;
+            var avatarObject = LoadFromPath(filePath);
+            if (avatarObject == null) return null;
 
-            AvatarObject.transform.parent = this.transform;
-            AvatarObject.transform.localPosition = new Vector3(0f, 0f, 0f);
-            AvatarTransform = AvatarObject.GetComponent<Transform>();
-            // 地面の高さに合わせる
-            var position = this.transform.position;
-            position.y = Ground.GetHeight(position.x, position.z) + 1f;
-            this.transform.position = position;
-            // アニメーションの設定
-            AvatarAnimator = AvatarObject.GetComponent<Animator>();
-            AvatarAnimator.avatar = PlayerAvatar;
-            AvatarAnimator.runtimeAnimatorController = PlayerAnimator;
-            return AvatarObject;
+            // 位置の初期設定
+            AvatarTransform = InitPosition(avatarObject, this.transform);
+            // アニメーションの初期設定
+            AvatarAnimator = InitAnimator(avatarObject, PlayerAvatar, PlayerAnimator);
+            return avatarObject;
         }
 
         private void LoadAvatar()
         {
             /* デフォルトモデルの読み込み */
-            if (LoadVRM(avatarFilePath) != null) return;
+            AvatarObject = LoadVRM(avatarFilePath);
+            if (AvatarObject != null) return;
 
 #if UNITY_EDITOR
             var filePath = EditorUtility.OpenFilePanel("vrmファイル(.vrm)", "", "vrm");
@@ -80,7 +100,8 @@ namespace OpenWorld
             var filePath = Path.GetFullPath(openFileDialog.FileName);
             avatarFilePath = filePath.ToString().Replace('\\', '/');
 #endif
-            if (LoadVRM(avatarFilePath) != null) return;
+            AvatarObject = LoadVRM(avatarFilePath);
+            if (AvatarObject != null) return;
         }
     }
 }
