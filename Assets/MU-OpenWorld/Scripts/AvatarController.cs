@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Utilities;
 using UnityEditor.Animations;
 using System.IO;
 #if UNITY_EDITOR
@@ -20,101 +18,22 @@ namespace OpenWorld
         public Avatar PlayerAvatar;
         public AnimatorController PlayerAnimator;
 
-        [Range(0f, 200f)]
-        public float LookSensitivity = 100f;
         public string avatarFilePath = "Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm";
 
         private Rigidbody playerRigidbody;
-        private GameObject avatarObject;
-        private Animator avatarAnimator;
-        private Transform avatarTransform;
+        public GameObject AvatarObject;
+        public Animator AvatarAnimator;
+        public Transform AvatarTransform;
         private Transform cameraTransform;
 
-        private InputAction moveAction;
-        private InputAction lookAction;
-        private InputActionTrace lookActionTrace;
-        private InputAction escAction;
-        private bool isMouseCenter = true;
-        private Vector2 centerPosition;
-        static float flameDeltaTime = 0.02f;
-        private float animationTimeScale = 10f;
-
-        void Start()
+        void Awake()
         {
             LoadAvatar();
-
-            var playerInput = this.GetComponent<PlayerInput>();
-            moveAction = playerInput.currentActionMap["Move"];
-            lookAction = playerInput.currentActionMap["Look"];
-            lookActionTrace = new InputActionTrace();
-            lookActionTrace.SubscribeTo(lookAction);
-
-            escAction = playerInput.currentActionMap["Esc"];
-            escAction.performed += (callback) =>
-            {
-                if (isMouseCenter)
-                {
-                    Cursor.visible = true;
-                    Cursor.lockState = CursorLockMode.None;
-                    lookActionTrace.UnsubscribeFrom(lookAction);
-                }
-                else
-                {
-                    Cursor.visible = false;
-                    Cursor.lockState = CursorLockMode.Locked;
-                    lookActionTrace.SubscribeTo(lookAction);
-                }
-                isMouseCenter = !isMouseCenter;
-            };
-
-            cameraTransform = GameObject.Find("CameraRotate").GetComponent<Transform>();
-            playerRigidbody = this.GetComponent<Rigidbody>();
-
-            centerPosition = new Vector2(Mathf.Round(Screen.width/2f), Mathf.Round(Screen.height/2f));
-            Mouse.current.WarpCursorPosition(centerPosition);
-            Cursor.visible = false;
-        }
-
-        void FixedUpdate()
-        {
-            // 視点操作
-            if (isMouseCenter)
-            {
-                Quaternion camera_rot = cameraTransform.rotation;
-                foreach (var look in lookActionTrace)
-                {
-                    var delta_pos = look.ReadValue<Vector2>();
-                    camera_rot *= Quaternion.Euler(0f, delta_pos.x/Mathf.Pow((200f-LookSensitivity)/100f*0.26f+1.138f, 10f)*2f, 0f);
-                }
-                cameraTransform.rotation = camera_rot;
-                lookActionTrace.Clear();
-            }
-
-            var move = moveAction.ReadValue<Vector2>();
-            if (move.x == 0f && move.y == 0f)
-            {
-                avatarAnimator.SetFloat("speed", 0f, 0.1f, flameDeltaTime);
-                return;
-            }
-            var position = playerRigidbody.position;
-            avatarAnimator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(move.x,2f)+Mathf.Pow(move.y,2f)), 0.1f, flameDeltaTime);
-            // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
-            var _dx = move.x * (5f / 50f);
-            var _dy = move.y * (5f / 50f);
-            var moveVector = new Vector3(_dx, 0f, _dy);
-            moveVector = cameraTransform.rotation * moveVector;
-            var rotation = avatarTransform.rotation;
-            avatarTransform.rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(moveVector), flameDeltaTime * animationTimeScale);
-            playerRigidbody.MovePosition(new Vector3(position.x + moveVector.x, position.y, position.z + moveVector.z));
-        }
-
-        private void OnApplicationQuit()
-        {
-            lookActionTrace.Dispose();
         }
 
         private GameObject LoadFromPath(string filePath)
         {
+            /* パスからVRMモデルを読み込む */
             var bytes = File.ReadAllBytes(filePath);
             var context = new VRMImporterContext();
             context.ParseGlb(bytes);
@@ -124,33 +43,35 @@ namespace OpenWorld
             return context.Root;
         }
 
-        private bool LoadVRM(string filePath)
+        private GameObject LoadVRM(string filePath)
         {
-            avatarObject = LoadFromPath(filePath);
-            if (avatarObject == null) return false;
+            /* VRMモデルを配置する */
+            AvatarObject = LoadFromPath(filePath);
+            if (AvatarObject == null) return null;
 
-            avatarObject.transform.parent = this.transform;
-            avatarObject.transform.localPosition = new Vector3(0f, 0f, 0f);
-            avatarTransform = avatarObject.GetComponent<Transform>();
+            AvatarObject.transform.parent = this.transform;
+            AvatarObject.transform.localPosition = new Vector3(0f, 0f, 0f);
+            AvatarTransform = AvatarObject.GetComponent<Transform>();
             // 地面の高さに合わせる
             var position = this.transform.position;
             position.y = Ground.GetHeight(position.x, position.z) + 1f;
             this.transform.position = position;
             // アニメーションの設定
-            avatarAnimator = avatarObject.GetComponent<Animator>();
-            avatarAnimator.avatar = PlayerAvatar;
-            avatarAnimator.runtimeAnimatorController = PlayerAnimator;
-            return true;
+            AvatarAnimator = AvatarObject.GetComponent<Animator>();
+            AvatarAnimator.avatar = PlayerAvatar;
+            AvatarAnimator.runtimeAnimatorController = PlayerAnimator;
+            return AvatarObject;
         }
 
         private void LoadAvatar()
         {
-            if (LoadVRM(avatarFilePath)) return;
+            /* デフォルトモデルの読み込み */
+            if (LoadVRM(avatarFilePath) != null) return;
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
             var filePath = EditorUtility.OpenFilePanel("vrmファイル(.vrm)", "", "vrm");
             avatarFilePath = filePath.ToString().Replace('\\', '/');
-    #elif UNITY_STANDALONE_WIN
+#elif UNITY_STANDALONE_WIN
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "vrmファイル(.vrm)|*.vrm";
 
@@ -158,8 +79,8 @@ namespace OpenWorld
 
             var filePath = Path.GetFullPath(openFileDialog.FileName);
             avatarFilePath = filePath.ToString().Replace('\\', '/');
-    #endif
-            if (LoadVRM(avatarFilePath)) return;
+#endif
+            if (LoadVRM(avatarFilePath) != null) return;
         }
     }
 }
