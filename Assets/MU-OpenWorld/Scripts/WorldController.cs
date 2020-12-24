@@ -302,26 +302,26 @@ namespace OpenWorld
                     Destroy(GroundObjectArray[index]);
                     for (int x=1; x<worldSize; x++)
                         System.Array.Copy(GroundObjectArray, index+x*worldSize, GroundObjectArray, index+(x-1)*worldSize, 1);
-                    addPositionDiff = new Vector3((float)WorldDistance * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + referencePos;
+                    addPositionDiff = new Vector3((float)WorldDistance * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
                     createIndex = (worldSize - 1) * worldSize + index;
                     break;
                 case Axis.Xminus:
                     Destroy(GroundObjectArray[(worldSize-1)*worldSize+index]);
                     for (int x=worldSize-1; x>0; x--)
                         System.Array.Copy(GroundObjectArray, index+(x-1)*worldSize, GroundObjectArray, index+x*worldSize, 1);
-                    addPositionDiff = new Vector3((float)(-1*WorldDistance) * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + referencePos;
+                    addPositionDiff = new Vector3((float)(-1*WorldDistance) * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
                     createIndex = index;
                     break;
                 case Axis.Zplus:
                     Destroy(GroundObjectArray[index*worldSize]);
                     System.Array.Copy(GroundObjectArray, index*worldSize+1, GroundObjectArray, index*worldSize, worldSize-1);
-                    addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, (float)WorldDistance * Ground.ZWidth) + referencePos;
+                    addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, (float)WorldDistance * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
                     createIndex = (index + 1) * worldSize - 1;
                     break;
                 case Axis.Zminus:
                     Destroy(GroundObjectArray[(index+1)*worldSize-1]);
                     System.Array.Copy(GroundObjectArray, index*worldSize, GroundObjectArray, index*worldSize+1, worldSize-1);
-                    addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, (float)(-1*WorldDistance) * Ground.ZWidth) + referencePos;
+                    addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, (float)(-1*WorldDistance) * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
                     createIndex = index * worldSize;
                     break;
                 default:
