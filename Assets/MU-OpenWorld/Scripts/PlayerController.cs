@@ -11,9 +11,9 @@ namespace OpenWorld
         [Range(0f, 200f)]
         public float LookSensitivity = 100f;
 
-        private Rigidbody playerRigidbody;
+        public Rigidbody PlayerRigidbody;
+        public AvatarController PlayerAvatarController;
         public Transform cameraTransform;
-        private AvatarController Avatar;
 
         // 入力関連
         private InputAction moveAction;
@@ -31,15 +31,11 @@ namespace OpenWorld
 
         void Awake()
         {
-            Avatar = this.GetComponent<AvatarController>();
             InputAwake();
         }
 
         void Start()
         {
-            cameraTransform = GameObject.Find("CameraRotate").GetComponent<Transform>();
-            playerRigidbody = this.GetComponent<Rigidbody>();
-
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
@@ -62,20 +58,20 @@ namespace OpenWorld
             var move = moveAction.ReadValue<Vector2>();
             if (move.x == 0f && move.y == 0f)
             {
-                Avatar.AvatarAnimator.SetFloat("speed", 0f, 0.1f, flameDeltaTime);
+                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 0f, 0.1f, flameDeltaTime);
                 return;
             }
 
-            Avatar.AvatarAnimator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(move.x,2f)+Mathf.Pow(move.y,2f)), 0.1f, flameDeltaTime);
+            PlayerAvatarController.AvatarAnimator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(move.x,2f)+Mathf.Pow(move.y,2f)), 0.1f, flameDeltaTime);
             // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
             var moveSpeed = 5f;
             var moveVector = new Vector3(move.x * (moveSpeed/frameParSecond), 0f, move.y * (moveSpeed/frameParSecond));
             moveVector = cameraTransform.rotation * moveVector;
 
-            var rotation = Avatar.AvatarTransform.rotation;
-            Avatar.AvatarTransform.rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(moveVector), flameDeltaTime * animationTimeScale);
-            var position = playerRigidbody.position;
-            playerRigidbody.MovePosition(new Vector3(position.x + moveVector.x, position.y, position.z + moveVector.z));
+            var rotation = PlayerAvatarController.AvatarTransform.rotation;
+            PlayerAvatarController.AvatarTransform.rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(moveVector), flameDeltaTime * animationTimeScale);
+            var position = PlayerRigidbody.position;
+            PlayerRigidbody.MovePosition(new Vector3(position.x + moveVector.x, position.y, position.z + moveVector.z));
         }
 
         private void OnApplicationQuit()
