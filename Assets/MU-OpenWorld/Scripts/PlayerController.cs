@@ -11,9 +11,10 @@ namespace OpenWorld
         [Range(0f, 200f)]
         public float LookSensitivity = 100f;
 
+        // GetComponentの回避
         public Rigidbody PlayerRigidbody;
         public AvatarController PlayerAvatarController;
-        public Transform cameraTransform;
+        public Transform CameraTransform;
 
         // 入力関連
         private InputAction moveAction;
@@ -45,13 +46,13 @@ namespace OpenWorld
             // 視点操作
             if (isMouseCenter)
             {
-                Quaternion camera_rot = cameraTransform.rotation;
+                Quaternion camera_rot = CameraTransform.rotation;
                 foreach (var look in lookActionTrace)
                 {
                     var delta_pos = look.ReadValue<Vector2>();
                     camera_rot *= Quaternion.Euler(0f, delta_pos.x/Mathf.Pow((200f-LookSensitivity)/100f*0.26f+1.138f, 10f)*2f, 0f);
                 }
-                cameraTransform.rotation = camera_rot;
+                CameraTransform.rotation = camera_rot;
                 lookActionTrace.Clear();
             }
 
@@ -66,7 +67,7 @@ namespace OpenWorld
             // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
             var moveSpeed = 5f;
             var moveVector = new Vector3(move.x * (moveSpeed/frameParSecond), 0f, move.y * (moveSpeed/frameParSecond));
-            moveVector = cameraTransform.rotation * moveVector;
+            moveVector = CameraTransform.rotation * moveVector;
 
             var rotation = PlayerAvatarController.AvatarTransform.rotation;
             PlayerAvatarController.AvatarTransform.rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(moveVector), flameDeltaTime * animationTimeScale);

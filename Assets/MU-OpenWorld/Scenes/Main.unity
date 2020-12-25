@@ -480,7 +480,7 @@ MonoBehaviour:
   LookSensitivity: 100
   PlayerRigidbody: {fileID: 929649736}
   PlayerAvatarController: {fileID: 929649733}
-  cameraTransform: {fileID: 589482134}
+  CameraTransform: {fileID: 589482134}
 --- !u!1 &1001228199
 GameObject:
   m_ObjectHideFlags: 0
