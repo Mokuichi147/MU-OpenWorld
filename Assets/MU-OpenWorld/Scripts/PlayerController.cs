@@ -24,7 +24,8 @@ namespace OpenWorld
         private bool isMouseCenter = true;
 
         // マジックナンバーの回避
-        static private float flameDeltaTime = 0.02f;
+        static private float frameParSecond = 50f;
+        static private float flameDeltaTime = 1f / frameParSecond;
         static private float animationTimeScale = 10f;
 
 
@@ -67,8 +68,9 @@ namespace OpenWorld
             var position = playerRigidbody.position;
             Avatar.AvatarAnimator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(move.x,2f)+Mathf.Pow(move.y,2f)), 0.1f, flameDeltaTime);
             // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
-            var _dx = move.x * (5f / 50f);
-            var _dy = move.y * (5f / 50f);
+            var moveSpeed = 5f;
+            var _dx = move.x * (moveSpeed / frameParSecond);
+            var _dy = move.y * (moveSpeed / frameParSecond);
             var moveVector = new Vector3(_dx, 0f, _dy);
             moveVector = cameraTransform.rotation * moveVector;
             var rotation = Avatar.AvatarTransform.rotation;
