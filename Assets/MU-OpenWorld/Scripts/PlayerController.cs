@@ -65,16 +65,16 @@ namespace OpenWorld
                 Avatar.AvatarAnimator.SetFloat("speed", 0f, 0.1f, flameDeltaTime);
                 return;
             }
-            var position = playerRigidbody.position;
+
             Avatar.AvatarAnimator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(move.x,2f)+Mathf.Pow(move.y,2f)), 0.1f, flameDeltaTime);
             // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
             var moveSpeed = 5f;
-            var _dx = move.x * (moveSpeed / frameParSecond);
-            var _dy = move.y * (moveSpeed / frameParSecond);
-            var moveVector = new Vector3(_dx, 0f, _dy);
+            var moveVector = new Vector3(move.x * (moveSpeed/frameParSecond), 0f, move.y * (moveSpeed/frameParSecond));
             moveVector = cameraTransform.rotation * moveVector;
+
             var rotation = Avatar.AvatarTransform.rotation;
             Avatar.AvatarTransform.rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(moveVector), flameDeltaTime * animationTimeScale);
+            var position = playerRigidbody.position;
             playerRigidbody.MovePosition(new Vector3(position.x + moveVector.x, position.y, position.z + moveVector.z));
         }
 
