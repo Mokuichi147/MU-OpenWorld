@@ -22,7 +22,6 @@ namespace OpenWorld
         private InputAction escAction;
 
         private bool isMouseCenter = true;
-        private Vector2 centerPosition;
 
         // マジックナンバーの回避
         static private float flameDeltaTime = 0.02f;
@@ -40,9 +39,8 @@ namespace OpenWorld
             cameraTransform = GameObject.Find("CameraRotate").GetComponent<Transform>();
             playerRigidbody = this.GetComponent<Rigidbody>();
 
-            centerPosition = new Vector2(Mathf.Round(Screen.width/2f), Mathf.Round(Screen.height/2f));
-            Mouse.current.WarpCursorPosition(centerPosition);
             Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         void FixedUpdate()
