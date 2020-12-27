@@ -37,9 +37,8 @@ namespace OpenWorld
             int[] result = new int[r + 1];
             for (int i=0; i<Length; i++)
             {
-                int index = Y[i];
-                if (result[index] < X[index])
-                    result[index] = X[index];
+                if (result[Y[i]] < X[i])
+                    result[Y[i]] = X[i];
             }
             return result;
         }
