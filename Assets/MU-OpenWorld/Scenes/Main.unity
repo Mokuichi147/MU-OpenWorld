@@ -199,7 +199,6 @@ MonoBehaviour:
   WorldDistance: 16
   Player: {fileID: 929649732}
   GroundObject: {fileID: 1395065153941191014, guid: d602c95c065b22c47b960145bed7944e, type: 3}
-  GroundObjectArray: []
 --- !u!1 &589482133
 GameObject:
   m_ObjectHideFlags: 0

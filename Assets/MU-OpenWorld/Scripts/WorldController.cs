@@ -38,7 +38,7 @@ namespace OpenWorld
 
         private Vector3 referencePosition;
         public GameObject GroundObject;
-        public GameObject[] GroundObjectArray;
+        public GameObject[,] GroundObjectArray;
 
         private List<WorldShift> worldShiftList;
 
@@ -56,7 +56,7 @@ namespace OpenWorld
             worldSize = WorldDistance * 2 + 1;
             worldMaxArray = Circle.HalfMax(WorldDistance);
 
-            GroundObjectArray = new GameObject[worldSize * worldSize];
+            GroundObjectArray = new GameObject[worldSize, worldSize];
         }
 
         void Start()
@@ -128,27 +128,25 @@ namespace OpenWorld
             GroundArrayShift(shiftData.ReferencePosition, shiftData.Axis, shiftData.Index);
         }
 
-        static int GetArrayPoint(Axis axis, int index, int distance, int distanceDiff=0, bool invert=false)
+        private (int, int) GetCircleEdgePoint(Axis axis, int index, bool invert=false)
         {
             /* 二次元配列の座標から一次元配列の座標の位置を返す */
             if (invert)
                 axis = (Axis)(-1 * (int)axis);
 
-            int size = (distance + distanceDiff) * 2 + 1;
-
             switch (axis)
             {
                 case Axis.Xplus:
-                    return ((size - 1) - distanceDiff) * size + distanceDiff + index;
+                    return (WorldDistance+worldMaxArray[index], index);
                 case Axis.Xminus:
-                    return distanceDiff * size + distanceDiff + index;
+                    return (WorldDistance-worldMaxArray[index], index);
                 case Axis.Zplus:
-                    return (distanceDiff + index) * size + (size - 1) - distanceDiff;
+                    return (index, WorldDistance+worldMaxArray[index]);
                 case Axis.Zminus:
-                    return (distanceDiff + index) * size + distanceDiff;
+                    return (index, WorldDistance-worldMaxArray[index]);
                 default:
                     Debug.Log("get array point error!");
-                    return -1;
+                    return (-1, -1);
             }
         }
 
@@ -156,42 +154,40 @@ namespace OpenWorld
         {
             /* 地面のオブジェクトを管理する配列の中で指定した行か列を更新する */
             Vector3 addPositionDiff;
-            int createIndex;
             float indexDiff = index - WorldDistance;
+
+            var (x, z) = GetCircleEdgePoint(axis, index, invert: true);
+            Destroy(GroundObjectArray[x, z]);
 
             switch (axis)
             {
                 case Axis.Xplus:
-                    Destroy(GroundObjectArray[index]);
-                    for (int x=1; x<worldSize; x++)
-                        System.Array.Copy(GroundObjectArray, index+x*worldSize, GroundObjectArray, index+(x-1)*worldSize, 1);
-                    addPositionDiff = new Vector3((float)WorldDistance * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
-                    createIndex = (worldSize - 1) * worldSize + index;
+                    for (int px=WorldDistance-worldMaxArray[index]; px<WorldDistance+worldMaxArray[index]; px++)
+                        GroundObjectArray[px, z] = GroundObjectArray[px+1, z];
+                    addPositionDiff = new Vector3(worldMaxArray[index] * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
                     break;
                 case Axis.Xminus:
-                    Destroy(GroundObjectArray[(worldSize-1)*worldSize+index]);
-                    for (int x=worldSize-1; x>0; x--)
-                        System.Array.Copy(GroundObjectArray, index+(x-1)*worldSize, GroundObjectArray, index+x*worldSize, 1);
-                    addPositionDiff = new Vector3((float)(-1*WorldDistance) * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
-                    createIndex = index;
+                    for (int px=WorldDistance+worldMaxArray[index]-1; px>=WorldDistance-worldMaxArray[index]; px--)
+                        GroundObjectArray[px+1, z] = GroundObjectArray[px, z];
+                    addPositionDiff = new Vector3(-worldMaxArray[index] * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
                     break;
                 case Axis.Zplus:
-                    Destroy(GroundObjectArray[index*worldSize]);
-                    System.Array.Copy(GroundObjectArray, index*worldSize+1, GroundObjectArray, index*worldSize, worldSize-1);
-                    addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, (float)WorldDistance * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
-                    createIndex = (index + 1) * worldSize - 1;
+                    for (int pz=WorldDistance-worldMaxArray[index]; pz<WorldDistance+worldMaxArray[index]; pz++)
+                        GroundObjectArray[x, pz] = GroundObjectArray[x, pz+1];
+                    addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, worldMaxArray[index] * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
                     break;
                 case Axis.Zminus:
-                    Destroy(GroundObjectArray[(index+1)*worldSize-1]);
-                    System.Array.Copy(GroundObjectArray, index*worldSize, GroundObjectArray, index*worldSize+1, worldSize-1);
-                    addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, (float)(-1*WorldDistance) * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
-                    createIndex = index * worldSize;
+                    for (int pz=WorldDistance+worldMaxArray[index]-1; pz>=WorldDistance-worldMaxArray[index]; pz--)
+                        GroundObjectArray[x, pz+1] = GroundObjectArray[x, pz];
+                    addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, -worldMaxArray[index] * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
                     break;
                 default:
                     Debug.Log("GroundObject shift error!");
                     return;
             }
-            GroundObjectArray[createIndex] = Instantiate(GroundObject, addPositionDiff, Quaternion.identity, this.transform);
+
+            (x, z) = GetCircleEdgePoint(axis, index);
+            GroundObjectArray[x, z] = Instantiate(GroundObject, addPositionDiff, Quaternion.identity, this.transform);
         }
 
         private void GenerateWorld()
@@ -199,13 +195,12 @@ namespace OpenWorld
             /* ワールドを生成する */
             for (int x=0; x<worldSize; x++)
             {
-                var _x = x * worldSize;
                 var xDiff = x - WorldDistance;
-                for (int z=0; z<worldSize; z++)
+                for (int z=WorldDistance-worldMaxArray[x]; z<=WorldDistance+worldMaxArray[x]; z++)
                 {
                     var zDiff = z - WorldDistance;
                     var position = new Vector3(Ground.XWidth*xDiff+referencePosition.x, 0f, Ground.ZWidth*zDiff+referencePosition.z);
-                    GroundObjectArray[_x+z] = Instantiate(GroundObject, position, Quaternion.identity, this.transform);
+                    GroundObjectArray[x, z] = Instantiate(GroundObject, position, Quaternion.identity, this.transform);
                 }
             }
         }
