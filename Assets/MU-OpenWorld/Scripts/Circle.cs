@@ -3,35 +3,33 @@ namespace OpenWorld
     public struct Points
     {
         public int Length;
-        public int MaxCount;
 
-        public int[] x;
-        public int[] y;
+        public int[] X;
+        public int[] Y;
         
         public Points(int r)
         {
-            this.MaxCount = r;
-            this.Length = this.MaxCount;
-            this.x = new int[r];
-            this.y = new int[r];
+            this.Length = r;
+            this.X = new int[r];
+            this.Y = new int[r];
         }
 
         public void SetPoint(float x, float y)
         {
-            this.x[(int)y] = (int)x;
-            this.y[(int)y] = (int)y;
+            this.X[(int)y] = (int)x;
+            this.Y[(int)y] = (int)y;
         }
 
         public void Resize(int len)
         {
             this.Length = len;
-            System.Array.Resize<int>(ref this.x, len);
-            System.Array.Resize<int>(ref this.y, len);
+            System.Array.Resize<int>(ref X, len);
+            System.Array.Resize<int>(ref Y, len);
         }
 
         public bool IsMirror()
         {
-            return x[Length - 1] == y[Length - 1];
+            return X[Length - 1] == Y[Length - 1];
         }
 
         public int[] GetXMax(int r)
@@ -39,9 +37,9 @@ namespace OpenWorld
             int[] result = new int[r + 1];
             for (int i=0; i<Length; i++)
             {
-                int index = y[i];
-                if (result[index] < x[index])
-                    result[index] = x[index];
+                int index = Y[i];
+                if (result[index] < X[index])
+                    result[index] = X[index];
             }
             return result;
         }
@@ -120,10 +118,10 @@ namespace OpenWorld
 
             int mirrorDiff = oneEighth.IsMirror() ? 1 : 0;
             quarter = new Points(2 * oneEighth.Length - mirrorDiff);
-            System.Array.Copy(oneEighth.x, 0, quarter.x, 0, oneEighth.Length);
-            System.Array.Copy(Reverse(oneEighth.y), 0, quarter.x, oneEighth.Length - mirrorDiff, oneEighth.Length);
-            System.Array.Copy(oneEighth.y, 0, quarter.y, 0, oneEighth.Length);
-            System.Array.Copy(Reverse(oneEighth.x), 0, quarter.y, oneEighth.Length - mirrorDiff, oneEighth.Length);
+            System.Array.Copy(oneEighth.X, 0, quarter.X, 0, oneEighth.Length);
+            System.Array.Copy(Reverse(oneEighth.Y), 0, quarter.X, oneEighth.Length - mirrorDiff, oneEighth.Length);
+            System.Array.Copy(oneEighth.Y, 0, quarter.Y, 0, oneEighth.Length);
+            System.Array.Copy(Reverse(oneEighth.X), 0, quarter.Y, oneEighth.Length - mirrorDiff, oneEighth.Length);
 
             int[] half;
             int[] quarterResult = quarter.GetXMax(r);
