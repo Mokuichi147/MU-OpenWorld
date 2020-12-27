@@ -32,58 +32,36 @@ namespace OpenWorld
         [Range(1, 64)]
         public int WorldDistance = 10;
         private int worldSize;
+        private int[] worldMaxArray;
 
-        [Range(0, 32)]
-        public int GrassDistance = 2;
-        [Range(0, 16)]
-        public int GrassHighDistance = 1;
-        private int grassSize;
-
-        public int ColliderDistance = 1;
-        private int colliderSize;
-
-        private GameObject player;
-        private Vector3 playerPosition;
+        public GameObject Player;
 
         private Vector3 referencePosition;
         public GameObject GroundObject;
         public GameObject[] GroundObjectArray;
-
-        public Material GrassLowMaterial;
-        public Material GrassMediumMaterial;
-        public Material GrassHighMaterial;
-        private Material[] grassMaterialArray;
-
-        public MeshRenderer[] GrassMeshRendererArray;
-        public MeshCollider[] MeshColliderArray;
 
         private List<WorldShift> worldShiftList;
 
 
         void Awake()
         {
-            // クオリティ別の草シェーダを設定する
-            grassMaterialArray = new Material[3];
-            grassMaterialArray[0] = GrassLowMaterial;
-            grassMaterialArray[1] = GrassMediumMaterial;
-            grassMaterialArray[2] = GrassHighMaterial;
-
             // 配列の大きさを計算する
-            worldSize = WorldDistance * 2 + 1;
-            grassSize = GrassDistance * 2 + 1;
-            colliderSize = ColliderDistance * 2 + 1;
-            GroundObjectArray = new GameObject[worldSize * worldSize];
-            GrassMeshRendererArray = new MeshRenderer[grassSize * grassSize];
-            MeshColliderArray = new MeshCollider[colliderSize * colliderSize];
+            InitWorld();
 
             worldShiftList = new List<WorldShift>();
         }
 
+        public void InitWorld()
+        {
+            worldSize = WorldDistance * 2 + 1;
+            worldMaxArray = Circle.HalfMax(WorldDistance);
+
+            GroundObjectArray = new GameObject[worldSize * worldSize];
+        }
+
         void Start()
         {
-            player = GameObject.Find("Player");
-            referencePosition = player.transform.position;
-            playerPosition = referencePosition;
+            referencePosition = Player.transform.position;
 
             GenerateWorld();
         }
@@ -91,7 +69,7 @@ namespace OpenWorld
         void Update()
         {
             // マップの更新が必要か
-            playerPosition = player.transform.position;
+            Vector3 playerPosition = Player.transform.position;
             Axis axis = Axis.None;
             if (playerPosition.x > referencePosition.x + Ground.XWidth / 2f)
             {
@@ -174,121 +152,6 @@ namespace OpenWorld
             }
         }
 
-        private void SetGrassLOD(int index, LOD lod)
-        {
-            /* 草のシェーダーを切り替える */
-            Material[] materialArray = GrassMeshRendererArray[index].sharedMaterials;
-            materialArray[1] = grassMaterialArray[(int)lod];
-            GrassMeshRendererArray[index].sharedMaterials = materialArray;
-        }
-
-        private void ColliderArrayShift(Axis axis, int worldIndex)
-        {
-            /* コライダーを管理する配列の中で指定した行か列を更新する */
-            if (Mathf.Abs(worldIndex - WorldDistance) > ColliderDistance)
-                return;
-            
-            int worldPoint, colliderPoint;
-            int colliderIndex = worldIndex - WorldDistance + ColliderDistance;
-            int colliderDiff = WorldDistance - ColliderDistance;
-
-            switch (axis)
-            {
-                case Axis.Xplus:
-                    MeshColliderArray[colliderIndex].enabled = false;
-                    for (int x=1; x<colliderSize; x++)
-                        System.Array.Copy(MeshColliderArray, colliderIndex+x*colliderSize, MeshColliderArray, colliderIndex+(x-1)*colliderSize, 1);
-                    colliderPoint = (colliderSize-1) * colliderSize + colliderIndex;
-                    worldPoint = (colliderDiff+colliderSize-1)*worldSize + colliderDiff + colliderIndex;
-                    break;
-                case Axis.Xminus:
-                    MeshColliderArray[(colliderSize-1)*colliderSize+colliderIndex].enabled = false;
-                    for (int x=colliderSize-1; x>0; x--)
-                        System.Array.Copy(MeshColliderArray, colliderIndex+(x-1)*colliderSize, MeshColliderArray, colliderIndex+x*colliderSize, 1);
-                    colliderPoint = colliderIndex;
-                    worldPoint = colliderDiff*worldSize + colliderDiff + colliderIndex;
-                    break;
-                case Axis.Zplus:
-                    MeshColliderArray[colliderIndex*colliderSize].enabled = false;
-                    System.Array.Copy(MeshColliderArray, colliderIndex*colliderSize+1, MeshColliderArray, colliderIndex*colliderSize, colliderSize-1);
-                    colliderPoint = (colliderIndex+1) * colliderSize - 1;
-                    worldPoint = colliderDiff*worldSize + 2*colliderDiff*colliderIndex + colliderDiff + colliderPoint;
-                    break;
-                case Axis.Zminus:
-                    MeshColliderArray[(colliderIndex+1)*colliderSize-1].enabled = false;
-                    System.Array.Copy(MeshColliderArray, colliderIndex*colliderSize, MeshColliderArray, colliderIndex*colliderSize+1, colliderSize-1);
-                    colliderPoint = colliderIndex * colliderSize;
-                    worldPoint = colliderDiff*worldSize + 2*colliderDiff*colliderIndex + colliderDiff + colliderPoint;
-                    break;
-                default:
-                    Debug.Log("grassMaterialArray shift error!");
-                    return;
-
-            }
-            MeshColliderArray[colliderPoint] = GroundObjectArray[worldPoint].GetComponent<MeshCollider>();
-            MeshColliderArray[colliderPoint].enabled = true;
-        }
-
-        private void GrassArrayShift(Axis axis, int worldIndex)
-        {
-            /* 草のシェーダを管理する配列の中で指定した行か列を更新する */
-            if (Mathf.Abs(worldIndex - WorldDistance) > GrassDistance)
-                return;
-            
-            int worldPoint, grassPoint;
-            int grassIndex = worldIndex - WorldDistance + GrassDistance;
-            int grassDiff = WorldDistance - GrassDistance;
-
-            if (Mathf.Abs(worldIndex - WorldDistance) <= GrassHighDistance)
-            {
-                int highIndex = grassIndex - GrassDistance + GrassHighDistance;
-                int highDiff = GrassDistance - GrassHighDistance;
-                SetGrassLOD(GetArrayPoint(axis, highIndex, GrassHighDistance, distanceDiff: highDiff, invert: true), LOD.Medium);
-            }
-            
-            switch (axis)
-            {
-                case Axis.Xplus:
-                    SetGrassLOD(grassIndex, LOD.Low);
-                    for (int x=1; x<grassSize; x++)
-                        System.Array.Copy(GrassMeshRendererArray, grassIndex+x*grassSize, GrassMeshRendererArray, grassIndex+(x-1)*grassSize, 1);
-                    grassPoint = (grassSize-1) * grassSize + grassIndex;
-                    worldPoint = (grassDiff+grassSize-1)*worldSize + grassDiff + grassIndex;
-                    break;
-                case Axis.Xminus:
-                    SetGrassLOD((grassSize-1)*grassSize+grassIndex, LOD.Low);
-                    for (int x=grassSize-1; x>0; x--)
-                        System.Array.Copy(GrassMeshRendererArray, grassIndex+(x-1)*grassSize, GrassMeshRendererArray, grassIndex+x*grassSize, 1);
-                    grassPoint = grassIndex;
-                    worldPoint = grassDiff*worldSize + grassDiff + grassIndex;
-                    break;
-                case Axis.Zplus:
-                    SetGrassLOD(grassIndex*grassSize, LOD.Low);
-                    System.Array.Copy(GrassMeshRendererArray, grassIndex*grassSize+1, GrassMeshRendererArray, grassIndex*grassSize, grassSize-1);
-                    grassPoint = (grassIndex+1) * grassSize - 1;
-                    worldPoint = grassDiff*worldSize + 2*grassDiff*grassIndex + grassDiff + grassPoint;
-                    break;
-                case Axis.Zminus:
-                    SetGrassLOD((grassIndex+1)*grassSize-1, LOD.Low);
-                    System.Array.Copy(GrassMeshRendererArray, grassIndex*grassSize, GrassMeshRendererArray, grassIndex*grassSize+1, grassSize-1);
-                    grassPoint = grassIndex * grassSize;
-                    worldPoint = grassDiff*worldSize + 2*grassDiff*grassIndex + grassDiff + grassPoint;
-                    break;
-                default:
-                    Debug.Log("grassMaterialArray shift error!");
-                    return;
-            }
-            GrassMeshRendererArray[grassPoint] = GroundObjectArray[worldPoint].GetComponent<MeshRenderer>();
-            SetGrassLOD(grassPoint, LOD.Medium);
-
-            if (Mathf.Abs(worldIndex - WorldDistance) <= GrassHighDistance)
-            {
-                int highIndex = grassIndex - GrassDistance + GrassHighDistance;
-                int highDiff = GrassDistance - GrassHighDistance;
-                SetGrassLOD(GetArrayPoint(axis, highIndex, GrassHighDistance, distanceDiff: highDiff), LOD.High);
-            }
-        }
-
         private void GroundArrayShift(Vector3 referencePos, Axis axis, int index)
         {
             /* 地面のオブジェクトを管理する配列の中で指定した行か列を更新する */
@@ -329,8 +192,6 @@ namespace OpenWorld
                     return;
             }
             GroundObjectArray[createIndex] = Instantiate(GroundObject, addPositionDiff, Quaternion.identity, this.transform);
-            GrassArrayShift(axis, index);
-            ColliderArrayShift(axis, index);
         }
 
         private void GenerateWorld()
@@ -345,30 +206,6 @@ namespace OpenWorld
                     var zDiff = z - WorldDistance;
                     var position = new Vector3(Ground.XWidth*xDiff+referencePosition.x, 0f, Ground.ZWidth*zDiff+referencePosition.z);
                     GroundObjectArray[_x+z] = Instantiate(GroundObject, position, Quaternion.identity, this.transform);
-
-                    // 草の表示切替用
-                    if (Mathf.Abs(xDiff) <= GrassHighDistance && Mathf.Abs(zDiff) <= GrassHighDistance)
-                    {
-                        var xGrass = xDiff + GrassDistance;
-                        var zGrass = zDiff + GrassDistance;
-                        GrassMeshRendererArray[xGrass*grassSize + zGrass] = GroundObjectArray[_x+z].GetComponent<MeshRenderer>();
-                        SetGrassLOD(xGrass*grassSize + zGrass, LOD.High);
-                    }
-                    else if (Mathf.Abs(xDiff) <= GrassDistance && Mathf.Abs(zDiff) <= GrassDistance)
-                    {
-                        var xGrass = xDiff + GrassDistance;
-                        var zGrass = zDiff + GrassDistance;
-                        GrassMeshRendererArray[xGrass*grassSize + zGrass] = GroundObjectArray[_x+z].GetComponent<MeshRenderer>();
-                        SetGrassLOD(xGrass*grassSize + zGrass, LOD.Medium);
-                    }
-                    // メッシュコライダー切替用
-                    if (Mathf.Abs(xDiff) <= ColliderDistance && Mathf.Abs(zDiff) <= ColliderDistance)
-                    {
-                        var xCollider = xDiff + ColliderDistance;
-                        var zCollider = zDiff + ColliderDistance;
-                        MeshColliderArray[xCollider*colliderSize + zCollider] = GroundObjectArray[_x+z].GetComponent<MeshCollider>();
-                        MeshColliderArray[xCollider*colliderSize + zCollider].enabled = true;
-                    }
                 }
             }
         }

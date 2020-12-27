@@ -196,17 +196,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 520388c5cc0332d4e932dbc63e2341c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WorldDistance: 10
-  GrassDistance: 2
-  GrassHighDistance: 1
-  ColliderDistance: 1
-  GroundObject: {fileID: 9140462846861877879, guid: 78baffc2eec83844b9bf4ee783c49fcb, type: 3}
+  WorldDistance: 16
+  Player: {fileID: 929649732}
+  GroundObject: {fileID: 1395065153941191014, guid: d602c95c065b22c47b960145bed7944e, type: 3}
   GroundObjectArray: []
-  GrassLowMaterial: {fileID: 2100000, guid: 7f2c4e31a1077014fb660887c45e15c3, type: 2}
-  GrassMediumMaterial: {fileID: 2100000, guid: a349d2ac41ccb3347b7e37b2a2ee304b, type: 2}
-  GrassHighMaterial: {fileID: 2100000, guid: 5590197e7aaf70b4594d9141adbcb1b2, type: 2}
-  GrassMeshRendererArray: []
-  MeshColliderArray: []
 --- !u!1 &589482133
 GameObject:
   m_ObjectHideFlags: 0

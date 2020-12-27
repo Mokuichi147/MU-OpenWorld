@@ -6,8 +6,17 @@ namespace OpenWorld
 {
     public class Ground : MonoBehaviour
     {
-        public Mesh MeshObject;
+        private Mesh meshObject;
+        private GameObject watarSurface = null;
+    
         public GameObject WaterSurfaceObject;
+        public MeshFilter Filter;
+        public MeshFilter HighFilter;
+        public MeshFilter MediumFilter;
+        public MeshFilter LowFilter;
+        public MeshCollider HighCollider;
+        public MeshCollider MediumCollider;
+        public MeshCollider LowCollider;
 
         static public int ZPointCount = 65;
         static public float ZWidth = 32f;
@@ -19,6 +28,8 @@ namespace OpenWorld
 
         static public float WorldSeed = 50000f;
         static public float WorldScale = 0.004f;
+
+        static private float watarHeight = 0f;
 
         static private int[] triangleArray = null;
 
@@ -56,13 +67,15 @@ namespace OpenWorld
 
         void OnDestroy()
         {
-            Destroy(MeshObject);
-            Destroy(WaterSurfaceObject);
+            Destroy(meshObject);
+            if (watarSurface != null)
+                Destroy(watarSurface);
         }
 
-        private Vector3[] MeshPoint(float x, float z)
+        private (Vector3[], bool) MeshPoint(float x, float z)
         {
             Vector3[] meshVerticeArray = new Vector3[XPointCount * ZPointCount];
+            bool isWatar = false;
 
             for (int ix=0; ix<XPointCount; ix++)
             {
@@ -71,21 +84,24 @@ namespace OpenWorld
                 {
                     float _dz = ZWidth/-2f + iz*triangleDiff.z + ix%2 * (triangleDiff.z/2f);
                     float _y = GetHeight(_dx + x, _dz + z);
+                    if (!isWatar && _y < watarHeight)
+                        isWatar = true;
                     meshVerticeArray[ix * ZPointCount + iz] = new Vector3(_dx, _y, _dz);
                 }
             }
-            return meshVerticeArray;
+            return (meshVerticeArray, isWatar);
         }
 
         private void Create(float x, float z)
         {
-            MeshObject = new Mesh();
-            MeshObject.name = $"GroundMesh_{x}_{z}";
-            MeshObject.Clear();
+            meshObject = new Mesh();
+            meshObject.name = $"GroundMesh_{x}_{z}";
+            meshObject.Clear();
 
             var verticeArray = new Vector3[XPointCount * ZPointCount];
+            bool isWatar;
 
-            verticeArray = MeshPoint(x, z);
+            (verticeArray, isWatar) = MeshPoint(x, z);
 
             if (triangleArray == null)
             {
@@ -119,18 +135,24 @@ namespace OpenWorld
                 }
             }
             
-            MeshObject.vertices = verticeArray;
-            MeshObject.triangles = triangleArray;
+            meshObject.vertices = verticeArray;
+            meshObject.triangles = triangleArray;
 
-            MeshObject.RecalculateNormals();
-            var filter = this.GetComponent<MeshFilter>();
-            filter.sharedMesh = MeshObject;
-            var collider = this.GetComponent<MeshCollider>();
-            collider.sharedMesh = MeshObject;
+            meshObject.RecalculateNormals();
+            Filter.sharedMesh = meshObject;
+            HighFilter.sharedMesh = meshObject;
+            MediumFilter.sharedMesh = meshObject;
+            LowFilter.sharedMesh = meshObject;
+            HighCollider.sharedMesh = meshObject;
+            MediumCollider.sharedMesh = meshObject;
+            LowCollider.sharedMesh = meshObject;
 
-            WaterSurfaceObject = this.transform.GetChild(0).gameObject;
-            WaterSurfaceObject.name = $"WaterSurface_{x}_{z}";
-            WaterSurfaceObject.transform.localScale = new Vector3(XWidth/10f, 1f, ZWidth/10f);
+            if (isWatar)
+            {
+                watarSurface = Instantiate(WaterSurfaceObject, this.transform.position, this.transform.rotation, this.transform);
+                watarSurface.name = $"WaterSurface_{x}_{z}";
+                watarSurface.transform.localScale = new Vector3(XWidth/10f, 1f, ZWidth/10f);
+            }
         }
     }
 }
