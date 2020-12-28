@@ -75,22 +75,22 @@ namespace OpenWorld
             if (xPosition > referencePosition.x)
             {
                 axis = Axis.Xplus;
-                referencePosition.x = xPosition;
+                referencePosition.x++;
             }
             else if (xPosition < referencePosition.x)
             {
                 axis = Axis.Xminus;
-                referencePosition.x = xPosition;
+                referencePosition.x--;
             }
             else if (zPosition > referencePosition.z)
             {
                 axis = Axis.Zplus;
-                referencePosition.z = zPosition;
+                referencePosition.z++;
             }
             else if (zPosition < referencePosition.z)
             {
                 axis = Axis.Zminus;
-                referencePosition.z = zPosition;
+                referencePosition.z--;
             }
 
             // ワールドの境界を行き来した場合に何度も更新しないための処理
