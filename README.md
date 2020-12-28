@@ -2,12 +2,20 @@
 目標: 好きなアバターで冒険できるゲーム
 
 
+![GameScreen](https://user-images.githubusercontent.com/38586357/103227443-bd3dad00-4971-11eb-95ef-40863418bffa.jpg)
+
+
+## 開発環境
+- Unity 2020.2.1f1
+- Windows 10 or MacOS(OpenGL Core)
+
+
 ## サードパーティソフトウェア
 このリポジトリ内に含んでいるOSSの一覧です。一部改変を行っているものもあります。
 
 ---
 
-UniVRM  
+[UniVRM](https://github.com/vrm-c/UniVRM)  
 Copyright (c) 2020 VRM Consortium  
 Copyright (c) 2018 Masataka SUMI for MToon  
 
@@ -31,7 +39,7 @@ SOFTWARE.
 
 ---
 
-ShaderGraphsMToonForURPVR  
+[ShaderGraphsMToonForURPVR](https://github.com/simplestargame/ShaderGraphsMToonForURPVR)  
 Copyright (c) 2020 simplestargame  
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
