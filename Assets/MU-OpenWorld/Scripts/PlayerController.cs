@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
+using UnityEngine.UI;
 
 namespace OpenWorld
 {
@@ -15,6 +16,9 @@ namespace OpenWorld
         public Rigidbody PlayerRigidbody;
         public AvatarController PlayerAvatarController;
         public Transform CameraTransform;
+
+        // UI関連
+        public GameObject MenuView;
 
         // 入力関連
         private InputAction moveAction;
@@ -37,8 +41,7 @@ namespace OpenWorld
 
         void Start()
         {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
+            HideMenuView();
         }
 
         void FixedUpdate()
@@ -87,25 +90,31 @@ namespace OpenWorld
             moveAction = playerInput.currentActionMap["Move"];
             lookAction = playerInput.currentActionMap["Look"];
             lookActionTrace = new InputActionTrace();
-            lookActionTrace.SubscribeTo(lookAction);
 
             escAction = playerInput.currentActionMap["Esc"];
             escAction.performed += (callback) =>
             {
                 if (isMouseCenter)
-                {
-                    Cursor.visible = true;
-                    Cursor.lockState = CursorLockMode.None;
-                    lookActionTrace.UnsubscribeFrom(lookAction);
-                }
-                else
-                {
-                    Cursor.visible = false;
-                    Cursor.lockState = CursorLockMode.Locked;
-                    lookActionTrace.SubscribeTo(lookAction);
-                }
-                isMouseCenter = !isMouseCenter;
+                    ShowMenuView();
             };
+        }
+
+        public void ShowMenuView()
+        {
+            MenuView.SetActive(true);
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            lookActionTrace.UnsubscribeFrom(lookAction);
+            isMouseCenter = false;
+        }
+
+        public void HideMenuView()
+        {
+            MenuView.SetActive(false);
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            lookActionTrace.SubscribeTo(lookAction);
+            isMouseCenter = true;
         }
     }
 }
