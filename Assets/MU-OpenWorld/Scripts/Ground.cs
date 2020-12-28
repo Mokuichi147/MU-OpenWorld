@@ -61,7 +61,7 @@ namespace OpenWorld
         void Awake()
         {
             var pos = this.transform.position;
-            this.name = $"Ground_{pos.x}_{pos.z}";
+            this.name = $"Ground_{Mathf.Floor(pos.x / XWidth)}_{Mathf.Floor(pos.z / ZWidth)}";
             Create(pos.x, pos.z);
         }
 
@@ -150,7 +150,7 @@ namespace OpenWorld
             if (isWatar)
             {
                 watarSurface = Instantiate(WaterSurfaceObject, this.transform.position, this.transform.rotation, this.transform);
-                watarSurface.name = $"WaterSurface_{x}_{z}";
+                watarSurface.name = $"WaterSurface_{Mathf.Floor(x / XWidth)}_{Mathf.Floor(z / ZWidth)}";
                 watarSurface.transform.localScale = new Vector3(XWidth/10f, 1f, ZWidth/10f);
             }
         }

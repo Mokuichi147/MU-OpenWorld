@@ -61,7 +61,7 @@ namespace OpenWorld
 
         void Start()
         {
-            referencePosition = Player.transform.position;
+            referencePosition = new Vector3(Mathf.Floor(Player.transform.position.x/Ground.XWidth), 0f, Mathf.Floor(Player.transform.position.z/Ground.ZWidth));
 
             GenerateWorld();
         }
@@ -69,27 +69,28 @@ namespace OpenWorld
         void Update()
         {
             // マップの更新が必要か
-            Vector3 playerPosition = Player.transform.position;
+            float xPosition = Mathf.Floor(Player.transform.position.x / Ground.XWidth);
+            float zPosition = Mathf.Floor(Player.transform.position.z / Ground.ZWidth);
             Axis axis = Axis.None;
-            if (playerPosition.x > referencePosition.x + Ground.XWidth / 2f)
+            if (xPosition > referencePosition.x)
             {
                 axis = Axis.Xplus;
-                referencePosition.x += Ground.XWidth;
+                referencePosition.x = xPosition;
             }
-            else if (playerPosition.x < referencePosition.x - Ground.XWidth / 2f)
+            else if (xPosition < referencePosition.x)
             {
                 axis = Axis.Xminus;
-                referencePosition.x -= Ground.XWidth;
+                referencePosition.x = xPosition;
             }
-            else if (playerPosition.z > referencePosition.z + Ground.ZWidth / 2f)
+            else if (zPosition > referencePosition.z)
             {
                 axis = Axis.Zplus;
-                referencePosition.z += Ground.ZWidth;
+                referencePosition.z = zPosition;
             }
-            else if (playerPosition.z < referencePosition.z - Ground.ZWidth / 2f)
+            else if (zPosition < referencePosition.z)
             {
                 axis = Axis.Zminus;
-                referencePosition.z -= Ground.ZWidth;
+                referencePosition.z = zPosition;
             }
 
             // ワールドの境界を行き来した場合に何度も更新しないための処理
@@ -164,22 +165,22 @@ namespace OpenWorld
                 case Axis.Xplus:
                     for (int px=WorldDistance-worldMaxArray[index]; px<WorldDistance+worldMaxArray[index]; px++)
                         GroundObjectArray[px, z] = GroundObjectArray[px+1, z];
-                    addPositionDiff = new Vector3(worldMaxArray[index] * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
+                    addPositionDiff = new Vector3((worldMaxArray[index]+referencePos.x) * Ground.XWidth, 0f, (indexDiff+referencePos.z) * Ground.ZWidth);
                     break;
                 case Axis.Xminus:
                     for (int px=WorldDistance+worldMaxArray[index]-1; px>=WorldDistance-worldMaxArray[index]; px--)
                         GroundObjectArray[px+1, z] = GroundObjectArray[px, z];
-                    addPositionDiff = new Vector3(-worldMaxArray[index] * Ground.XWidth, 0f, indexDiff * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
+                    addPositionDiff = new Vector3((-worldMaxArray[index]+referencePos.x) * Ground.XWidth, 0f, (indexDiff+referencePos.z) * Ground.ZWidth);
                     break;
                 case Axis.Zplus:
                     for (int pz=WorldDistance-worldMaxArray[index]; pz<WorldDistance+worldMaxArray[index]; pz++)
                         GroundObjectArray[x, pz] = GroundObjectArray[x, pz+1];
-                    addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, worldMaxArray[index] * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
+                    addPositionDiff = new Vector3((indexDiff+referencePos.x) * Ground.XWidth, 0f, (worldMaxArray[index]+referencePos.z) * Ground.ZWidth);
                     break;
                 case Axis.Zminus:
                     for (int pz=WorldDistance+worldMaxArray[index]-1; pz>=WorldDistance-worldMaxArray[index]; pz--)
                         GroundObjectArray[x, pz+1] = GroundObjectArray[x, pz];
-                    addPositionDiff = new Vector3(indexDiff * Ground.XWidth, 0f, -worldMaxArray[index] * Ground.ZWidth) + new Vector3(referencePos.x, 0f, referencePos.z);
+                    addPositionDiff = new Vector3((indexDiff+referencePos.x) * Ground.XWidth, 0f, (-worldMaxArray[index]+referencePos.z) * Ground.ZWidth);
                     break;
                 default:
                     Debug.Log("GroundObject shift error!");
