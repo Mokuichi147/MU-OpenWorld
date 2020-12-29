@@ -46,7 +46,12 @@ namespace OpenWorld
 
         public void InitWorld()
         {
-            var world = Data.WorldCreate();
+            Data.AppLoad();
+            Data.World world;
+            if (Data.AppData.PreWorldUUID != "")
+                world = Data.WorldLoad(Data.AppData.PreWorldUUID);
+            else
+                world = Data.WorldCreate();
             Ground.WorldSeed = world.Seed;
             Ground.WorldScale = world.Scale;
             worldSize = WorldDistance * 2 + 1;

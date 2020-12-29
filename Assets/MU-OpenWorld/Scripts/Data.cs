@@ -20,6 +20,7 @@ namespace OpenWorld
         {
             public string UUID;
             public string UserName;
+            public string PreWorldUUID;
             public List<WorldPath> Worlds;
         }
 
@@ -55,7 +56,7 @@ namespace OpenWorld
         static private string rootPath = Application.dataPath + "/UserData";
         static private string appDataPath = rootPath + "/GameData.xml";
 
-        static private App appData;
+        static public App AppData;
 
 
         void Awake()
@@ -91,23 +92,24 @@ namespace OpenWorld
         // アプリケーション関連
         static private void AppSave()
         {
-            Save(appDataPath, appData);
+            Save(appDataPath, AppData);
         }
 
-        static private void AppLoad()
+        static public void AppLoad()
         {
             if (File.Exists(appDataPath))
             {
-                appData = Load(appDataPath, new App());
+                AppData = Load(appDataPath, new App());
             }
             else
             {
                 if (!Directory.Exists(rootPath))
                     Directory.CreateDirectory($"{rootPath}");
-                appData = new App();
-                appData.UUID = System.Guid.NewGuid().ToString();
-                appData.UserName = "";
-                appData.Worlds = new List<WorldPath>();
+                AppData = new App();
+                AppData.UUID = System.Guid.NewGuid().ToString();
+                AppData.UserName = "";
+                AppData.Worlds = new List<WorldPath>();
+                AppData.PreWorldUUID = "";
                 AppSave();
             }
         }
@@ -120,13 +122,15 @@ namespace OpenWorld
 
             var world = new World();
             world.UUID = System.Guid.NewGuid().ToString();
-            world.Seed = Random.Range(0f, 70000f);
+            world.Seed = 50000f;//Random.Range(0f, 70000f);
             world.Scale = 0.004f;
 
-            appData.Worlds.Add(new WorldPath() {UUID=world.UUID, Path=$"{rootPath}/worlds/{world.UUID}"});
+            AppData.Worlds.Add(new WorldPath() {UUID=world.UUID, Path=$"{rootPath}/worlds/{world.UUID}"});
 
             Directory.CreateDirectory($"{rootPath}/worlds/{world.UUID}");
             WorldSave(world);
+
+            AppData.PreWorldUUID = world.UUID;
             AppSave();
 
             return world;
