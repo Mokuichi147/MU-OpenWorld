@@ -4,13 +4,6 @@ using UnityEngine;
 
 namespace OpenWorld
 {
-    enum LOD
-    {
-        Low    = 0,
-        Medium = 1,
-        High   = 2
-    }
-
     enum Axis
     {
         None   =  0,
@@ -53,6 +46,9 @@ namespace OpenWorld
 
         public void InitWorld()
         {
+            var world = Data.WorldCreate();
+            Ground.WorldSeed = world.Seed;
+            Ground.WorldScale = world.Scale;
             worldSize = WorldDistance * 2 + 1;
             worldMaxArray = Circle.HalfMax(WorldDistance);
 
