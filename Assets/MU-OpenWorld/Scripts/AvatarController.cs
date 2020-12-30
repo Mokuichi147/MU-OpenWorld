@@ -18,7 +18,8 @@ namespace OpenWorld
         public Avatar PlayerAvatar;
         public AnimatorController PlayerAnimator;
 
-        public string avatarFilePath = "Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm";
+        static public string DefaultFilePath = "Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm";
+        public string AvatarFilePath = DefaultFilePath;
 
         private Rigidbody playerRigidbody;
 
@@ -29,10 +30,6 @@ namespace OpenWorld
         [System.NonSerialized]
         public Transform AvatarTransform;
 
-        void Awake()
-        {
-            LoadAvatar();
-        }
 
         static private GameObject LoadFromPath(string filePath)
         {
@@ -46,18 +43,21 @@ namespace OpenWorld
             return context.Root;
         }
 
-        static public Transform InitPosition(GameObject avatarObject, Transform parent, float addHeight=1f)
+        static public Transform InitPosition(GameObject avatarObject, Transform parent)
         {
             avatarObject.transform.parent = parent;
             avatarObject.transform.localPosition = new Vector3(0f, 0f, 0f);
             var avatarTransform = avatarObject.GetComponent<Transform>();
 
+            return avatarTransform;
+        }
+
+        static public void SetHeight(Transform parent, float addHeight=1f)
+        {
             // 地面の高さに合わせる
             var position = parent.position;
             position.y = Ground.GetHeight(position.x, position.z) + addHeight;
             parent.position = position;
-
-            return avatarTransform;
         }
 
         static public Animator InitAnimator(GameObject avatarObject, Avatar avatar, AnimatorController animator)
@@ -73,7 +73,6 @@ namespace OpenWorld
         {
             /* VRMモデルを配置する */
             var avatarObject = LoadFromPath(filePath);
-            if (avatarObject == null) return null;
 
             // 位置の初期設定
             AvatarTransform = InitPosition(avatarObject, this.transform);
@@ -82,26 +81,26 @@ namespace OpenWorld
             return avatarObject;
         }
 
-        private void LoadAvatar()
+        public void PlayerLoad(string avatarPath)
         {
-            /* デフォルトモデルの読み込み */
-            AvatarObject = LoadVRM(avatarFilePath);
-            if (AvatarObject != null) return;
+            AvatarFilePath = avatarPath;
+            AvatarObject = LoadVRM(AvatarFilePath);
+        }
 
-#if UNITY_EDITOR
-            var filePath = EditorUtility.OpenFilePanel("vrmファイル(.vrm)", "", "vrm");
-            avatarFilePath = filePath.ToString().Replace('\\', '/');
-#elif UNITY_STANDALONE_WIN
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "vrmファイル(.vrm)|*.vrm";
+        private void SelectPath()
+        {
+            #if UNITY_EDITOR
+                var filePath = EditorUtility.OpenFilePanel("vrmファイル(.vrm)", "", "vrm");
+                AvatarFilePath = filePath.ToString().Replace('\\', '/');
+            #elif UNITY_STANDALONE_WIN
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "vrmファイル(.vrm)|*.vrm";
 
-            if (openFileDialog.ShowDialog() == DialogResult.Cancel) return;
+                if (openFileDialog.ShowDialog() == DialogResult.Cancel) return;
 
-            var filePath = Path.GetFullPath(openFileDialog.FileName);
-            avatarFilePath = filePath.ToString().Replace('\\', '/');
-#endif
-            AvatarObject = LoadVRM(avatarFilePath);
-            if (AvatarObject != null) return;
+                var filePath = Path.GetFullPath(openFileDialog.FileName);
+                AvatarFilePath = filePath.ToString().Replace('\\', '/');
+            #endif
         }
     }
 }

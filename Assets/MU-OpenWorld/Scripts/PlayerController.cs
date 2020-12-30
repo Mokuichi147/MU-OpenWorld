@@ -36,7 +36,8 @@ namespace OpenWorld
 
         void Awake()
         {
-            InputAwake();
+            InitInput();
+            InitPlayer();
         }
 
         void Start()
@@ -81,9 +82,10 @@ namespace OpenWorld
         private void OnApplicationQuit()
         {
             lookActionTrace.Dispose();
+            PlayerSave();
         }
 
-        private void InputAwake()
+        private void InitInput()
         {
             /* 入力の初期設定 */
             var playerInput = this.GetComponent<PlayerInput>();
@@ -97,6 +99,29 @@ namespace OpenWorld
                 if (isMouseCenter)
                     ShowMenuView();
             };
+        }
+
+        private void InitPlayer()
+        {
+            if (Data.IsPlayerData())
+            {
+                var player = Data.PlayerLoad();
+                PlayerRigidbody.position = player.Position;
+                PlayerAvatarController.PlayerLoad(player.AvatarPath);
+            }
+            else
+            {
+                var player = Data.PlayerCreate();
+                PlayerRigidbody.position = player.Position;
+                PlayerAvatarController.PlayerLoad(player.AvatarPath);
+                AvatarController.SetHeight(this.transform);
+            }
+        }
+
+        private void PlayerSave()
+        {
+            var player = new Data.Player() {Position=PlayerRigidbody.position, AvatarPath=PlayerAvatarController.AvatarFilePath};
+            Data.PlayerSave(player);
         }
 
         public void ShowMenuView()

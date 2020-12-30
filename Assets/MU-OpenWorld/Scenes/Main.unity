@@ -416,7 +416,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &435173565
 MonoBehaviour:
@@ -882,7 +882,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerAvatar: {fileID: 9000000, guid: a5c50b3e5ee906c4fad3e2777bb9d5a4, type: 2}
   PlayerAnimator: {fileID: 9100000, guid: dd21dd21e31d9d04392184b602484678, type: 2}
-  avatarFilePath: Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm
+  AvatarFilePath: 
 --- !u!114 &929649734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -926,7 +926,7 @@ Transform:
   m_Children:
   - {fileID: 589482134}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &929649736
 Rigidbody:

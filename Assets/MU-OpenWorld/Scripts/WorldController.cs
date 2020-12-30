@@ -46,7 +46,6 @@ namespace OpenWorld
 
         public void InitWorld()
         {
-            Data.AppLoad();
             Data.World world;
             if (Data.AppData.PreWorldUUID != "")
                 world = Data.WorldLoad(Data.AppData.PreWorldUUID);

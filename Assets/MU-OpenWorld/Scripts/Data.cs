@@ -36,7 +36,7 @@ namespace OpenWorld
         public struct Player
         {
             public Vector3 Position;
-            public int Distance;
+            public string AvatarPath;
         }
 
         [System.Serializable]
@@ -57,12 +57,8 @@ namespace OpenWorld
         static private string appDataPath = rootPath + "/GameData.xml";
 
         static public App AppData;
+        static private string worldUUID;
 
-
-        void Awake()
-        {
-            AppLoad();
-        }
 
         void OnApplicationQuit()
         {
@@ -95,6 +91,7 @@ namespace OpenWorld
             Save(appDataPath, AppData);
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static public void AppLoad()
         {
             if (File.Exists(appDataPath))
@@ -118,8 +115,6 @@ namespace OpenWorld
         // ワールド関連
         static public World WorldCreate()
         {
-            AppLoad();
-
             var world = new World();
             world.UUID = System.Guid.NewGuid().ToString();
             world.Seed = 50000f;//Random.Range(0f, 70000f);
@@ -128,6 +123,8 @@ namespace OpenWorld
             AppData.Worlds.Add(new WorldPath() {UUID=world.UUID, Path=$"{rootPath}/worlds/{world.UUID}"});
 
             Directory.CreateDirectory($"{rootPath}/worlds/{world.UUID}");
+
+            worldUUID = world.UUID;
             WorldSave(world);
 
             AppData.PreWorldUUID = world.UUID;
@@ -139,12 +136,42 @@ namespace OpenWorld
         static public World WorldLoad(string uuid)
         {
             World world = Load($"{rootPath}/worlds/{uuid}/world.xml", new World());
+            AppData.PreWorldUUID = uuid;
+            worldUUID = uuid;
             return world;
         }
 
         static public void WorldSave(World world)
         {
-            Save($"{rootPath}/worlds/{world.UUID}/world.xml", world);
+            Save($"{rootPath}/worlds/{worldUUID}/world.xml", world);
+        }
+
+
+        // プレイヤー関連
+        static public bool IsPlayerData()
+        {
+            return File.Exists($"{rootPath}/worlds/{worldUUID}/player.xml");
+        }
+
+        static public Player PlayerCreate()
+        {
+            var player = new Player();
+            player.Position = new Vector3(0f, 0f, 0f);
+            player.AvatarPath = $"{Application.dataPath}/MU-OpenWorld/Models/Avatars/Moyu.vrm";
+
+            PlayerSave(player);
+            return player;
+        }
+
+        static public Player PlayerLoad()
+        {
+            Player player = Load($"{rootPath}/worlds/{worldUUID}/player.xml", new Player());
+            return player;
+        }
+
+        static public void PlayerSave(Player player)
+        {
+            Save($"{rootPath}/worlds/{worldUUID}/player.xml", player);
         }
     }
 }
