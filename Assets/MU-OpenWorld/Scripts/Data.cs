@@ -36,6 +36,7 @@ namespace OpenWorld
         public struct Player
         {
             public Vector3 Position;
+            public Quaternion Rotation;
             public string AvatarPath;
         }
 
@@ -157,6 +158,7 @@ namespace OpenWorld
         {
             var player = new Player();
             player.Position = new Vector3(0f, 0f, 0f);
+            player.Rotation = Quaternion.identity;
             player.AvatarPath = $"{Application.dataPath}/MU-OpenWorld/Models/Avatars/Moyu.vrm";
 
             PlayerSave(player);

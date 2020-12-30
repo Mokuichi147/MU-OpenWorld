@@ -9,6 +9,8 @@ namespace OpenWorld
 {
     public class PlayerController : MonoBehaviour
     {
+        public bool IsActive = false;
+
         [Range(0f, 200f)]
         public float LookSensitivity = 100f;
 
@@ -22,11 +24,11 @@ namespace OpenWorld
 
         // 入力関連
         private InputAction moveAction;
-        private InputAction lookAction;
-        private InputActionTrace lookActionTrace;
+        static private InputAction lookAction;
+        static private InputActionTrace lookActionTrace;
         private InputAction escAction;
 
-        private bool isMouseCenter = true;
+        static private bool isMouseCenter = true;
 
         // マジックナンバーの回避
         static private float frameParSecond = 50f;
@@ -34,19 +36,19 @@ namespace OpenWorld
         static private float animationTimeScale = 10f;
 
 
-        void Awake()
+        public void Init()
         {
             InitInput();
             InitPlayer();
-        }
-
-        void Start()
-        {
-            HideMenuView();
+            HideCursor();
+            IsActive = true;
         }
 
         void FixedUpdate()
         {
+            if (!IsActive)
+                return;
+
             // 視点操作
             if (isMouseCenter)
             {
@@ -81,8 +83,11 @@ namespace OpenWorld
 
         private void OnApplicationQuit()
         {
-            lookActionTrace.Dispose();
-            PlayerSave();
+            if (IsActive)
+            {
+                lookActionTrace.Dispose();
+                PlayerSave();
+            }
         }
 
         private void InitInput()
@@ -97,45 +102,48 @@ namespace OpenWorld
             escAction.performed += (callback) =>
             {
                 if (isMouseCenter)
-                    ShowMenuView();
+                    GameManager.ShowMenuView();
             };
         }
 
         private void InitPlayer()
         {
+            Data.Player player;
             if (Data.IsPlayerData())
             {
-                var player = Data.PlayerLoad();
+                player = Data.PlayerLoad();
                 PlayerRigidbody.position = player.Position;
                 PlayerAvatarController.PlayerLoad(player.AvatarPath);
             }
             else
             {
-                var player = Data.PlayerCreate();
+                player = Data.PlayerCreate();
                 PlayerRigidbody.position = player.Position;
                 PlayerAvatarController.PlayerLoad(player.AvatarPath);
                 AvatarController.SetHeight(this.transform);
             }
+            CameraTransform.rotation = player.Rotation;
         }
 
         private void PlayerSave()
         {
-            var player = new Data.Player() {Position=PlayerRigidbody.position, AvatarPath=PlayerAvatarController.AvatarFilePath};
+            var player = new Data.Player();
+            player.Position = PlayerRigidbody.position;
+            player.Rotation = CameraTransform.rotation;
+            player.AvatarPath = PlayerAvatarController.AvatarFilePath;
             Data.PlayerSave(player);
         }
 
-        public void ShowMenuView()
+        static public void ShowCursor()
         {
-            MenuView.SetActive(true);
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             lookActionTrace.UnsubscribeFrom(lookAction);
             isMouseCenter = false;
         }
 
-        public void HideMenuView()
+        static public void HideCursor()
         {
-            MenuView.SetActive(false);
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             lookActionTrace.SubscribeTo(lookAction);

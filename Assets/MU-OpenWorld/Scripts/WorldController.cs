@@ -22,6 +22,8 @@ namespace OpenWorld
 
     public class WorldController : MonoBehaviour
     {
+        public bool IsActive = false;
+
         [Range(1, 64)]
         public int WorldDistance = 10;
         private int worldSize;
@@ -36,12 +38,17 @@ namespace OpenWorld
         private List<WorldShift> worldShiftList;
 
 
-        void Awake()
+        public void Init()
         {
             // 配列の大きさを計算する
             InitWorld();
 
             worldShiftList = new List<WorldShift>();
+            
+            referencePosition = new Vector3(Mathf.Floor(Player.transform.position.x/Ground.XWidth), 0f, Mathf.Floor(Player.transform.position.z/Ground.ZWidth));
+
+            GenerateWorld();
+            IsActive = true;
         }
 
         public void InitWorld()
@@ -59,15 +66,11 @@ namespace OpenWorld
             GroundObjectArray = new GameObject[worldSize, worldSize];
         }
 
-        void Start()
-        {
-            referencePosition = new Vector3(Mathf.Floor(Player.transform.position.x/Ground.XWidth), 0f, Mathf.Floor(Player.transform.position.z/Ground.ZWidth));
-
-            GenerateWorld();
-        }
-
         void Update()
         {
+            if (!IsActive)
+                return;
+
             // マップの更新が必要か
             float xPosition = Mathf.Floor(Player.transform.position.x / Ground.XWidth);
             float zPosition = Mathf.Floor(Player.transform.position.z / Ground.ZWidth);
