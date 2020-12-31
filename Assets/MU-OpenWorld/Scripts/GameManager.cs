@@ -8,40 +8,40 @@ namespace OpenWorld
     {
         // UI関連
         public GameObject TitleView;
-        [SerializeField]
-        private GameObject menuViewTemp;
-        static public GameObject MenuView;
+        public GameObject MenuView;
 
         // その他
         public WorldController WorldScript;
         public PlayerController PlayerScript;
 
+
         void Awake()
         {
-            // インスペクター上で指定した値をstatic変数として使用する
-            MenuView = menuViewTemp;
+            Data.AppLoad();
 
             TitleView.SetActive(true);
             MenuView.SetActive(false);
         }
 
-        void GameStart()
+        void Start()
         {
             TitleView.SetActive(false);
             WorldScript.Init();
-            PlayerScript.Init();
+            PlayerScript.InitPlayer();
+            WorldScript.GenerateWorld();
+            HideMenuView();
         }
 
-        static public void ShowMenuView()
+        public void ShowMenuView()
         {
             MenuView.SetActive(true);
-            PlayerController.ShowCursor();
+            PlayerScript.ShowCursor();
         }
 
-        static public void HideMenuView()
+        public void HideMenuView()
         {
             MenuView.SetActive(false);
-            PlayerController.HideCursor();
+            PlayerScript.HideCursor();
         }
 
         public void QuitApplication()

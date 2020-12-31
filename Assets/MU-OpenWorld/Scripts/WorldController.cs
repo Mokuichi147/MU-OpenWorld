@@ -22,7 +22,7 @@ namespace OpenWorld
 
     public class WorldController : MonoBehaviour
     {
-        public bool IsActive = false;
+        public bool isActive = false;
 
         [Range(1, 64)]
         public int WorldDistance = 10;
@@ -44,11 +44,6 @@ namespace OpenWorld
             InitWorld();
 
             worldShiftList = new List<WorldShift>();
-            
-            referencePosition = new Vector3(Mathf.Floor(Player.transform.position.x/Ground.XWidth), 0f, Mathf.Floor(Player.transform.position.z/Ground.ZWidth));
-
-            GenerateWorld();
-            IsActive = true;
         }
 
         public void InitWorld()
@@ -68,7 +63,7 @@ namespace OpenWorld
 
         void Update()
         {
-            if (!IsActive)
+            if (!isActive)
                 return;
 
             // マップの更新が必要か
@@ -194,8 +189,11 @@ namespace OpenWorld
             GroundObjectArray[x, z] = Instantiate(GroundObject, addPositionDiff, Quaternion.identity, this.transform);
         }
 
-        private void GenerateWorld()
+        public void GenerateWorld()
         {
+            referencePosition = new Vector3(Mathf.Floor(Player.transform.position.x/Ground.XWidth), 0f, Mathf.Floor(Player.transform.position.z/Ground.ZWidth));
+            isActive = true;
+
             /* ワールドを生成する */
             for (int x=0; x<worldSize; x++)
             {
@@ -203,7 +201,7 @@ namespace OpenWorld
                 for (int z=WorldDistance-worldMaxArray[x]; z<=WorldDistance+worldMaxArray[x]; z++)
                 {
                     var zDiff = z - WorldDistance;
-                    var position = new Vector3(Ground.XWidth*xDiff+referencePosition.x, 0f, Ground.ZWidth*zDiff+referencePosition.z);
+                    var position = new Vector3(Ground.XWidth*(xDiff+referencePosition.x), 0f, Ground.ZWidth*(zDiff+referencePosition.z));
                     GroundObjectArray[x, z] = Instantiate(GroundObject, position, Quaternion.identity, this.transform);
                 }
             }

@@ -90,9 +90,9 @@ namespace OpenWorld
         static private void AppSave()
         {
             Save(appDataPath, AppData);
+            Debug.Log("App Saved!");
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static public void AppLoad()
         {
             if (File.Exists(appDataPath))
@@ -110,6 +110,7 @@ namespace OpenWorld
                 AppData.PreWorldUUID = "";
                 AppSave();
             }
+            Debug.Log("App Loaded!");
         }
 
 
@@ -130,7 +131,7 @@ namespace OpenWorld
 
             AppData.PreWorldUUID = world.UUID;
             AppSave();
-
+            Debug.Log("World Created!");
             return world;
         }
 
@@ -139,12 +140,14 @@ namespace OpenWorld
             World world = Load($"{rootPath}/worlds/{uuid}/world.xml", new World());
             AppData.PreWorldUUID = uuid;
             worldUUID = uuid;
+            Debug.Log("World Loaded!");
             return world;
         }
 
         static public void WorldSave(World world)
         {
             Save($"{rootPath}/worlds/{worldUUID}/world.xml", world);
+            Debug.Log("World Saved!");
         }
 
 
@@ -162,18 +165,21 @@ namespace OpenWorld
             player.AvatarPath = $"{Application.dataPath}/MU-OpenWorld/Models/Avatars/Moyu.vrm";
 
             PlayerSave(player);
+            Debug.Log("Player Created!");
             return player;
         }
 
         static public Player PlayerLoad()
         {
             Player player = Load($"{rootPath}/worlds/{worldUUID}/player.xml", new Player());
+            Debug.Log("Player Loaded!");
             return player;
         }
 
         static public void PlayerSave(Player player)
         {
             Save($"{rootPath}/worlds/{worldUUID}/player.xml", player);
+            Debug.Log("Player Saved!");
         }
     }
 }

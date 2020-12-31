@@ -9,7 +9,7 @@ namespace OpenWorld
 {
     public class PlayerController : MonoBehaviour
     {
-        public bool IsActive = false;
+        public bool isActive;
 
         [Range(0f, 200f)]
         public float LookSensitivity = 100f;
@@ -20,15 +20,15 @@ namespace OpenWorld
         public Transform CameraTransform;
 
         // UI関連
-        public GameObject MenuView;
+        public GameManager GameManagerScript;
 
         // 入力関連
         private InputAction moveAction;
-        static private InputAction lookAction;
-        static private InputActionTrace lookActionTrace;
+        private InputAction lookAction;
+        public InputActionTrace lookActionTrace = null;
         private InputAction escAction;
 
-        static private bool isMouseCenter = true;
+        private bool isMouseCenter = true;
 
         // マジックナンバーの回避
         static private float frameParSecond = 50f;
@@ -36,17 +36,18 @@ namespace OpenWorld
         static private float animationTimeScale = 10f;
 
 
-        public void Init()
+        void Awake()
         {
             InitInput();
-            InitPlayer();
-            HideCursor();
-            IsActive = true;
+            PlayerRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+
+            isActive = false;
         }
+
 
         void FixedUpdate()
         {
-            if (!IsActive)
+            if (!isActive)
                 return;
 
             // 視点操作
@@ -83,14 +84,14 @@ namespace OpenWorld
 
         private void OnApplicationQuit()
         {
-            if (IsActive)
+            if (lookActionTrace != null)
             {
                 lookActionTrace.Dispose();
                 PlayerSave();
             }
         }
 
-        private void InitInput()
+        public void InitInput()
         {
             /* 入力の初期設定 */
             var playerInput = this.GetComponent<PlayerInput>();
@@ -101,40 +102,42 @@ namespace OpenWorld
             escAction = playerInput.currentActionMap["Esc"];
             escAction.performed += (callback) =>
             {
-                if (isMouseCenter)
-                    GameManager.ShowMenuView();
+                if (isMouseCenter && isActive)
+                    GameManagerScript.ShowMenuView();
             };
         }
 
-        private void InitPlayer()
+        public void InitPlayer()
         {
+            PlayerRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
             Data.Player player;
             if (Data.IsPlayerData())
             {
                 player = Data.PlayerLoad();
-                PlayerRigidbody.position = player.Position;
+                this.transform.position = player.Position;
                 PlayerAvatarController.PlayerLoad(player.AvatarPath);
             }
             else
             {
                 player = Data.PlayerCreate();
-                PlayerRigidbody.position = player.Position;
+                this.transform.position = player.Position;
                 PlayerAvatarController.PlayerLoad(player.AvatarPath);
                 AvatarController.SetHeight(this.transform);
             }
             CameraTransform.rotation = player.Rotation;
+            isActive = true;
         }
 
         private void PlayerSave()
         {
             var player = new Data.Player();
-            player.Position = PlayerRigidbody.position;
+            player.Position = this.transform.position;
             player.Rotation = CameraTransform.rotation;
             player.AvatarPath = PlayerAvatarController.AvatarFilePath;
             Data.PlayerSave(player);
         }
 
-        static public void ShowCursor()
+        public void ShowCursor()
         {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
@@ -142,7 +145,7 @@ namespace OpenWorld
             isMouseCenter = false;
         }
 
-        static public void HideCursor()
+        public void HideCursor()
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;

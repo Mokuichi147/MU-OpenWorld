@@ -1493,7 +1493,7 @@ MonoBehaviour:
   PlayerRigidbody: {fileID: 929649736}
   PlayerAvatarController: {fileID: 929649733}
   CameraTransform: {fileID: 589482134}
-  MenuView: {fileID: 2067146190}
+  GameManagerScript: {fileID: 1813910865}
 --- !u!1 &1001228199
 GameObject:
   m_ObjectHideFlags: 0
@@ -2377,7 +2377,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TitleView: {fileID: 322520707}
-  menuViewTemp: {fileID: 2067146190}
+  MenuView: {fileID: 2067146190}
   WorldScript: {fileID: 435173565}
   PlayerScript: {fileID: 929649738}
 --- !u!4 &1813910866
