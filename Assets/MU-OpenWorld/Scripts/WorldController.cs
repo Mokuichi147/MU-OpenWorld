@@ -32,8 +32,8 @@ namespace OpenWorld
         public GameObject Player;
 
         private Vector3 referencePosition;
-        public GameObject GroundObject;
-        public GameObject[,] GroundObjectArray;
+        public GameObject ChankObject;
+        public GameObject[,] ChankObjectArray;
 
         private List<WorldShift> worldShiftList;
 
@@ -58,7 +58,7 @@ namespace OpenWorld
             worldSize = WorldDistance * 2 + 1;
             worldMaxArray = Circle.HalfMax(WorldDistance);
 
-            GroundObjectArray = new GameObject[worldSize, worldSize];
+            ChankObjectArray = new GameObject[worldSize, worldSize];
         }
 
         void Update()
@@ -156,37 +156,37 @@ namespace OpenWorld
             float indexDiff = index - WorldDistance;
 
             var (x, z) = GetCircleEdgePoint(axis, index, invert: true);
-            Destroy(GroundObjectArray[x, z]);
+            Destroy(ChankObjectArray[x, z]);
 
             switch (axis)
             {
                 case Axis.Xplus:
                     for (int px=WorldDistance-worldMaxArray[index]; px<WorldDistance+worldMaxArray[index]; px++)
-                        GroundObjectArray[px, z] = GroundObjectArray[px+1, z];
+                        ChankObjectArray[px, z] = ChankObjectArray[px+1, z];
                     addPositionDiff = new Vector3((worldMaxArray[index]+referencePos.x) * Ground.XWidth, 0f, (indexDiff+referencePos.z) * Ground.ZWidth);
                     break;
                 case Axis.Xminus:
                     for (int px=WorldDistance+worldMaxArray[index]-1; px>=WorldDistance-worldMaxArray[index]; px--)
-                        GroundObjectArray[px+1, z] = GroundObjectArray[px, z];
+                        ChankObjectArray[px+1, z] = ChankObjectArray[px, z];
                     addPositionDiff = new Vector3((-worldMaxArray[index]+referencePos.x) * Ground.XWidth, 0f, (indexDiff+referencePos.z) * Ground.ZWidth);
                     break;
                 case Axis.Zplus:
                     for (int pz=WorldDistance-worldMaxArray[index]; pz<WorldDistance+worldMaxArray[index]; pz++)
-                        GroundObjectArray[x, pz] = GroundObjectArray[x, pz+1];
+                        ChankObjectArray[x, pz] = ChankObjectArray[x, pz+1];
                     addPositionDiff = new Vector3((indexDiff+referencePos.x) * Ground.XWidth, 0f, (worldMaxArray[index]+referencePos.z) * Ground.ZWidth);
                     break;
                 case Axis.Zminus:
                     for (int pz=WorldDistance+worldMaxArray[index]-1; pz>=WorldDistance-worldMaxArray[index]; pz--)
-                        GroundObjectArray[x, pz+1] = GroundObjectArray[x, pz];
+                        ChankObjectArray[x, pz+1] = ChankObjectArray[x, pz];
                     addPositionDiff = new Vector3((indexDiff+referencePos.x) * Ground.XWidth, 0f, (-worldMaxArray[index]+referencePos.z) * Ground.ZWidth);
                     break;
                 default:
-                    Debug.Log("GroundObject shift error!");
+                    Debug.Log("ChankObject shift error!");
                     return;
             }
 
             (x, z) = GetCircleEdgePoint(axis, index);
-            GroundObjectArray[x, z] = Instantiate(GroundObject, addPositionDiff, Quaternion.identity, this.transform);
+            ChankObjectArray[x, z] = Instantiate(ChankObject, addPositionDiff, Quaternion.identity, this.transform);
         }
 
         public void GenerateWorld()
@@ -202,7 +202,7 @@ namespace OpenWorld
                 {
                     var zDiff = z - WorldDistance;
                     var position = new Vector3(Ground.XWidth*(xDiff+referencePosition.x), 0f, Ground.ZWidth*(zDiff+referencePosition.z));
-                    GroundObjectArray[x, z] = Instantiate(GroundObject, position, Quaternion.identity, this.transform);
+                    ChankObjectArray[x, z] = Instantiate(ChankObject, position, Quaternion.identity, this.transform);
                 }
             }
         }

@@ -876,7 +876,7 @@ MonoBehaviour:
   isActive: 0
   WorldDistance: 16
   Player: {fileID: 929649732}
-  GroundObject: {fileID: 1395065153941191014, guid: d602c95c065b22c47b960145bed7944e, type: 3}
+  ChankObject: {fileID: 6677106608305203657, guid: 2e049e748f60c7346bf49aa2c161ee54, type: 3}
 --- !u!1 &438114288
 GameObject:
   m_ObjectHideFlags: 0
@@ -2758,6 +2758,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1813910866}
   - component: {fileID: 1813910865}
+  - component: {fileID: 1813910867}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2779,6 +2780,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TitleView: {fileID: 322520707}
   MenuView: {fileID: 2067146190}
+  PrefabIDScript: {fileID: 1813910867}
   WorldScript: {fileID: 435173565}
   PlayerScript: {fileID: 929649738}
 --- !u!4 &1813910866
@@ -2795,6 +2797,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1813910867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1813910864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41f0ed3a1fd3cc643b82e181489e6085, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PrefabsInspector:
+  - ID: Ground
+    PrefabObject: {fileID: 1395065153941191014, guid: d602c95c065b22c47b960145bed7944e, type: 3}
+  - ID: Watar
+    PrefabObject: {fileID: 3448391514385853938, guid: e873b80db5288564fbf9039966272fa0, type: 3}
 --- !u!1 &2059514214
 GameObject:
   m_ObjectHideFlags: 0

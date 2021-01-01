@@ -40,16 +40,18 @@ namespace OpenWorld
             public string AvatarPath;
         }
 
+        public struct PrefabData
+        {
+            public string ID;
+            public Vector3 Position;
+            public Quaternion Rotation;
+            public Vector3 Scale;
+        }
+
         [System.Serializable]
         public struct Chunk
         {
-            public int X;
-            public int Y;
-
-            public Vector3[] MeshPoints;
-            public float[] YDiff;
-
-            public bool IsWatar;
+            public List<PrefabData> Prefabs;
         }
 
 
@@ -180,6 +182,29 @@ namespace OpenWorld
         {
             Save($"{rootPath}/worlds/{worldUUID}/player.xml", player);
             Debug.Log("Player Saved!");
+        }
+
+
+        // チャンク関連
+        static public bool IsChunkData(int x, int z)
+        {
+            string chankName = x.ToString("x8") + "-" + z.ToString("x8");
+            return File.Exists($"{rootPath}/worlds/{worldUUID}/chanks/{chankName}.xml");
+        }
+
+        static public Chunk ChunkLoad(int x, int z)
+        {
+            string chankName = x.ToString("x8") + "-" + z.ToString("x8");
+            Chunk chank = Load($"{rootPath}/worlds/{worldUUID}/chanks/{chankName}.xml", new Chunk());
+            return chank;
+        }
+
+        static public void ChunkSave(int x, int z, Chunk chank)
+        {
+            string chankName = x.ToString("x8") + "-" + z.ToString("x8");
+            if (!Directory.Exists($"{rootPath}/worlds/{worldUUID}/chanks"))
+                Directory.CreateDirectory($"{rootPath}/worlds/{worldUUID}/chanks");
+            Save($"{rootPath}/worlds/{worldUUID}/chanks/{chankName}.xml", chank);
         }
     }
 }

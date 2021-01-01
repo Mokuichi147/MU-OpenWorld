@@ -57,12 +57,16 @@ namespace OpenWorld
             _y -= (s_m - 0.001f);
             return _y * Height;
         }
-        
-        void Awake()
+
+        public void Awake()
         {
             var pos = this.transform.position;
             this.name = $"Ground_{Mathf.Floor(pos.x / XWidth)}_{Mathf.Floor(pos.z / ZWidth)}";
-            Create(pos.x, pos.z);
+
+            if (triangleArray == null)
+                MeshTriangle();
+            
+            Create();
         }
 
         void OnDestroy()
@@ -72,7 +76,39 @@ namespace OpenWorld
                 Destroy(watarSurface);
         }
 
-        private (Vector3[], bool) MeshPoint(float x, float z)
+        private void MeshTriangle()
+        {
+            triangleArray = new int[(XPointCount - 1) * (ZPointCount - 1) * 2 * 3];
+            for (int ix=0; ix<XPointCount-1; ix++)
+            {
+                for (int iz=0; iz<ZPointCount-1; iz++)
+                {
+                    var _x  = ZPointCount * ix;
+                    var _nx = ZPointCount * (ix + 1);
+                    var _i = 6 * ((ZPointCount-1) * ix + iz);
+                    if (ix % 2 == 0)
+                    {
+                        triangleArray[_i]   = _x  + iz;
+                        triangleArray[_i+1] = _x  + iz + 1;
+                        triangleArray[_i+2] = _nx + iz;
+                        triangleArray[_i+3] = _nx + iz;
+                        triangleArray[_i+4] = _x  + iz + 1;
+                        triangleArray[_i+5] = _nx + iz + 1;
+                    }
+                    else
+                    {
+                        triangleArray[_i]   = _nx  + iz;
+                        triangleArray[_i+1] = _x  + iz;
+                        triangleArray[_i+2] = _nx + iz + 1;
+                        triangleArray[_i+3] = _x + iz;
+                        triangleArray[_i+4] = _x  + iz + 1;
+                        triangleArray[_i+5] = _nx + iz + 1;
+                    }
+                }
+            }
+        }
+
+        public (Vector3[], bool) MeshPoint(float x, float z)
         {
             Vector3[] meshVerticeArray = new Vector3[XPointCount * ZPointCount];
             bool isWatar = false;
@@ -92,8 +128,11 @@ namespace OpenWorld
             return (meshVerticeArray, isWatar);
         }
 
-        private void Create(float x, float z)
+        public void Create()
         {
+            float x = this.transform.position.x;
+            float z = this.transform.position.z;
+
             meshObject = new Mesh();
             meshObject.name = $"GroundMesh_{x}_{z}";
             meshObject.Clear();
@@ -102,38 +141,6 @@ namespace OpenWorld
             bool isWatar;
 
             (verticeArray, isWatar) = MeshPoint(x, z);
-
-            if (triangleArray == null)
-            {
-                triangleArray = new int[(XPointCount - 1) * (ZPointCount - 1) * 2 * 3];
-                for (int ix=0; ix<XPointCount-1; ix++)
-                {
-                    for (int iz=0; iz<ZPointCount-1; iz++)
-                    {
-                        var _x  = ZPointCount * ix;
-                        var _nx = ZPointCount * (ix + 1);
-                        var _i = 6 * ((ZPointCount-1) * ix + iz);
-                        if (ix % 2 == 0)
-                        {
-                            triangleArray[_i]   = _x  + iz;
-                            triangleArray[_i+1] = _x  + iz + 1;
-                            triangleArray[_i+2] = _nx + iz;
-                            triangleArray[_i+3] = _nx + iz;
-                            triangleArray[_i+4] = _x  + iz + 1;
-                            triangleArray[_i+5] = _nx + iz + 1;
-                        }
-                        else
-                        {
-                            triangleArray[_i]   = _nx  + iz;
-                            triangleArray[_i+1] = _x  + iz;
-                            triangleArray[_i+2] = _nx + iz + 1;
-                            triangleArray[_i+3] = _x + iz;
-                            triangleArray[_i+4] = _x  + iz + 1;
-                            triangleArray[_i+5] = _nx + iz + 1;
-                        }
-                    }
-                }
-            }
             
             meshObject.vertices = verticeArray;
             meshObject.triangles = triangleArray;

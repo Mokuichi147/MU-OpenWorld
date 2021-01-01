@@ -11,6 +11,7 @@ namespace OpenWorld
         public GameObject MenuView;
 
         // その他
+        public PrefabID PrefabIDScript;
         public WorldController WorldScript;
         public PlayerController PlayerScript;
 
@@ -18,6 +19,7 @@ namespace OpenWorld
         void Awake()
         {
             Data.AppLoad();
+            PrefabIDScript.Init();
 
             TitleView.SetActive(true);
             MenuView.SetActive(false);
