@@ -58,8 +58,8 @@ namespace OpenWorld
 
 
         // デフォルト値
-        static private string rootPath = Application.dataPath + "/UserData";
-        static private string appDataPath = rootPath + "/GameData.xml";
+        static private string rootPath = Application.dataPath + "/.user";
+        static private string appDataPath = rootPath + "/game.xml";
 
         static public App AppData;
         static private string worldUUID;
