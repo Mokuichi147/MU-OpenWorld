@@ -51,6 +51,8 @@ namespace OpenWorld
         [System.Serializable]
         public struct Chunk
         {
+            public int X;
+            public int Z;
             public List<PrefabData> Prefabs;
         }
 
@@ -188,23 +190,23 @@ namespace OpenWorld
         // チャンク関連
         static public bool IsChunkData(int x, int z)
         {
-            string chankName = x.ToString("x8") + "-" + z.ToString("x8");
-            return File.Exists($"{rootPath}/worlds/{worldUUID}/chanks/{chankName}.xml");
+            string chunkName = x.ToString("x8") + "-" + z.ToString("x8");
+            return File.Exists($"{rootPath}/worlds/{worldUUID}/chunks/{chunkName}.xml");
         }
 
         static public Chunk ChunkLoad(int x, int z)
         {
-            string chankName = x.ToString("x8") + "-" + z.ToString("x8");
-            Chunk chank = Load($"{rootPath}/worlds/{worldUUID}/chanks/{chankName}.xml", new Chunk());
-            return chank;
+            string chunkName = x.ToString("x8") + "-" + z.ToString("x8");
+            Chunk chunk = Load($"{rootPath}/worlds/{worldUUID}/chunks/{chunkName}.xml", new Chunk());
+            return chunk;
         }
 
-        static public void ChunkSave(int x, int z, Chunk chank)
+        static public void ChunkSave(Chunk chunk)
         {
-            string chankName = x.ToString("x8") + "-" + z.ToString("x8");
-            if (!Directory.Exists($"{rootPath}/worlds/{worldUUID}/chanks"))
-                Directory.CreateDirectory($"{rootPath}/worlds/{worldUUID}/chanks");
-            Save($"{rootPath}/worlds/{worldUUID}/chanks/{chankName}.xml", chank);
+            string chunkName = chunk.X.ToString("x8") + "-" + chunk.Z.ToString("x8");
+            if (!Directory.Exists($"{rootPath}/worlds/{worldUUID}/chunks"))
+                Directory.CreateDirectory($"{rootPath}/worlds/{worldUUID}/chunks");
+            Save($"{rootPath}/worlds/{worldUUID}/chunks/{chunkName}.xml", chunk);
         }
     }
 }

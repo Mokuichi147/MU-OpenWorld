@@ -36,6 +36,7 @@ namespace OpenWorld
         public GameObject[,] ChankObjectArray;
 
         private List<WorldShift> worldShiftList;
+        static public List<Data.Chunk> chunkSaveList;
 
 
         public void Init()
@@ -44,6 +45,7 @@ namespace OpenWorld
             InitWorld();
 
             worldShiftList = new List<WorldShift>();
+            chunkSaveList = new List<Data.Chunk>();
         }
 
         public void InitWorld()
@@ -118,7 +120,14 @@ namespace OpenWorld
 
             // マップを更新する必要がない場合
             if (worldShiftList.Count == 0)
+            {
+                if (chunkSaveList.Count == 0)
+                    return;
+                var chunkSave = chunkSaveList[0];
+                chunkSaveList.RemoveAt(0);
+                Data.ChunkSave(chunkSave);
                 return;
+            }
 
             // ワールドを更新する
             var shiftData = worldShiftList[0];
