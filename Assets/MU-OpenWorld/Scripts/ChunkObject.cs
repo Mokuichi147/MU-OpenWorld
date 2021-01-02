@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace OpenWorld
 {
-    public class AddPrefab : MonoBehaviour
+    public class ChunkObject : MonoBehaviour
     {
         public string id;
 
-        private void OnApplicationQuit()
+        public void Add()
         {
             int x = (int)Mathf.Floor(this.transform.position.x / Ground.XWidth);
             int z = (int)Mathf.Floor(this.transform.position.z / Ground.ZWidth);
