@@ -2814,6 +2814,8 @@ MonoBehaviour:
     PrefabObject: {fileID: 1395065153941191014, guid: d602c95c065b22c47b960145bed7944e, type: 3}
   - ID: Watar
     PrefabObject: {fileID: 3448391514385853938, guid: e873b80db5288564fbf9039966272fa0, type: 3}
+  - ID: Ball
+    PrefabObject: {fileID: 1613085947769263005, guid: 1d3db45a4533b414f857d98c31b963ba, type: 3}
 --- !u!1 &2059514214
 GameObject:
   m_ObjectHideFlags: 0
