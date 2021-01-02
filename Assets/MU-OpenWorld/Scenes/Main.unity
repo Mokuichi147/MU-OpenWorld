@@ -2816,6 +2816,8 @@ MonoBehaviour:
     PrefabObject: {fileID: 3448391514385853938, guid: e873b80db5288564fbf9039966272fa0, type: 3}
   - ID: Ball
     PrefabObject: {fileID: 1613085947769263005, guid: 1d3db45a4533b414f857d98c31b963ba, type: 3}
+  - ID: Rock
+    PrefabObject: {fileID: 5976570376031995475, guid: a02f00e042e1c7348a4cebf2cdded3bb, type: 3}
 --- !u!1 &2059514214
 GameObject:
   m_ObjectHideFlags: 0
