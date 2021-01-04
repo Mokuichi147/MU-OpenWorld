@@ -76,24 +76,23 @@ namespace OpenWorld
                 isDash = false;
                 return;
             }
+
             if (!isDash)
                 isDash = shiftAction.ReadValue<float>() == 1f;
 
-            float moveAnimation;
             float moveSpeed;
 
             if (isDash)
             {
-                moveAnimation = 2f;
+                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 2f, 0.1f, flameDeltaTime);
                 moveSpeed = dashSpeed;
             }
             else
             {
-                moveAnimation = 1f;
+                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 1f, 0.1f, flameDeltaTime);
                 moveSpeed = walkSpeed;
             }
 
-            PlayerAvatarController.AvatarAnimator.SetFloat("speed", moveAnimation, 0.1f, flameDeltaTime);
             var moveVector = new Vector3(move.x * (moveSpeed/frameParSecond), 0f, move.y * (moveSpeed/frameParSecond));
             moveVector = CameraTransform.rotation * moveVector;
 
