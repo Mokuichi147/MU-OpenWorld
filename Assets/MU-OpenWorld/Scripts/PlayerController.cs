@@ -37,8 +37,11 @@ namespace OpenWorld
 
         private int upJumpCount = 0;
         private int maxUpJumpCount = 5;
+
         private float farstYUpVelocity = 3f;
         private float yUpVelocity = 0.7f;
+        private float preYVelocity = 0f;
+
         private bool hasUpJump = false;
         private bool hasDownJump = false;
 
@@ -94,34 +97,41 @@ namespace OpenWorld
 
             // ジャンプ
             var jump = jumpAction.ReadValue<float>();
+
             var rbVelocity = PlayerRigidbody.velocity;
-            if (jump == 1f)
+            if (isGround && jump==1f && upJumpCount==0)
             {
-                if (isGround && upJumpCount == 0)
-                {
-                    PlayerRigidbody.velocity = rbVelocity + new Vector3(0f, farstYUpVelocity, 0f);
-                    hasUpJump = true;
-                    upJumpCount++;
-                }
-                else if (hasUpJump && upJumpCount < maxUpJumpCount)
-                {
-                    PlayerRigidbody.velocity = rbVelocity + new Vector3(0f, yUpVelocity, 0f);
-                    upJumpCount++;
-                }
+                PlayerRigidbody.velocity = rbVelocity + new Vector3(0f, farstYUpVelocity, 0f);
+                hasUpJump = true;
+                upJumpCount++;
             }
-            else if (hasUpJump)
+            else if (hasUpJump && jump==1f && upJumpCount<maxUpJumpCount)
+            {
+                PlayerRigidbody.velocity = rbVelocity + new Vector3(0f, yUpVelocity, 0f);
+                upJumpCount++;
+            }
+            else if (hasUpJump && rbVelocity.y-preYVelocity > 0f)
+            {
+                upJumpCount = maxUpJumpCount;
+            }
+            else if (hasUpJump && rbVelocity.y-preYVelocity <= 0f)
             {
                 hasUpJump = false;
                 hasDownJump = true;
-                upJumpCount = 0;
             }
-            else
+            else if (hasDownJump && isGround)
             {
                 hasUpJump = false;
                 hasDownJump = false;
+                upJumpCount = 0;
             }
+            preYVelocity = rbVelocity.y;
 
-            float jumpAnimationScale = isGround ? 1f : 0f;
+            float hasJumpAnimation = hasUpJump || hasDownJump ? 1f : 0f;
+            PlayerAvatarController.AvatarAnimator.SetFloat("hasJump", hasJumpAnimation, 0.1f, flameDeltaTime);
+
+            float jumpAnimation = hasDownJump ? 1f : 0f;
+            PlayerAvatarController.AvatarAnimator.SetFloat("jump", jumpAnimation, 0.3f, flameDeltaTime);
             
 
             // 移動
@@ -140,12 +150,12 @@ namespace OpenWorld
 
             if (isDash)
             {
-                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 2f * jumpAnimationScale, 0.1f, flameDeltaTime);
+                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 2f, 0.1f, flameDeltaTime);
                 moveSpeed = dashSpeed;
             }
             else
             {
-                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 1f * jumpAnimationScale, 0.1f, flameDeltaTime);
+                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 1f, 0.1f, flameDeltaTime);
                 moveSpeed = walkSpeed;
             }
 
