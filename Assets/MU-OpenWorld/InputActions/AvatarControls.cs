@@ -43,6 +43,14 @@ namespace OpenWorld
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Shift"",
+                    ""type"": ""Button"",
+                    ""id"": ""aaa85bdd-17bb-44a6-b1b6-d3b7dadea700"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -102,6 +110,61 @@ namespace OpenWorld
                     ""isPartOfComposite"": true
                 },
                 {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""1a11c7fe-099c-4887-8961-8f8d0c6ec470"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""166e7e26-d6fb-4e16-992a-01918fba6e98"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""3f2c5c01-f971-4d7f-8809-3892097d8c4f"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""066fc847-8347-46e6-8cbf-9c623ac4bede"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""91693e36-69c3-4568-b31d-2823215c2b12"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
                     ""name"": """",
                     ""id"": ""722f1624-dd6d-424d-b9a3-677e17831595"",
                     ""path"": ""<Mouse>/delta"",
@@ -120,6 +183,17 @@ namespace OpenWorld
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Esc"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""588b5222-a5e9-48f7-8c3c-9530ac12352b"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shift"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -150,6 +224,7 @@ namespace OpenWorld
             m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
             m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
             m_Player_Esc = m_Player.FindAction("Esc", throwIfNotFound: true);
+            m_Player_Shift = m_Player.FindAction("Shift", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -202,6 +277,7 @@ namespace OpenWorld
         private readonly InputAction m_Player_Move;
         private readonly InputAction m_Player_Look;
         private readonly InputAction m_Player_Esc;
+        private readonly InputAction m_Player_Shift;
         public struct PlayerActions
         {
             private @AvatarControls m_Wrapper;
@@ -209,6 +285,7 @@ namespace OpenWorld
             public InputAction @Move => m_Wrapper.m_Player_Move;
             public InputAction @Look => m_Wrapper.m_Player_Look;
             public InputAction @Esc => m_Wrapper.m_Player_Esc;
+            public InputAction @Shift => m_Wrapper.m_Player_Shift;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -227,6 +304,9 @@ namespace OpenWorld
                     @Esc.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
                     @Esc.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
                     @Esc.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
+                    @Shift.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShift;
+                    @Shift.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShift;
+                    @Shift.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShift;
                 }
                 m_Wrapper.m_PlayerActionsCallbackInterface = instance;
                 if (instance != null)
@@ -240,6 +320,9 @@ namespace OpenWorld
                     @Esc.started += instance.OnEsc;
                     @Esc.performed += instance.OnEsc;
                     @Esc.canceled += instance.OnEsc;
+                    @Shift.started += instance.OnShift;
+                    @Shift.performed += instance.OnShift;
+                    @Shift.canceled += instance.OnShift;
                 }
             }
         }
@@ -258,6 +341,7 @@ namespace OpenWorld
             void OnMove(InputAction.CallbackContext context);
             void OnLook(InputAction.CallbackContext context);
             void OnEsc(InputAction.CallbackContext context);
+            void OnShift(InputAction.CallbackContext context);
         }
     }
 }

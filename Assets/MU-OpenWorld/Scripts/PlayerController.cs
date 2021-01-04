@@ -27,8 +27,14 @@ namespace OpenWorld
         private InputAction lookAction;
         public InputActionTrace lookActionTrace = null;
         private InputAction escAction;
+        private InputAction shiftAction;
 
         private bool isMouseCenter = true;
+        private bool isDash = false;
+
+        // 移動速度 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
+        private float walkSpeed = 1.5f;
+        private float dashSpeed = 5f;
 
         // マジックナンバーの回避
         static private float frameParSecond = 50f;
@@ -67,12 +73,27 @@ namespace OpenWorld
             if (move.x == 0f && move.y == 0f)
             {
                 PlayerAvatarController.AvatarAnimator.SetFloat("speed", 0f, 0.1f, flameDeltaTime);
+                isDash = false;
                 return;
             }
+            if (!isDash)
+                isDash = shiftAction.ReadValue<float>() == 1f;
 
-            PlayerAvatarController.AvatarAnimator.SetFloat("speed", Mathf.Sqrt(Mathf.Pow(move.x,2f)+Mathf.Pow(move.y,2f)), 0.1f, flameDeltaTime);
-            // 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
-            var moveSpeed = 5f;
+            float moveAnimation;
+            float moveSpeed;
+
+            if (isDash)
+            {
+                moveAnimation = 2f;
+                moveSpeed = dashSpeed;
+            }
+            else
+            {
+                moveAnimation = 1f;
+                moveSpeed = walkSpeed;
+            }
+
+            PlayerAvatarController.AvatarAnimator.SetFloat("speed", moveAnimation, 0.1f, flameDeltaTime);
             var moveVector = new Vector3(move.x * (moveSpeed/frameParSecond), 0f, move.y * (moveSpeed/frameParSecond));
             moveVector = CameraTransform.rotation * moveVector;
 
@@ -99,6 +120,7 @@ namespace OpenWorld
             lookAction = playerInput.currentActionMap["Look"];
             lookActionTrace = new InputActionTrace();
 
+            shiftAction = playerInput.currentActionMap["Shift"];
             escAction = playerInput.currentActionMap["Esc"];
             escAction.performed += (callback) =>
             {
