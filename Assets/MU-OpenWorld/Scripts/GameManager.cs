@@ -8,6 +8,7 @@ namespace OpenWorld
     {
         // UI関連
         public GameObject TitleView;
+        public GameObject GameView;
         public GameObject MenuView;
 
         // その他
@@ -22,6 +23,7 @@ namespace OpenWorld
             PrefabIDScript.Init();
 
             TitleView.SetActive(true);
+            GameView.SetActive(false);
             MenuView.SetActive(false);
         }
 
@@ -36,12 +38,14 @@ namespace OpenWorld
 
         public void ShowMenuView()
         {
+            GameView.SetActive(false);
             MenuView.SetActive(true);
             PlayerScript.ShowCursor();
         }
 
         public void HideMenuView()
         {
+            GameView.SetActive(true);
             MenuView.SetActive(false);
             PlayerScript.HideCursor();
         }
