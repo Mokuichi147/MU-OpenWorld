@@ -18,6 +18,7 @@ namespace OpenWorld
         public Rigidbody PlayerRigidbody;
         public AvatarController PlayerAvatarController;
         public Transform CameraTransform;
+        public Transform MiniMapPlayer;
 
         // UI関連
         public GameManager GameManagerScript;
@@ -98,6 +99,7 @@ namespace OpenWorld
 
             var rotation = PlayerAvatarController.AvatarTransform.rotation;
             PlayerAvatarController.AvatarTransform.rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(moveVector), flameDeltaTime * animationTimeScale);
+            MiniMapPlayer.rotation = Quaternion.LookRotation(moveVector);
             var position = PlayerRigidbody.position;
             PlayerRigidbody.MovePosition(new Vector3(position.x + moveVector.x, position.y, position.z + moveVector.z));
         }
