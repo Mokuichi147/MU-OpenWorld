@@ -27,11 +27,20 @@ namespace OpenWorld
         private InputAction moveAction;
         private InputAction lookAction;
         public InputActionTrace lookActionTrace = null;
-        private InputAction escAction;
-        private InputAction shiftAction;
+        private InputAction menuAction;
+        private InputAction dashAction;
+        private InputAction jumpAction;
 
         private bool isMouseCenter = true;
         private bool isDash = false;
+        private bool isGround = false;
+
+        private int upJumpCount = 0;
+        private int maxUpJumpCount = 5;
+        private float farstYUpVelocity = 3f;
+        private float yUpVelocity = 0.7f;
+        private bool hasUpJump = false;
+        private bool hasDownJump = false;
 
         // 移動速度 歩き:1.25, 自転車(ゆっくり):3.0, 自転車(普通):5.0, 長距離世界記録:5.67
         private float walkSpeed = 1.5f;
@@ -70,6 +79,52 @@ namespace OpenWorld
                 lookActionTrace.Clear();
             }
 
+            // 地面に足がついているか
+            RaycastHit hit;
+            if (Physics.Raycast(this.transform.position, this.transform.TransformDirection(Vector3.down), out hit, 0.25f))
+            {
+                Debug.DrawRay(this.transform.position, this.transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow);
+                isGround = true;
+            }
+            else
+            {
+                Debug.DrawRay(this.transform.position, this.transform.TransformDirection(Vector3.down) * 0.25f, Color.white);
+                isGround = false;
+            }
+
+            // ジャンプ
+            var jump = jumpAction.ReadValue<float>();
+            var rbVelocity = PlayerRigidbody.velocity;
+            if (jump == 1f)
+            {
+                if (isGround && upJumpCount == 0)
+                {
+                    PlayerRigidbody.velocity = rbVelocity + new Vector3(0f, farstYUpVelocity, 0f);
+                    hasUpJump = true;
+                    upJumpCount++;
+                }
+                else if (hasUpJump && upJumpCount < maxUpJumpCount)
+                {
+                    PlayerRigidbody.velocity = rbVelocity + new Vector3(0f, yUpVelocity, 0f);
+                    upJumpCount++;
+                }
+            }
+            else if (hasUpJump)
+            {
+                hasUpJump = false;
+                hasDownJump = true;
+                upJumpCount = 0;
+            }
+            else
+            {
+                hasUpJump = false;
+                hasDownJump = false;
+            }
+
+            float jumpAnimationScale = isGround ? 1f : 0f;
+            
+
+            // 移動
             var move = moveAction.ReadValue<Vector2>();
             if (move.x == 0f && move.y == 0f)
             {
@@ -79,18 +134,18 @@ namespace OpenWorld
             }
 
             if (!isDash)
-                isDash = shiftAction.ReadValue<float>() == 1f;
+                isDash = dashAction.ReadValue<float>() == 1f;
 
             float moveSpeed;
 
             if (isDash)
             {
-                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 2f, 0.1f, flameDeltaTime);
+                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 2f * jumpAnimationScale, 0.1f, flameDeltaTime);
                 moveSpeed = dashSpeed;
             }
             else
             {
-                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 1f, 0.1f, flameDeltaTime);
+                PlayerAvatarController.AvatarAnimator.SetFloat("speed", 1f * jumpAnimationScale, 0.1f, flameDeltaTime);
                 moveSpeed = walkSpeed;
             }
 
@@ -121,9 +176,10 @@ namespace OpenWorld
             lookAction = playerInput.currentActionMap["Look"];
             lookActionTrace = new InputActionTrace();
 
-            shiftAction = playerInput.currentActionMap["Shift"];
-            escAction = playerInput.currentActionMap["Esc"];
-            escAction.performed += (callback) =>
+            dashAction = playerInput.currentActionMap["Dash"];
+            jumpAction = playerInput.currentActionMap["Jump"];
+            menuAction = playerInput.currentActionMap["Menu"];
+            menuAction.performed += (callback) =>
             {
                 if (isMouseCenter && isActive)
                     GameManagerScript.ShowMenuView();

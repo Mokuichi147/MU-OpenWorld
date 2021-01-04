@@ -37,7 +37,7 @@ namespace OpenWorld
                     ""interactions"": """"
                 },
                 {
-                    ""name"": ""Esc"",
+                    ""name"": ""Menu"",
                     ""type"": ""Button"",
                     ""id"": ""62ab0242-e4d7-4800-9b75-30a311a55f5f"",
                     ""expectedControlType"": ""Button"",
@@ -45,9 +45,17 @@ namespace OpenWorld
                     ""interactions"": """"
                 },
                 {
-                    ""name"": ""Shift"",
+                    ""name"": ""Dash"",
                     ""type"": ""Button"",
                     ""id"": ""aaa85bdd-17bb-44a6-b1b6-d3b7dadea700"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""cab8e31b-4c1a-4fbe-b5ad-9c4fed181e36"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -182,7 +190,7 @@ namespace OpenWorld
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Esc"",
+                    ""action"": ""Menu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -193,7 +201,18 @@ namespace OpenWorld
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Shift"",
+                    ""action"": ""Dash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3b5cde1c-f147-4475-9f5e-2cd80bd34662"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -223,8 +242,9 @@ namespace OpenWorld
             m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
             m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
             m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
-            m_Player_Esc = m_Player.FindAction("Esc", throwIfNotFound: true);
-            m_Player_Shift = m_Player.FindAction("Shift", throwIfNotFound: true);
+            m_Player_Menu = m_Player.FindAction("Menu", throwIfNotFound: true);
+            m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
+            m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -276,16 +296,18 @@ namespace OpenWorld
         private IPlayerActions m_PlayerActionsCallbackInterface;
         private readonly InputAction m_Player_Move;
         private readonly InputAction m_Player_Look;
-        private readonly InputAction m_Player_Esc;
-        private readonly InputAction m_Player_Shift;
+        private readonly InputAction m_Player_Menu;
+        private readonly InputAction m_Player_Dash;
+        private readonly InputAction m_Player_Jump;
         public struct PlayerActions
         {
             private @AvatarControls m_Wrapper;
             public PlayerActions(@AvatarControls wrapper) { m_Wrapper = wrapper; }
             public InputAction @Move => m_Wrapper.m_Player_Move;
             public InputAction @Look => m_Wrapper.m_Player_Look;
-            public InputAction @Esc => m_Wrapper.m_Player_Esc;
-            public InputAction @Shift => m_Wrapper.m_Player_Shift;
+            public InputAction @Menu => m_Wrapper.m_Player_Menu;
+            public InputAction @Dash => m_Wrapper.m_Player_Dash;
+            public InputAction @Jump => m_Wrapper.m_Player_Jump;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -301,12 +323,15 @@ namespace OpenWorld
                     @Look.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLook;
                     @Look.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLook;
                     @Look.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLook;
-                    @Esc.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
-                    @Esc.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
-                    @Esc.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
-                    @Shift.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShift;
-                    @Shift.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShift;
-                    @Shift.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShift;
+                    @Menu.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMenu;
+                    @Menu.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMenu;
+                    @Menu.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMenu;
+                    @Dash.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDash;
+                    @Dash.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDash;
+                    @Dash.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDash;
+                    @Jump.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
+                    @Jump.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
+                    @Jump.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
                 }
                 m_Wrapper.m_PlayerActionsCallbackInterface = instance;
                 if (instance != null)
@@ -317,12 +342,15 @@ namespace OpenWorld
                     @Look.started += instance.OnLook;
                     @Look.performed += instance.OnLook;
                     @Look.canceled += instance.OnLook;
-                    @Esc.started += instance.OnEsc;
-                    @Esc.performed += instance.OnEsc;
-                    @Esc.canceled += instance.OnEsc;
-                    @Shift.started += instance.OnShift;
-                    @Shift.performed += instance.OnShift;
-                    @Shift.canceled += instance.OnShift;
+                    @Menu.started += instance.OnMenu;
+                    @Menu.performed += instance.OnMenu;
+                    @Menu.canceled += instance.OnMenu;
+                    @Dash.started += instance.OnDash;
+                    @Dash.performed += instance.OnDash;
+                    @Dash.canceled += instance.OnDash;
+                    @Jump.started += instance.OnJump;
+                    @Jump.performed += instance.OnJump;
+                    @Jump.canceled += instance.OnJump;
                 }
             }
         }
@@ -340,8 +368,9 @@ namespace OpenWorld
         {
             void OnMove(InputAction.CallbackContext context);
             void OnLook(InputAction.CallbackContext context);
-            void OnEsc(InputAction.CallbackContext context);
-            void OnShift(InputAction.CallbackContext context);
+            void OnMenu(InputAction.CallbackContext context);
+            void OnDash(InputAction.CallbackContext context);
+            void OnJump(InputAction.CallbackContext context);
         }
     }
 }

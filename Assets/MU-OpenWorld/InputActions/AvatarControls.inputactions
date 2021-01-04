@@ -22,7 +22,7 @@
                     "interactions": ""
                 },
                 {
-                    "name": "Esc",
+                    "name": "Menu",
                     "type": "Button",
                     "id": "62ab0242-e4d7-4800-9b75-30a311a55f5f",
                     "expectedControlType": "Button",
@@ -30,9 +30,17 @@
                     "interactions": ""
                 },
                 {
-                    "name": "Shift",
+                    "name": "Dash",
                     "type": "Button",
                     "id": "aaa85bdd-17bb-44a6-b1b6-d3b7dadea700",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "cab8e31b-4c1a-4fbe-b5ad-9c4fed181e36",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -167,7 +175,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Esc",
+                    "action": "Menu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -178,7 +186,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Shift",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3b5cde1c-f147-4475-9f5e-2cd80bd34662",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
