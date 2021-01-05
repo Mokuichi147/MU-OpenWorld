@@ -40,7 +40,6 @@ namespace OpenWorld
 
         private float farstYUpVelocity = 3f;
         private float yUpVelocity = 0.7f;
-        private float preYVelocity = 0f;
 
         private bool hasUpJump = false;
         private bool hasDownJump = false;
@@ -84,16 +83,18 @@ namespace OpenWorld
 
             // 地面に足がついているか
             RaycastHit hit;
-            if (Physics.Raycast(this.transform.position, this.transform.TransformDirection(Vector3.down), out hit, 0.25f))
+            var rayStartPosition = this.transform.position + Vector3.up * 0.2f;
+            var rayTarget = this.transform.TransformDirection(Vector3.down);
+            if (Physics.Raycast(rayStartPosition, rayTarget, out hit, 0.4f))
             {
-                Debug.DrawRay(this.transform.position, this.transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow);
+                Debug.DrawRay(rayStartPosition, rayTarget * hit.distance, Color.yellow);
                 isGround = true;
             }
             else
             {
-                Debug.DrawRay(this.transform.position, this.transform.TransformDirection(Vector3.down) * 0.25f, Color.white);
                 isGround = false;
             }
+            Debug.DrawRay(rayStartPosition, rayTarget * 0.4f, Color.white);
 
             // ジャンプ
             var jump = jumpAction.ReadValue<float>();
@@ -110,11 +111,11 @@ namespace OpenWorld
                 PlayerRigidbody.velocity = rbVelocity + new Vector3(0f, yUpVelocity, 0f);
                 upJumpCount++;
             }
-            else if (hasUpJump && rbVelocity.y-preYVelocity > 0f)
+            else if (hasUpJump && rbVelocity.y > 0f)
             {
                 upJumpCount = maxUpJumpCount;
             }
-            else if (hasUpJump && rbVelocity.y-preYVelocity <= 0f)
+            else if (hasUpJump && rbVelocity.y <= 0f)
             {
                 hasUpJump = false;
                 hasDownJump = true;
@@ -125,7 +126,6 @@ namespace OpenWorld
                 hasDownJump = false;
                 upJumpCount = 0;
             }
-            preYVelocity = rbVelocity.y;
 
             float hasJumpAnimation = hasUpJump || hasDownJump ? 1f : 0f;
             PlayerAvatarController.AvatarAnimator.SetFloat("hasJump", hasJumpAnimation, 0.1f, flameDeltaTime);
