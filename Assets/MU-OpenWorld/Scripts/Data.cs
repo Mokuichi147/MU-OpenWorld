@@ -166,9 +166,8 @@ namespace OpenWorld
             var player = new Player();
             player.Position = new Vector3(0f, 0f, 0f);
             player.Rotation = Quaternion.identity;
-            player.AvatarPath = $"{Application.dataPath}/MU-OpenWorld/Models/Avatars/Moyu.vrm";
+            player.AvatarPath = "";
 
-            PlayerSave(player);
             Debug.Log("Player Created!");
             return player;
         }

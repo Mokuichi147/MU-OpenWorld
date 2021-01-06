@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.Animations;
 using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.Animations;
 #elif UNITY_STANDALONE_WIN
 using System.Windows.Forms;
 #endif
@@ -16,10 +16,9 @@ namespace OpenWorld
     {
         // アニメーション関連
         public Avatar PlayerAvatar;
-        public AnimatorController PlayerAnimator;
+        public RuntimeAnimatorController PlayerAnimator;
 
-        static public string DefaultFilePath = "Assets/MU-OpenWorld/Models/Avatars/Moyu.vrm";
-        public string AvatarFilePath = DefaultFilePath;
+        public string AvatarFilePath;
 
         private Rigidbody playerRigidbody;
 
@@ -60,7 +59,7 @@ namespace OpenWorld
             parent.position = position;
         }
 
-        static public Animator InitAnimator(GameObject avatarObject, Avatar avatar, AnimatorController animator)
+        static public Animator InitAnimator(GameObject avatarObject, Avatar avatar, RuntimeAnimatorController animator)
         {
             var avatarAnimator = avatarObject.GetComponent<Animator>();
             avatarAnimator.avatar = avatar;
@@ -72,7 +71,11 @@ namespace OpenWorld
         private GameObject LoadVRM(string filePath)
         {
             /* VRMモデルを配置する */
-            var avatarObject = LoadFromPath(filePath);
+            GameObject avatarObject;
+            if (filePath == "")
+                avatarObject = Instantiate(PrefabID.GetPrefab("DefaultAvatar"), this.transform);
+            else
+                avatarObject = LoadFromPath(filePath);
 
             // 位置の初期設定
             AvatarTransform = InitPosition(avatarObject, this.transform);

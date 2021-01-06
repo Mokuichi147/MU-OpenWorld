@@ -3375,6 +3375,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabsInspector:
+  - ID: DefaultAvatar
+    PrefabObject: {fileID: 6446477057859327339, guid: 1a8ba19b6dee6c84b9c8189df40be2a2, type: 3}
   - ID: Ground
     PrefabObject: {fileID: 1395065153941191014, guid: d602c95c065b22c47b960145bed7944e, type: 3}
   - ID: Watar
