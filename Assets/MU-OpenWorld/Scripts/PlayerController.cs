@@ -120,7 +120,7 @@ namespace OpenWorld
                 hasUpJump = false;
                 hasDownJump = true;
             }
-            else if (hasDownJump && isGround)
+            else if (hasDownJump && (isGround || rbVelocity.y == 0f))
             {
                 hasUpJump = false;
                 hasDownJump = false;
