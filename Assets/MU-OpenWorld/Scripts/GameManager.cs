@@ -10,6 +10,7 @@ namespace OpenWorld
         public GameObject TitleView;
         public GameObject GameView;
         public GameObject MenuView;
+        public GameObject LicenseView;
 
         // その他
         public PrefabID PrefabIDScript;
@@ -25,6 +26,7 @@ namespace OpenWorld
             TitleView.SetActive(true);
             GameView.SetActive(false);
             MenuView.SetActive(false);
+            LicenseView.SetActive(false);
         }
 
         void Start()
@@ -48,6 +50,18 @@ namespace OpenWorld
             GameView.SetActive(true);
             MenuView.SetActive(false);
             PlayerScript.HideCursor();
+        }
+
+        public void ShowLicenseView()
+        {
+            LicenseView.SetActive(true);
+            MenuView.SetActive(false);
+        }
+
+        public void HideLicenseView()
+        {
+            LicenseView.SetActive(false);
+            MenuView.SetActive(true);
         }
 
         public void QuitApplication()
