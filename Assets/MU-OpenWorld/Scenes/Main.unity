@@ -157,8 +157,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -5}
-  m_SizeDelta: {x: 0, y: -10}
+  m_AnchoredPosition: {x: 0, y: -15}
+  m_SizeDelta: {x: 0, y: -30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &37363707
 MonoBehaviour:
@@ -1097,7 +1097,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 1100}
+  m_SizeDelta: {x: 0, y: 750}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &290568126
 MonoBehaviour:
@@ -1392,7 +1392,7 @@ RectTransform:
   m_Father: {fileID: 1373967054}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.6818182}
+  m_AnchorMin: {x: 0, y: 0.5333333}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -1738,8 +1738,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 319, y: -850}
-  m_SizeDelta: {x: 598, y: 300}
+  m_AnchoredPosition: {x: 321.5, y: -575}
+  m_SizeDelta: {x: 603, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &581617553
 MonoBehaviour:
@@ -1944,8 +1944,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 319, y: -50}
-  m_SizeDelta: {x: 598, y: 100}
+  m_AnchoredPosition: {x: 321.5, y: -50}
+  m_SizeDelta: {x: 603, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &655489904
 MonoBehaviour:
@@ -4089,7 +4089,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 437871498}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.3181818
+  m_Size: 0.46666667
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4434,8 +4434,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 319, y: -350}
-  m_SizeDelta: {x: 598, y: 300}
+  m_AnchoredPosition: {x: 321.5, y: -250}
+  m_SizeDelta: {x: 603, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1594663262
 MonoBehaviour:
@@ -4524,7 +4524,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -12, y: 0}
+  m_SizeDelta: {x: -7, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1636671762
 MonoBehaviour:
@@ -4847,7 +4847,7 @@ MonoBehaviour:
     Copyright (c) 2018 Masataka SUMI
     for MToon
 
-    
+
 
     Permission is hereby granted, free of charge, to any person
     obtaining a copy of this software and associated documentation files (the "Software"),
@@ -4856,18 +4856,18 @@ MonoBehaviour:
     copies of the Software, and to permit persons to whom the Software is furnished
     to do so, subject to the following conditions:
 
-    
 
-    The above copyright
-    notice and this permission notice shall be included in all copies or substantial
-    portions of the Software.
 
-    
+    The above copyright notice
+    and this permission notice shall be included in all copies or substantial portions
+    of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT
-    WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-    NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+    EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
     OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
     IN THE SOFTWARE.'
@@ -5789,8 +5789,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -20}
-  m_SizeDelta: {x: 0, y: -40}
+  m_AnchoredPosition: {x: 0, y: -30}
+  m_SizeDelta: {x: 0, y: -60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2102811031
 MonoBehaviour:
@@ -5814,7 +5814,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Copyright (c) 2020 simplestargame
 
-    
+
 
     Permission is hereby granted,
     free of charge, to any person obtaining a copy of this software and associated
@@ -5823,21 +5823,21 @@ MonoBehaviour:
     distribute, sublicense, and/or sell copies of the Software, and to permit persons
     to whom the Software is furnished to do so, subject to the following conditions:
 
-    
+
 
     The
     above copyright notice and this permission notice shall be included in all copies
     or substantial portions of the Software.
 
-    
 
-    THE SOFTWARE IS PROVIDED
-    "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
-    LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
-    AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-    FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
-    THE USE OR OTHER DEALINGS IN THE SOFTWARE.'
+
+    THE SOFTWARE IS PROVIDED "AS
+    IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+    OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+    IN THE SOFTWARE.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: bebf38c6524c1b44795a1e12651a7602, type: 2}
   m_sharedMaterial: {fileID: -7926339555821908611, guid: bebf38c6524c1b44795a1e12651a7602, type: 2}
