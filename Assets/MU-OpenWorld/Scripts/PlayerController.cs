@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngine.UI;
+using Cinemachine;
 
 namespace OpenWorld
 {
@@ -18,15 +19,16 @@ namespace OpenWorld
         public Rigidbody PlayerRigidbody;
         public AvatarController PlayerAvatarController;
         public Transform CameraTransform;
+        public Transform MiniMapCamera;
         public Transform MiniMapPlayer;
+
+        public CinemachineFreeLook CinemachineComponent;
 
         // UI関連
         public GameManager GameManagerScript;
 
         // 入力関連
         private InputAction moveAction;
-        private InputAction lookAction;
-        public InputActionTrace lookActionTrace = null;
         private InputAction menuAction;
         private InputAction dashAction;
         private InputAction jumpAction;
@@ -69,17 +71,8 @@ namespace OpenWorld
                 return;
 
             // 視点操作
-            if (isMouseCenter)
-            {
-                Quaternion camera_rot = CameraTransform.rotation;
-                foreach (var look in lookActionTrace)
-                {
-                    var delta_pos = look.ReadValue<Vector2>();
-                    camera_rot *= Quaternion.Euler(0f, delta_pos.x/Mathf.Pow((200f-LookSensitivity)/100f*0.26f+1.138f, 10f)*2f, 0f);
-                }
-                CameraTransform.rotation = camera_rot;
-                lookActionTrace.Clear();
-            }
+            var cameraRotation = Quaternion.Euler(90f, CameraTransform.rotation.eulerAngles.y, 0f);
+            MiniMapCamera.rotation = cameraRotation;
 
             // 地面に足がついているか
             RaycastHit hit;
@@ -160,7 +153,7 @@ namespace OpenWorld
             }
 
             var moveVector = new Vector3(move.x * (moveSpeed/frameParSecond), 0f, move.y * (moveSpeed/frameParSecond));
-            moveVector = CameraTransform.rotation * moveVector;
+            moveVector = Quaternion.Euler(0f, CameraTransform.rotation.eulerAngles.y, 0f) * moveVector;
 
             var rotation = PlayerAvatarController.AvatarTransform.rotation;
             PlayerAvatarController.AvatarTransform.rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(moveVector), flameDeltaTime * animationTimeScale);
@@ -171,11 +164,7 @@ namespace OpenWorld
 
         private void OnApplicationQuit()
         {
-            if (lookActionTrace != null)
-            {
-                lookActionTrace.Dispose();
-                PlayerSave();
-            }
+            PlayerSave();
         }
 
         public void InitInput()
@@ -183,8 +172,6 @@ namespace OpenWorld
             /* 入力の初期設定 */
             var playerInput = this.GetComponent<PlayerInput>();
             moveAction = playerInput.currentActionMap["Move"];
-            lookAction = playerInput.currentActionMap["Look"];
-            lookActionTrace = new InputActionTrace();
 
             dashAction = playerInput.currentActionMap["Dash"];
             jumpAction = playerInput.currentActionMap["Jump"];
@@ -228,17 +215,17 @@ namespace OpenWorld
 
         public void ShowCursor()
         {
+            CinemachineComponent.enabled = false;
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
-            lookActionTrace.UnsubscribeFrom(lookAction);
             isMouseCenter = false;
         }
 
         public void HideCursor()
         {
+            CinemachineComponent.enabled = true;
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-            lookActionTrace.SubscribeTo(lookAction);
             isMouseCenter = true;
         }
 
