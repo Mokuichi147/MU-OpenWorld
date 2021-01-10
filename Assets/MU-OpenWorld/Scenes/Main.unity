@@ -2920,6 +2920,7 @@ MonoBehaviour:
   LookSensitivity: 100
   PlayerRigidbody: {fileID: 929649736}
   PlayerAvatarController: {fileID: 929649733}
+  VCamera: {fileID: 849203766}
   MiniMapCamera: {fileID: 2078324769}
   CameraRotate: {fileID: 589482134}
   PlayerRotate: {fileID: 2028049035}

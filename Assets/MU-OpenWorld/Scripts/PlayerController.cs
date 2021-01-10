@@ -17,6 +17,7 @@ namespace OpenWorld
         // GetComponentの回避
         public Rigidbody PlayerRigidbody;
         public AvatarController PlayerAvatarController;
+        public Transform VCamera;
         public Transform MiniMapCamera;
         public Transform CameraRotate;
         public Transform PlayerRotate;
@@ -26,8 +27,10 @@ namespace OpenWorld
 
         // 入力関連
         private InputAction moveAction;
+        private InputAction zoomAction;
         private InputAction lookAction;
         public InputActionTrace lookActionTrace = null;
+        public InputActionTrace zoomActionTrace = null;
         private InputAction menuAction;
         private InputAction dashAction;
         private InputAction jumpAction;
@@ -88,6 +91,18 @@ namespace OpenWorld
                 MiniMapCamera.rotation = Quaternion.Euler(90f, camera_rot.eulerAngles.y, 0f);
 
                 lookActionTrace.Clear();
+
+                Vector3 vCameraPosition = VCamera.localPosition;
+                foreach (var zoom in zoomActionTrace)
+                {
+                    var scroll = zoom.ReadValue<float>();
+                    vCameraPosition += new Vector3(0f, 0f, scroll / 500f);
+                }
+                // 範囲を制限する
+                vCameraPosition = new Vector3(0f, 0f, Mathf.Clamp(vCameraPosition.z, -10f, -1.2f));
+
+                VCamera.localPosition = Vector3.Lerp(VCamera.localPosition, vCameraPosition, flameDeltaTime * animationTimeScale);
+                zoomActionTrace.Clear();
             }
 
             // 地面に足がついているか
@@ -183,6 +198,7 @@ namespace OpenWorld
             if (lookActionTrace != null)
             {
                 lookActionTrace.Dispose();
+                zoomActionTrace.Dispose();
                 PlayerSave();
             }
         }
@@ -194,6 +210,8 @@ namespace OpenWorld
             moveAction = playerInput.currentActionMap["Move"];
             lookAction = playerInput.currentActionMap["Look"];
             lookActionTrace = new InputActionTrace();
+            zoomAction = playerInput.currentActionMap["Zoom"];
+            zoomActionTrace = new InputActionTrace();
 
             dashAction = playerInput.currentActionMap["Dash"];
             jumpAction = playerInput.currentActionMap["Jump"];
@@ -240,6 +258,7 @@ namespace OpenWorld
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             lookActionTrace.UnsubscribeFrom(lookAction);
+            zoomActionTrace.UnsubscribeFrom(zoomAction);
             isMouseCenter = false;
         }
 
@@ -248,6 +267,7 @@ namespace OpenWorld
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             lookActionTrace.SubscribeTo(lookAction);
+            zoomActionTrace.SubscribeTo(zoomAction);
             isMouseCenter = true;
         }
 

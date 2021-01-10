@@ -59,6 +59,14 @@ namespace OpenWorld
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Zoom"",
+                    ""type"": ""Value"",
+                    ""id"": ""165fcb96-344f-49fe-a043-29d958bf9f9e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -215,6 +223,17 @@ namespace OpenWorld
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""45d97bb6-9d7a-4b06-98b5-9cdfad21774b"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Zoom"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -245,6 +264,7 @@ namespace OpenWorld
             m_Player_Menu = m_Player.FindAction("Menu", throwIfNotFound: true);
             m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
             m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+            m_Player_Zoom = m_Player.FindAction("Zoom", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -299,6 +319,7 @@ namespace OpenWorld
         private readonly InputAction m_Player_Menu;
         private readonly InputAction m_Player_Dash;
         private readonly InputAction m_Player_Jump;
+        private readonly InputAction m_Player_Zoom;
         public struct PlayerActions
         {
             private @AvatarControls m_Wrapper;
@@ -308,6 +329,7 @@ namespace OpenWorld
             public InputAction @Menu => m_Wrapper.m_Player_Menu;
             public InputAction @Dash => m_Wrapper.m_Player_Dash;
             public InputAction @Jump => m_Wrapper.m_Player_Jump;
+            public InputAction @Zoom => m_Wrapper.m_Player_Zoom;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -332,6 +354,9 @@ namespace OpenWorld
                     @Jump.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
                     @Jump.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
                     @Jump.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
+                    @Zoom.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnZoom;
+                    @Zoom.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnZoom;
+                    @Zoom.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnZoom;
                 }
                 m_Wrapper.m_PlayerActionsCallbackInterface = instance;
                 if (instance != null)
@@ -351,6 +376,9 @@ namespace OpenWorld
                     @Jump.started += instance.OnJump;
                     @Jump.performed += instance.OnJump;
                     @Jump.canceled += instance.OnJump;
+                    @Zoom.started += instance.OnZoom;
+                    @Zoom.performed += instance.OnZoom;
+                    @Zoom.canceled += instance.OnZoom;
                 }
             }
         }
@@ -371,6 +399,7 @@ namespace OpenWorld
             void OnMenu(InputAction.CallbackContext context);
             void OnDash(InputAction.CallbackContext context);
             void OnJump(InputAction.CallbackContext context);
+            void OnZoom(InputAction.CallbackContext context);
         }
     }
 }
