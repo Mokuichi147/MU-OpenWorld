@@ -173,7 +173,7 @@ namespace OpenWorld
 
             var rotation = PlayerAvatarController.AvatarTransform.rotation;
             PlayerAvatarController.AvatarTransform.rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(moveVector), flameDeltaTime * animationTimeScale);
-            PlayerRotate.rotation = Quaternion.LookRotation(moveVector);
+            PlayerRotate.rotation = Quaternion.Lerp(PlayerRotate.rotation, Quaternion.LookRotation(moveVector), flameDeltaTime * animationTimeScale * 2f);
             var position = PlayerRigidbody.position;
             PlayerRigidbody.MovePosition(new Vector3(position.x + moveVector.x, position.y, position.z + moveVector.z));
         }
