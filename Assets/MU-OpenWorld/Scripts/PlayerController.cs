@@ -17,8 +17,9 @@ namespace OpenWorld
         // GetComponentの回避
         public Rigidbody PlayerRigidbody;
         public AvatarController PlayerAvatarController;
-        public Transform CameraTransform;
-        public Transform MiniMapPlayer;
+        public Transform MiniMapCamera;
+        public Transform CameraRotate;
+        public Transform PlayerRotate;
 
         // UI関連
         public GameManager GameManagerScript;
@@ -71,13 +72,21 @@ namespace OpenWorld
             // 視点操作
             if (isMouseCenter)
             {
-                Quaternion camera_rot = CameraTransform.rotation;
+                Quaternion camera_rot = CameraRotate.rotation;
                 foreach (var look in lookActionTrace)
                 {
                     var delta_pos = look.ReadValue<Vector2>();
-                    camera_rot *= Quaternion.Euler(0f, delta_pos.x/Mathf.Pow((200f-LookSensitivity)/100f*0.26f+1.138f, 10f)*2f, 0f);
+                    float deltaX = delta_pos.x / Mathf.Pow((200f-LookSensitivity)/100f*0.26f+1.138f, 10f) * 2f;
+                    float deltaY = -delta_pos.y / Mathf.Pow((200f-LookSensitivity)/100f*0.26f+1.138f, 10f) * 2f;
+                    camera_rot *= Quaternion.Euler(deltaY, deltaX, 0f);
                 }
-                CameraTransform.rotation = camera_rot;
+                float eularX = camera_rot.eulerAngles.x;
+                // 範囲を制限する
+                eularX = eularX > 180f ? Mathf.Max(280f, eularX) : Mathf.Min(80f, eularX);
+
+                CameraRotate.rotation = Quaternion.Euler(eularX, camera_rot.eulerAngles.y, 0f);
+                MiniMapCamera.rotation = Quaternion.Euler(90f, camera_rot.eulerAngles.y, 0f);
+
                 lookActionTrace.Clear();
             }
 
@@ -160,11 +169,11 @@ namespace OpenWorld
             }
 
             var moveVector = new Vector3(move.x * (moveSpeed/frameParSecond), 0f, move.y * (moveSpeed/frameParSecond));
-            moveVector = CameraTransform.rotation * moveVector;
+            moveVector = Quaternion.Euler(0f, MiniMapCamera.eulerAngles.y, 0f) * moveVector;
 
             var rotation = PlayerAvatarController.AvatarTransform.rotation;
             PlayerAvatarController.AvatarTransform.rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(moveVector), flameDeltaTime * animationTimeScale);
-            MiniMapPlayer.rotation = Quaternion.LookRotation(moveVector);
+            PlayerRotate.rotation = Quaternion.LookRotation(moveVector);
             var position = PlayerRigidbody.position;
             PlayerRigidbody.MovePosition(new Vector3(position.x + moveVector.x, position.y, position.z + moveVector.z));
         }
@@ -213,7 +222,7 @@ namespace OpenWorld
                 PlayerAvatarController.PlayerLoad(player.AvatarPath);
                 AvatarController.SetHeight(this.transform);
             }
-            CameraTransform.rotation = player.Rotation;
+            CameraRotate.rotation = player.Rotation;
             isActive = true;
         }
 
@@ -221,7 +230,7 @@ namespace OpenWorld
         {
             var player = new Data.Player();
             player.Position = this.transform.position;
-            player.Rotation = CameraTransform.rotation;
+            player.Rotation = CameraRotate.rotation;
             player.AvatarPath = PlayerAvatarController.AvatarFilePath;
             Data.PlayerSave(player);
         }
