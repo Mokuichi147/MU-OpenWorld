@@ -20,6 +20,7 @@ namespace OpenWorld
         public PrefabID PrefabIDScript;
         public WorldController WorldScript;
         public PlayerController PlayerScript;
+        public AvatarView AvatarViewScript;
 
 
         void Awake()
@@ -74,6 +75,7 @@ namespace OpenWorld
             PlayerCamera.SetActive(false);
             AvatarView.SetActive(true);
             MenuView.SetActive(false);
+            AvatarViewScript.GetAvatars();
         }
 
         public void HideAvatarView()

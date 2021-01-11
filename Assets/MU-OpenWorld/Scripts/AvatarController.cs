@@ -1,7 +1,7 @@
-﻿using System.Collections;
+﻿using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Animations;
@@ -9,6 +9,7 @@ using UnityEditor.Animations;
 using System.Windows.Forms;
 #endif
 using VRM;
+
 
 namespace OpenWorld
 {
@@ -30,13 +31,18 @@ namespace OpenWorld
         public Transform AvatarTransform;
 
 
-        static private GameObject LoadFromPath(string filePath)
+        static public VRMImporterContext GetCentext(string filePath)
         {
-            /* パスからVRMモデルを読み込む */
             var bytes = File.ReadAllBytes(filePath);
             var context = new VRMImporterContext();
             context.ParseGlb(bytes);
-            var meta = context.ReadMeta(false);
+            return context;
+        }
+
+        static private GameObject LoadFromPath(string filePath)
+        {
+            /* パスからVRMモデルを読み込む */
+            var context = GetCentext(filePath);
             context.Load();
             context.ShowMeshes();
             return context.Root;
