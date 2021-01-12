@@ -3,9 +3,9 @@
 
 
 ![GameScreen Jump](https://user-images.githubusercontent.com/38586357/104295401-c303c880-5503-11eb-8a80-48e6d2696fec.jpg)
-<img src="https://user-images.githubusercontent.com/38586357/104295373-b8493380-5503-11eb-9749-5defc3cf7036.jpg" alt="GameScreen Far" width="33%">
-<img src="https://user-images.githubusercontent.com/38586357/104295311-a071af80-5503-11eb-8ccd-b379bfc44a56.jpg" alt="GameScreen Run" width="33%">
-<img src="https://user-images.githubusercontent.com/38586357/104295436-cd25c700-5503-11eb-8a2a-9249b5ae02ad.jpg" alt="AvatarSelect Screen" width="33%">
+<img src="https://user-images.githubusercontent.com/38586357/104295373-b8493380-5503-11eb-9749-5defc3cf7036.jpg" alt="GameScreen Far" width="32.95%">
+<img src="https://user-images.githubusercontent.com/38586357/104295311-a071af80-5503-11eb-8ccd-b379bfc44a56.jpg" alt="GameScreen Run" width="32.95%">
+<img src="https://user-images.githubusercontent.com/38586357/104295436-cd25c700-5503-11eb-8a2a-9249b5ae02ad.jpg" alt="AvatarSelect Screen" width="32.95%">
 
 
 ## 開発環境
