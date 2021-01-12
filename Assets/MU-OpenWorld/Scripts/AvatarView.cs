@@ -84,15 +84,20 @@ namespace OpenWorld
             {
                 Destroy(avatarObject);
             }
-            var avatarPrefab = AvatarController.LoadFromPath(avatarDatas[index].FilePath);
-            avatarObject = Instantiate(avatarPrefab, AvatarParent);
+            // モデル読み込み
+            avatarObject = AvatarController.LoadFromPath(avatarDatas[index].FilePath);
+            // 初期化
+            avatarObject.transform.parent = AvatarParent;
+            avatarObject.transform.localPosition = Vector3.zero;
+            avatarObject.transform.localRotation = Quaternion.identity;
+            avatarObject.transform.localScale = Vector3.one;
+            // アニメーターの設定
+            AvatarController.InitAnimator(avatarObject, AvatarControllerScript.PlayerAvatar, AvatarControllerScript.PlayerAnimator);
             // レイヤーの変更
             foreach (var child in avatarObject.GetComponentsInChildren<Transform>())
             {
                 child.gameObject.layer = LayerMask.NameToLayer("UI3D");
             }
-            // アニメーターの設定
-            AvatarController.InitAnimator(avatarObject, AvatarControllerScript.PlayerAvatar, AvatarControllerScript.PlayerAnimator);
         }
 
         private void SetMeta(int index)
