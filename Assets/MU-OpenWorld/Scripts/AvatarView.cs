@@ -4,6 +4,8 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using SFB;
+
 
 namespace OpenWorld
 {
@@ -67,14 +69,15 @@ namespace OpenWorld
             string[] avatarPaths = Directory.GetFiles(Data.AvatarDataPath, "*.vrm", SearchOption.AllDirectories);
             for (int i=0; i<avatarPaths.Length; i++)
             {
-                if (selectFilePath == avatarPaths[i])
+                var filePath = Data.Separator(avatarPaths[i]);
+                if (selectFilePath == filePath)
                 {
                     selectedIndex = i;
-                    CreateContent(avatarPaths[i], i, true);
+                    CreateContent(filePath, i, true);
                 }
                 else
                 {
-                    CreateContent(avatarPaths[i], i, false);
+                    CreateContent(filePath, i, false);
                 }
             }
         }
@@ -82,7 +85,7 @@ namespace OpenWorld
         private void CreateContent(string filePath, int index, bool isSelect)
         {
             var contentData = new ScrollViewContent();
-            contentData.FilePath = Data.Separator(filePath);
+            contentData.FilePath = filePath;
             contentData.Context = AvatarController.GetCentext(filePath);
             contentData.Meta = contentData.Context.ReadMeta(true);
 
@@ -161,6 +164,12 @@ namespace OpenWorld
                 return;
 
             AvatarControllerScript.PlayerLoad(contentDatas[selectedIndex].FilePath);
+        }
+
+        public void OpenFileBrowser()
+        {
+            StandaloneFileBrowser.OpenFilePanelAsync("Open File", Data.AvatarDataPath, "", false, (string[] paths) => {  });
+            GetAvatars();
         }
     }
 }
