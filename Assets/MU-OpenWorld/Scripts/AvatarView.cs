@@ -43,12 +43,18 @@ namespace OpenWorld
         public AvatarController AvatarControllerScript;
 
         private List<ScrollViewContent> contentDatas;
-        private int preSelected = -1;
+        private int selectedIndex = -1;
+
+        void Awake()
+        {
+            contentDatas = new List<ScrollViewContent>();
+        }
 
 
         public void GetAvatars()
         {
-            contentDatas = new List<ScrollViewContent>();
+            if (contentDatas.Count != 0)
+                return;
 
             string[] avatarPaths = Directory.GetFiles(Data.AvatarDataPath, "*.vrm", SearchOption.AllDirectories);
             for (int i=0; i<avatarPaths.Length; i++)
@@ -83,15 +89,15 @@ namespace OpenWorld
 
         public void SelectAvatar(int index)
         {
-            if (preSelected >= 0)
-                contentDatas[preSelected].BackgroundImage.color = NormalColor;
+            if (selectedIndex != -1)
+                contentDatas[selectedIndex].BackgroundImage.color = NormalColor;
         
             contentDatas[index].BackgroundImage.color = SelectedColor;
             
             SetPreview(index);
             SetMeta(index);
 
-            preSelected = index;
+            selectedIndex = index;
         }
 
         private void SetPreview(int index)
@@ -127,6 +133,14 @@ namespace OpenWorld
             CommercialUssage.text = $"{contentDatas[index].Meta.CommercialUssage}";
             LicenseType.text = $"{contentDatas[index].Meta.LicenseType}";
             OtherLicenseUrl.text = contentDatas[index].Meta.OtherLicenseUrl;
+        }
+
+        public void SetPlayerAvatar()
+        {
+            if (selectedIndex == -1)
+                return;
+
+            AvatarControllerScript.PlayerLoad(contentDatas[selectedIndex].FilePath);
         }
     }
 }

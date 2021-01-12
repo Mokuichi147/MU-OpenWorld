@@ -24,7 +24,7 @@ namespace OpenWorld
         private Rigidbody playerRigidbody;
 
         [System.NonSerialized]
-        public GameObject AvatarObject;
+        public GameObject AvatarObject = null;
         [System.NonSerialized]
         public Animator AvatarAnimator;
         [System.NonSerialized]
@@ -98,7 +98,16 @@ namespace OpenWorld
         public void PlayerLoad(string avatarPath)
         {
             AvatarFilePath = avatarPath;
+
+            Quaternion localRotation = Quaternion.identity;
+            if (AvatarObject != null)
+            {
+                localRotation = AvatarObject.transform.localRotation;
+                Destroy(AvatarObject);
+            } 
+
             AvatarObject = LoadVRM(AvatarFilePath);
+            AvatarObject.transform.localRotation = localRotation;
         }
 
         private void SelectPath()

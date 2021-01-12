@@ -80,6 +80,7 @@ namespace OpenWorld
 
         public void HideAvatarView()
         {
+            AvatarViewScript.SetPlayerAvatar();
             PlayerCamera.SetActive(true);
             AvatarView.SetActive(false);
             MenuView.SetActive(true);
