@@ -1,9 +1,8 @@
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using TMPro;
 
 namespace OpenWorld
@@ -15,6 +14,7 @@ namespace OpenWorld
             public string FilePath;
             public VRM.VRMImporterContext Context;
             public VRM.VRMMetaObject Meta;
+            public GameObject Content;
             public Image BackgroundImage;
         }
 
@@ -53,38 +53,58 @@ namespace OpenWorld
 
         public void GetAvatars()
         {
+            string selectFilePath = selectedIndex != -1 ? contentDatas[selectedIndex].FilePath : "";
+
             if (contentDatas.Count != 0)
-                return;
+            {
+                foreach (var content in contentDatas)
+                {
+                    Destroy(content.Content);
+                }
+                contentDatas.Clear();
+            }
 
             string[] avatarPaths = Directory.GetFiles(Data.AvatarDataPath, "*.vrm", SearchOption.AllDirectories);
             for (int i=0; i<avatarPaths.Length; i++)
             {
-                var contentData = new ScrollViewContent();
-                contentData.FilePath = Data.Separator(avatarPaths[i]);
-                contentData.Context = AvatarController.GetCentext(avatarPaths[i]);
-                contentData.Meta = contentData.Context.ReadMeta(true);
-
-                var scrollViewContent = Instantiate(AvatarScrollViewContent, AvatarScrollView);
-                // タイトル
-                var titleObject = scrollViewContent.transform.Find("Title").gameObject;
-                titleObject.GetComponent<TextMeshProUGUI>().text = contentData.Meta.Title != "" ? contentData.Meta.Title : "名前なし";
-                // サムネイル
-                var thumbnailObject = scrollViewContent.transform.Find("ThumbnailMask").gameObject.transform.Find("Thumbnail").gameObject;
-                var thumnail = thumbnailObject.GetComponent<RawImage>();
-                thumnail.texture = contentData.Meta.Thumbnail;
-                // バージョン
-                var versionObject = scrollViewContent.transform.Find("Version").gameObject;
-                versionObject.GetComponent<TextMeshProUGUI>().text = contentData.Meta.Version != "" ? contentData.Meta.Version : "不明";
-                // クリックアクション
-                var buttonObject = scrollViewContent.transform.Find("Button").gameObject;
-                var index = i;
-                buttonObject.GetComponent<Button>().onClick.AddListener(() => {SelectAvatar(index);});
-                // 背景画像
-                contentData.BackgroundImage = scrollViewContent.transform.Find("Background").gameObject.GetComponent<Image>();
-                contentData.BackgroundImage.color = NormalColor;
-
-                contentDatas.Add(contentData);
+                if (selectFilePath == avatarPaths[i])
+                {
+                    selectedIndex = i;
+                    CreateContent(avatarPaths[i], i, true);
+                }
+                else
+                {
+                    CreateContent(avatarPaths[i], i, false);
+                }
             }
+        }
+        
+        private void CreateContent(string filePath, int index, bool isSelect)
+        {
+            var contentData = new ScrollViewContent();
+            contentData.FilePath = Data.Separator(filePath);
+            contentData.Context = AvatarController.GetCentext(filePath);
+            contentData.Meta = contentData.Context.ReadMeta(true);
+
+            contentData.Content = Instantiate(AvatarScrollViewContent, AvatarScrollView);
+            // タイトル
+            var titleObject = contentData.Content.transform.Find("Title").gameObject;
+            titleObject.GetComponent<TextMeshProUGUI>().text = contentData.Meta.Title != "" ? contentData.Meta.Title : "名前なし";
+            // サムネイル
+            var thumbnailObject = contentData.Content.transform.Find("ThumbnailMask").gameObject.transform.Find("Thumbnail").gameObject;
+            var thumnail = thumbnailObject.GetComponent<RawImage>();
+            thumnail.texture = contentData.Meta.Thumbnail;
+            // バージョン
+            var versionObject = contentData.Content.transform.Find("Version").gameObject;
+            versionObject.GetComponent<TextMeshProUGUI>().text = contentData.Meta.Version != "" ? contentData.Meta.Version : "不明";
+            // クリックアクション
+            var buttonObject = contentData.Content.transform.Find("Button").gameObject;
+            buttonObject.GetComponent<Button>().onClick.AddListener(() => {SelectAvatar(index);});
+            // 背景画像
+            contentData.BackgroundImage = contentData.Content.transform.Find("Background").gameObject.GetComponent<Image>();
+            contentData.BackgroundImage.color = isSelect ? SelectedColor : NormalColor;
+
+            contentDatas.Add(contentData);
         }
 
         public void SelectAvatar(int index)
