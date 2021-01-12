@@ -10804,6 +10804,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AvatarScrollView: {fileID: 635783706}
   AvatarScrollViewContent: {fileID: 3579733771375357420, guid: 789a62eeccee7344987ea62854f768fd, type: 3}
+  NormalColor: {r: 0, g: 0, b: 0, a: 0.11764706}
+  SelectedColor: {r: 0.06132078, g: 0.38344255, b: 1, a: 0.23529412}
   AvatarParent: {fileID: 1514818679}
   Author: {fileID: 1328010147}
   ContactInformation: {fileID: 672481410}

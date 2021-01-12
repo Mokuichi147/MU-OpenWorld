@@ -3,22 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 namespace OpenWorld
 {
     public class AvatarView : MonoBehaviour
     {
-        public struct Avatar
+        public struct ScrollViewContent
         {
             public string FilePath;
             public VRM.VRMImporterContext Context;
             public VRM.VRMMetaObject Meta;
+            public Image BackgroundImage;
         }
 
         // アバター一覧関連
         public Transform AvatarScrollView;
         public GameObject AvatarScrollViewContent;
+
+        public Color NormalColor;
+        public Color SelectedColor;
 
         // プレビュー関連
         public Transform AvatarParent;
@@ -37,45 +42,56 @@ namespace OpenWorld
 
         public AvatarController AvatarControllerScript;
 
-        private List<Avatar> avatarDatas;
+        private List<ScrollViewContent> contentDatas;
+        private int preSelected = -1;
 
 
         public void GetAvatars()
         {
-            avatarDatas = new List<Avatar>();
+            contentDatas = new List<ScrollViewContent>();
 
             string[] avatarPaths = Directory.GetFiles(Data.AvatarDataPath, "*.vrm", SearchOption.AllDirectories);
             for (int i=0; i<avatarPaths.Length; i++)
             {
-                var avatarData = new Avatar();
-                avatarData.FilePath = Data.Separator(avatarPaths[i]);
-                avatarData.Context = AvatarController.GetCentext(avatarPaths[i]);
-                avatarData.Meta = avatarData.Context.ReadMeta(true);
-
-                avatarDatas.Add(avatarData);
+                var contentData = new ScrollViewContent();
+                contentData.FilePath = Data.Separator(avatarPaths[i]);
+                contentData.Context = AvatarController.GetCentext(avatarPaths[i]);
+                contentData.Meta = contentData.Context.ReadMeta(true);
 
                 var scrollViewContent = Instantiate(AvatarScrollViewContent, AvatarScrollView);
                 // タイトル
                 var titleObject = scrollViewContent.transform.Find("Title").gameObject;
-                titleObject.GetComponent<TextMeshProUGUI>().text = avatarData.Meta.Title != "" ? avatarData.Meta.Title : "名前なし";
+                titleObject.GetComponent<TextMeshProUGUI>().text = contentData.Meta.Title != "" ? contentData.Meta.Title : "名前なし";
                 // サムネイル
                 var thumbnailObject = scrollViewContent.transform.Find("ThumbnailMask").gameObject.transform.Find("Thumbnail").gameObject;
                 var thumnail = thumbnailObject.GetComponent<RawImage>();
-                thumnail.texture = avatarData.Meta.Thumbnail;
+                thumnail.texture = contentData.Meta.Thumbnail;
                 // バージョン
                 var versionObject = scrollViewContent.transform.Find("Version").gameObject;
-                versionObject.GetComponent<TextMeshProUGUI>().text = avatarData.Meta.Version != "" ? avatarData.Meta.Version : "不明";
+                versionObject.GetComponent<TextMeshProUGUI>().text = contentData.Meta.Version != "" ? contentData.Meta.Version : "不明";
                 // クリックアクション
                 var buttonObject = scrollViewContent.transform.Find("Button").gameObject;
                 var index = i;
                 buttonObject.GetComponent<Button>().onClick.AddListener(() => {SelectAvatar(index);});
+                // 背景画像
+                contentData.BackgroundImage = scrollViewContent.transform.Find("Background").gameObject.GetComponent<Image>();
+                contentData.BackgroundImage.color = NormalColor;
+
+                contentDatas.Add(contentData);
             }
         }
 
         public void SelectAvatar(int index)
         {
+            if (preSelected >= 0)
+                contentDatas[preSelected].BackgroundImage.color = NormalColor;
+        
+            contentDatas[index].BackgroundImage.color = SelectedColor;
+            
             SetPreview(index);
             SetMeta(index);
+
+            preSelected = index;
         }
 
         private void SetPreview(int index)
@@ -85,7 +101,7 @@ namespace OpenWorld
                 Destroy(avatarObject);
             }
             // モデル読み込み
-            avatarObject = AvatarController.LoadFromPath(avatarDatas[index].FilePath);
+            avatarObject = AvatarController.LoadFromPath(contentDatas[index].FilePath);
             // 初期化
             avatarObject.transform.parent = AvatarParent;
             avatarObject.transform.localPosition = Vector3.zero;
@@ -102,15 +118,15 @@ namespace OpenWorld
 
         private void SetMeta(int index)
         {
-            Author.text = avatarDatas[index].Meta.Author;
-            ContactInformation.text = avatarDatas[index].Meta.ContactInformation;
-            Reference.text = avatarDatas[index].Meta.Reference;
-            AllowedUser.text = $"{avatarDatas[index].Meta.AllowedUser}";
-            ViolentUssage.text = $"{avatarDatas[index].Meta.ViolentUssage}";
-            SexualUssage.text = $"{avatarDatas[index].Meta.SexualUssage}";
-            CommercialUssage.text = $"{avatarDatas[index].Meta.CommercialUssage}";
-            LicenseType.text = $"{avatarDatas[index].Meta.LicenseType}";
-            OtherLicenseUrl.text = avatarDatas[index].Meta.OtherLicenseUrl;
+            Author.text = contentDatas[index].Meta.Author;
+            ContactInformation.text = contentDatas[index].Meta.ContactInformation;
+            Reference.text = contentDatas[index].Meta.Reference;
+            AllowedUser.text = $"{contentDatas[index].Meta.AllowedUser}";
+            ViolentUssage.text = $"{contentDatas[index].Meta.ViolentUssage}";
+            SexualUssage.text = $"{contentDatas[index].Meta.SexualUssage}";
+            CommercialUssage.text = $"{contentDatas[index].Meta.CommercialUssage}";
+            LicenseType.text = $"{contentDatas[index].Meta.LicenseType}";
+            OtherLicenseUrl.text = contentDatas[index].Meta.OtherLicenseUrl;
         }
     }
 }
