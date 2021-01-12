@@ -39,13 +39,18 @@ namespace OpenWorld
             return context;
         }
 
-        static private GameObject LoadFromPath(string filePath)
+        static public GameObject GetAvatar(VRMImporterContext context)
         {
-            /* パスからVRMモデルを読み込む */
-            var context = GetCentext(filePath);
             context.Load();
             context.ShowMeshes();
             return context.Root;
+        }
+
+        static public GameObject LoadFromPath(string filePath)
+        {
+            /* パスからVRMモデルを読み込む */
+            var context = GetCentext(filePath);
+            return GetAvatar(context);
         }
 
         static public Transform InitPosition(GameObject avatarObject, Transform parent)
