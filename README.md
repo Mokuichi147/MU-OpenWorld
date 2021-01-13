@@ -2,11 +2,14 @@
 目標: 好きなアバターで冒険できるゲーム
 
 
-![GameScreen Jump](https://user-images.githubusercontent.com/38586357/104295401-c303c880-5503-11eb-8a80-48e6d2696fec.jpg)
-<img src="https://user-images.githubusercontent.com/38586357/104295373-b8493380-5503-11eb-9749-5defc3cf7036.jpg" alt="GameScreen Far" width="32.95%">
-<img src="https://user-images.githubusercontent.com/38586357/104295311-a071af80-5503-11eb-8ccd-b379bfc44a56.jpg" alt="GameScreen Run" width="32.95%">
-<img src="https://user-images.githubusercontent.com/38586357/104295436-cd25c700-5503-11eb-8a2a-9249b5ae02ad.jpg" alt="AvatarSelect Screen" width="32.95%">
-
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/38586357/104295401-c303c880-5503-11eb-8a80-48e6d2696fec.jpg" alt="GameScreen Jump" width="800px">
+</p>
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/38586357/104295373-b8493380-5503-11eb-9749-5defc3cf7036.jpg" alt="GameScreen Far" width="20%">
+    <img src="https://user-images.githubusercontent.com/38586357/104295311-a071af80-5503-11eb-8ccd-b379bfc44a56.jpg" alt="GameScreen Run" width="20%">
+    <img src="https://user-images.githubusercontent.com/38586357/104295436-cd25c700-5503-11eb-8a2a-9249b5ae02ad.jpg" alt="AvatarSelect Screen" width="20%">
+</p>
 
 ## 開発環境
 - Unity 2020.2.1f1
