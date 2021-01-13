@@ -60,7 +60,6 @@ namespace OpenWorld
 
         void Awake()
         {
-            InitInput();
             PlayerRigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
             isActive = false;
@@ -203,8 +202,9 @@ namespace OpenWorld
             }
         }
 
-        public void InitInput()
+        public IEnumerator InitInput()
         {
+            yield return null;
             /* 入力の初期設定 */
             var playerInput = this.GetComponent<PlayerInput>();
             moveAction = playerInput.currentActionMap["Move"];
@@ -221,6 +221,9 @@ namespace OpenWorld
                 if (isMouseCenter && isActive)
                     GameManagerScript.ShowMenuView();
             };
+
+            HideCursor();
+            isActive = true;
         }
 
         public void InitPlayer()
@@ -241,7 +244,6 @@ namespace OpenWorld
                 AvatarController.SetHeight(this.transform);
             }
             CameraRotate.rotation = player.Rotation;
-            isActive = true;
         }
 
         private void PlayerSave()

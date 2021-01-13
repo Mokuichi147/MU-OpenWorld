@@ -35,13 +35,13 @@ namespace OpenWorld
             AvatarView.SetActive(false);
         }
 
-        void Start()
+        public void GameStart()
         {
             TitleView.SetActive(false);
             WorldScript.Init();
             PlayerScript.InitPlayer();
             WorldScript.GenerateWorld();
-            HideMenuView();
+            PlayerScript.StartCoroutine(PlayerScript.InitInput());
         }
 
         public void ShowMenuView()
