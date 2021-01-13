@@ -198,22 +198,94 @@ namespace OpenWorld
             ChankObjectArray[x, z] = Instantiate(ChankObject, addPositionDiff, Quaternion.identity, this.transform);
         }
 
-        public void GenerateWorld()
+        private void CreateChunk(int x, int z)
+        {
+            var xDiff = x - WorldDistance;
+            var zDiff = z - WorldDistance;
+            var position = new Vector3(Ground.XWidth*(xDiff+referencePosition.x), 0f, Ground.ZWidth*(zDiff+referencePosition.z));
+            ChankObjectArray[x, z] = Instantiate(ChankObject, position, Quaternion.identity, this.transform);
+        }
+
+        public void GenerateWorld(int maxSize)
         {
             referencePosition = new Vector3(Mathf.Floor(Player.transform.position.x/Ground.XWidth), 0f, Mathf.Floor(Player.transform.position.z/Ground.ZWidth));
-            isActive = true;
 
-            /* ワールドを生成する */
-            for (int x=0; x<worldSize; x++)
+            int x = WorldDistance;
+            int z = WorldDistance;
+
+            /* ワールドを渦巻順に生成する */
+            CreateChunk(x, z);
+
+            int maxCount = Mathf.Min(maxSize, worldSize);
+            for (int i=1; i<=maxCount; i++)
             {
-                var xDiff = x - WorldDistance;
-                for (int z=WorldDistance-worldMaxArray[x]; z<=WorldDistance+worldMaxArray[x]; z++)
+                if (i == worldSize)
                 {
-                    var zDiff = z - WorldDistance;
-                    var position = new Vector3(Ground.XWidth*(xDiff+referencePosition.x), 0f, Ground.ZWidth*(zDiff+referencePosition.z));
-                    ChankObjectArray[x, z] = Instantiate(ChankObject, position, Quaternion.identity, this.transform);
+                    for (int count=0; count<worldSize-1; count++)
+                    {
+                        z -= 1;
+                        if (WorldDistance-worldMaxArray[x] > z || z > WorldDistance+worldMaxArray[x])
+                            continue;
+                        CreateChunk(x, z);
+                    }
+                    return;
+                }
+                for (int count=0; count<i; count++)
+                {
+                    z += i%2==0 ? 1 : -1;
+                    if (WorldDistance-worldMaxArray[x] > z || z > WorldDistance+worldMaxArray[x])
+                        continue;
+                    CreateChunk(x, z);
+                }
+                for (int count=0; count<i; count++)
+                {
+                    x += i%2==0 ? 1 : -1;
+                    if (WorldDistance-worldMaxArray[x] > z || z > WorldDistance+worldMaxArray[x])
+                        continue;
+                    CreateChunk(x, z);
                 }
             }
+            this.StartCoroutine(GenerateWorldCoroutine(maxSize+1));
+        }
+
+        public IEnumerator GenerateWorldCoroutine(int startSize)
+        {
+            int x = startSize%2==0 ? WorldDistance-startSize/2 : WorldDistance+startSize/2;
+            int z = x;
+
+            /* ワールドを渦巻順に生成する */
+            for (int i=startSize; i<=worldSize; i++)
+            {
+                if (i == worldSize)
+                {
+                    for (int count=0; count<worldSize-1; count++)
+                    {
+                        z -= 1;
+                        if (WorldDistance-worldMaxArray[x] > z || z > WorldDistance+worldMaxArray[x])
+                            continue;
+                        CreateChunk(x, z);
+                        yield return null;
+                    }
+                    break;
+                }
+                for (int count=0; count<i; count++)
+                {
+                    z += i%2==0 ? 1 : -1;
+                    if (WorldDistance-worldMaxArray[x] > z || z > WorldDistance+worldMaxArray[x])
+                        continue;
+                    CreateChunk(x, z);
+                    yield return null;
+                }
+                for (int count=0; count<i; count++)
+                {
+                    x += i%2==0 ? 1 : -1;
+                    if (WorldDistance-worldMaxArray[x] > z || z > WorldDistance+worldMaxArray[x])
+                        continue;
+                    CreateChunk(x, z);
+                    yield return null;
+                }
+            }
+            isActive = true;
         }
     }
 }

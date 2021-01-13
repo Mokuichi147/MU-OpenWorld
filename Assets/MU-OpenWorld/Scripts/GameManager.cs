@@ -40,7 +40,7 @@ namespace OpenWorld
             TitleView.SetActive(false);
             WorldScript.Init();
             PlayerScript.InitPlayer();
-            WorldScript.GenerateWorld();
+            WorldScript.GenerateWorld(5);
             PlayerScript.StartCoroutine(PlayerScript.InitInput());
         }
 
