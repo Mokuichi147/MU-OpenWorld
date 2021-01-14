@@ -19,7 +19,7 @@ namespace OpenWorld
         public Avatar PlayerAvatar;
         public RuntimeAnimatorController PlayerAnimator;
 
-        public string AvatarFilePath;
+        public string AvatarFilePath = "";
 
         private Rigidbody playerRigidbody;
 
@@ -83,7 +83,7 @@ namespace OpenWorld
         {
             /* VRMモデルを配置する */
             GameObject avatarObject;
-            if (filePath == "")
+            if (filePath == "" || filePath == null)
                 avatarObject = Instantiate(PrefabID.GetPrefab("DefaultAvatar"), this.transform);
             else
                 avatarObject = LoadFromPath(filePath);
@@ -95,9 +95,15 @@ namespace OpenWorld
             return avatarObject;
         }
 
-        public void PlayerLoad(string avatarPath)
+        public void PlayerLoad()
         {
-            AvatarFilePath = avatarPath;
+            Debug.Log("Player Load");
+            Debug.Log(AvatarFilePath);
+            Debug.Log(Data.AppData.AvatarPath);
+            if (AvatarFilePath == Data.AppData.AvatarPath && AvatarFilePath != "")
+                return;
+
+            AvatarFilePath = Data.AppData.AvatarPath;
 
             Quaternion localRotation = Quaternion.identity;
             if (AvatarObject != null)

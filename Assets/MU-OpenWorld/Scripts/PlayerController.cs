@@ -234,24 +234,25 @@ namespace OpenWorld
             {
                 player = Data.PlayerLoad();
                 this.transform.position = player.Position;
-                PlayerAvatarController.PlayerLoad(player.AvatarPath);
+                PlayerAvatarController.PlayerLoad();
             }
             else
             {
                 player = Data.PlayerCreate();
                 this.transform.position = player.Position;
-                PlayerAvatarController.PlayerLoad(player.AvatarPath);
+                PlayerAvatarController.PlayerLoad();
                 AvatarController.SetHeight(this.transform);
             }
-            CameraRotate.rotation = player.Rotation;
+            CameraRotate.rotation = player.CameraRotation;
+            PlayerAvatarController.AvatarTransform.rotation = player.Rotation;
         }
 
         private void PlayerSave()
         {
             var player = new Data.Player();
             player.Position = this.transform.position;
-            player.Rotation = CameraRotate.rotation;
-            player.AvatarPath = PlayerAvatarController.AvatarFilePath;
+            player.Rotation = PlayerAvatarController.AvatarTransform.rotation;
+            player.CameraRotation = CameraRotate.rotation;
             Data.PlayerSave(player);
         }
 

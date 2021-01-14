@@ -9,25 +9,19 @@ namespace OpenWorld
 {
     public class Data : MonoBehaviour
     {
-        public struct WorldPath
-        {
-            public string UUID;
-            public string Path;
-        }
-
         [System.Serializable]
         public struct App
         {
-            public string UUID;
+            public string UserID;
             public string UserName;
-            public string PreWorldUUID;
-            public List<WorldPath> Worlds;
+            public string WorldPath;
+            public string AvatarPath;
         }
 
         [System.Serializable]
         public struct World
         {
-            public string UUID;
+            public string Name;
             public float Seed;
             public float Scale;
         }
@@ -37,12 +31,12 @@ namespace OpenWorld
         {
             public Vector3 Position;
             public Quaternion Rotation;
-            public string AvatarPath;
+            public Quaternion CameraRotation;
         }
 
         public struct PrefabData
         {
-            public string ID;
+            public string PrefabID;
             public Vector3 Position;
             public Quaternion Rotation;
             public Vector3 Scale;
@@ -57,14 +51,13 @@ namespace OpenWorld
         }
 
 
-        // デフォルト値
+        // デフォルトパス
         static public string RootPath = $"{Application.dataPath}/.user";
         static public string AppDataPath = $"{RootPath}/game.xml";
         static public string AvatarDataPath = $"{RootPath}/avatars";
         static public string WorldDataPath = $"{RootPath}/worlds";
 
         static public App AppData;
-        static private string worldUUID;
 
 
         void OnApplicationQuit()
@@ -127,13 +120,25 @@ namespace OpenWorld
             else
             {
                 AppData = new App();
-                AppData.UUID = System.Guid.NewGuid().ToString();
+                AppData.UserID = System.Guid.NewGuid().ToString();
                 AppData.UserName = "";
-                AppData.Worlds = new List<WorldPath>();
-                AppData.PreWorldUUID = "";
+                AppData.WorldPath = "";
+                AppData.AvatarPath = "";
                 AppSave();
             }
             Debug.Log("App Loaded!");
+        }
+
+        static public void SetAvatar(string filePath)
+        {
+            AppData.AvatarPath = filePath;
+            AppSave();
+        }
+
+        static public void SetWorld(string filePath)
+        {
+            AppData.WorldPath = filePath;
+            AppSave();
         }
 
 
@@ -141,35 +146,33 @@ namespace OpenWorld
         static public World WorldCreate()
         {
             var world = new World();
-            world.UUID = System.Guid.NewGuid().ToString();
+            world.Name = "New World";
             world.Seed = 50000f;//Random.Range(0f, 70000f);
             world.Scale = 0.004f;
 
-            AppData.Worlds.Add(new WorldPath() {UUID=world.UUID, Path=$"{RootPath}/worlds/{world.UUID}"});
+            var worldFIleName = System.Guid.NewGuid().ToString();
 
-            Directory.CreateDirectory($"{RootPath}/worlds/{world.UUID}");
+            Directory.CreateDirectory($"{WorldDataPath}/{worldFIleName}");
 
-            worldUUID = world.UUID;
+            AppData.WorldPath = $"{WorldDataPath}/{worldFIleName}";
             WorldSave(world);
-
-            AppData.PreWorldUUID = world.UUID;
             AppSave();
+
             Debug.Log("World Created!");
             return world;
         }
 
-        static public World WorldLoad(string uuid)
+        static public World WorldLoad(string worldFilePath)
         {
-            World world = Load($"{RootPath}/worlds/{uuid}/world.xml", new World());
-            AppData.PreWorldUUID = uuid;
-            worldUUID = uuid;
+            World world = Load($"{worldFilePath}/world.xml", new World());
+            AppData.WorldPath = worldFilePath;
             Debug.Log("World Loaded!");
             return world;
         }
 
         static public void WorldSave(World world)
         {
-            Save($"{RootPath}/worlds/{worldUUID}/world.xml", world);
+            Save($"{AppData.WorldPath}/world.xml", world);
             Debug.Log("World Saved!");
         }
 
@@ -177,15 +180,15 @@ namespace OpenWorld
         // プレイヤー関連
         static public bool IsPlayerData()
         {
-            return File.Exists($"{RootPath}/worlds/{worldUUID}/player.xml");
+            return File.Exists($"{AppData.WorldPath}/player.xml");
         }
 
         static public Player PlayerCreate()
         {
             var player = new Player();
-            player.Position = new Vector3(0f, 0f, 0f);
+            player.Position = Vector3.zero;
             player.Rotation = Quaternion.identity;
-            player.AvatarPath = "";
+            player.CameraRotation = Quaternion.identity;
 
             Debug.Log("Player Created!");
             return player;
@@ -193,14 +196,14 @@ namespace OpenWorld
 
         static public Player PlayerLoad()
         {
-            Player player = Load($"{RootPath}/worlds/{worldUUID}/player.xml", new Player());
+            Player player = Load($"{AppData.WorldPath}/player.xml", new Player());
             Debug.Log("Player Loaded!");
             return player;
         }
 
         static public void PlayerSave(Player player)
         {
-            Save($"{RootPath}/worlds/{worldUUID}/player.xml", player);
+            Save($"{AppData.WorldPath}/player.xml", player);
             Debug.Log("Player Saved!");
         }
 
@@ -209,22 +212,24 @@ namespace OpenWorld
         static public bool IsChunkData(int x, int z)
         {
             string chunkName = x.ToString("x8") + "-" + z.ToString("x8");
-            return File.Exists($"{RootPath}/worlds/{worldUUID}/chunks/{chunkName}.xml");
+            return File.Exists($"{AppData.WorldPath}/chunks/{chunkName}.xml");
         }
 
         static public Chunk ChunkLoad(int x, int z)
         {
             string chunkName = x.ToString("x8") + "-" + z.ToString("x8");
-            Chunk chunk = Load($"{RootPath}/worlds/{worldUUID}/chunks/{chunkName}.xml", new Chunk());
+            Chunk chunk = Load($"{AppData.WorldPath}/chunks/{chunkName}.xml", new Chunk());
             return chunk;
         }
 
         static public void ChunkSave(Chunk chunk)
         {
             string chunkName = chunk.X.ToString("x8") + "-" + chunk.Z.ToString("x8");
-            if (!Directory.Exists($"{RootPath}/worlds/{worldUUID}/chunks"))
-                Directory.CreateDirectory($"{RootPath}/worlds/{worldUUID}/chunks");
-            Save($"{RootPath}/worlds/{worldUUID}/chunks/{chunkName}.xml", chunk);
+
+            if (!Directory.Exists($"{AppData.WorldPath}/chunks"))
+                Directory.CreateDirectory($"{AppData.WorldPath}/chunks");
+
+            Save($"{AppData.WorldPath}/chunks/{chunkName}.xml", chunk);
         }
     }
 }

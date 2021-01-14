@@ -16,7 +16,7 @@ namespace OpenWorld
             chunk.X = x;
             chunk.Z = z;
             Data.PrefabData prefab = new Data.PrefabData();
-            prefab.ID = id;
+            prefab.PrefabID = id;
             prefab.Position = this.transform.position;
             prefab.Rotation = this.transform.rotation;
             prefab.Scale = this.transform.localScale;

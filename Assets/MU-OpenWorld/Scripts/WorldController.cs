@@ -56,8 +56,8 @@ namespace OpenWorld
         public void InitWorld()
         {
             Data.World world;
-            if (Data.AppData.PreWorldUUID != "")
-                world = Data.WorldLoad(Data.AppData.PreWorldUUID);
+            if (Data.AppData.WorldPath != "")
+                world = Data.WorldLoad(Data.AppData.WorldPath);
             else
                 world = Data.WorldCreate();
             Ground.WorldSeed = world.Seed;

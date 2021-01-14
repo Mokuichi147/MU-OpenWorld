@@ -6,6 +6,13 @@ namespace OpenWorld
 {
     public class GameManager : MonoBehaviour
     {
+        public enum Mode
+        {
+            Title,
+            Game,
+            Menu
+        }
+
         // UI関連
         public GameObject TitleView;
         public GameObject GameView;
@@ -20,13 +27,18 @@ namespace OpenWorld
         public PrefabID PrefabIDScript;
         public WorldController WorldScript;
         public PlayerController PlayerScript;
+        public AvatarController AvatarScript;
         public AvatarView AvatarViewScript;
+
+        private Mode mode;
 
 
         void Awake()
         {
             Data.AppLoad();
             PrefabIDScript.Init();
+
+            mode = Mode.Title;
 
             TitleView.SetActive(true);
             GameView.SetActive(false);
@@ -37,6 +49,8 @@ namespace OpenWorld
 
         public void GameStart()
         {
+            mode = Mode.Game;
+
             TitleView.SetActive(false);
             GameView.SetActive(true);
             WorldScript.Init();
@@ -47,6 +61,8 @@ namespace OpenWorld
 
         public void ShowMenuView()
         {
+            mode = Mode.Menu;
+
             GameView.SetActive(false);
             MenuView.SetActive(true);
             PlayerScript.ShowCursor();
@@ -54,6 +70,8 @@ namespace OpenWorld
 
         public void HideMenuView()
         {
+            mode = Mode.Game;
+
             GameView.SetActive(true);
             MenuView.SetActive(false);
             PlayerScript.HideCursor();
@@ -62,19 +80,24 @@ namespace OpenWorld
         public void ShowLicenseView()
         {
             LicenseView.SetActive(true);
+            TitleView.SetActive(false);
             MenuView.SetActive(false);
         }
 
         public void HideLicenseView()
         {
             LicenseView.SetActive(false);
-            MenuView.SetActive(true);
+            if (mode == Mode.Title)
+                TitleView.SetActive(true);
+            else
+                MenuView.SetActive(true);
         }
 
         public void ShowAvatarView()
         {
             PlayerCamera.SetActive(false);
             AvatarView.SetActive(true);
+            TitleView.SetActive(false);
             MenuView.SetActive(false);
             AvatarViewScript.GetAvatars();
         }
@@ -82,9 +105,16 @@ namespace OpenWorld
         public void HideAvatarView()
         {
             AvatarViewScript.SetPlayerAvatar();
+
             PlayerCamera.SetActive(true);
             AvatarView.SetActive(false);
-            MenuView.SetActive(true);
+            if (mode == Mode.Title)
+                TitleView.SetActive(true);
+            else
+            {
+                MenuView.SetActive(true);
+                AvatarScript.PlayerLoad();
+            }
         }
 
         public void QuitApplication()

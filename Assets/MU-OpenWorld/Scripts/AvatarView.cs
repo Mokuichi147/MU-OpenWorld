@@ -163,7 +163,7 @@ namespace OpenWorld
             if (selectedIndex == -1)
                 return;
 
-            AvatarControllerScript.PlayerLoad(contentDatas[selectedIndex].FilePath);
+            Data.SetAvatar(contentDatas[selectedIndex].FilePath);
         }
 
         public void OpenFileBrowser()

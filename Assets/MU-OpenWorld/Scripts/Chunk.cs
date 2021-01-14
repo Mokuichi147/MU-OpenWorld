@@ -38,10 +38,10 @@ namespace OpenWorld
             chunk.Z = z;
             chunk.Prefabs = new List<Data.PrefabData>();
             Data.PrefabData ground = new Data.PrefabData();
-            ground.ID = "Ground";
+            ground.PrefabID = "Ground";
             ground.Position = this.transform.position;
             ground.Rotation = Quaternion.identity;
-            ground.Scale = new Vector3(1f, 1f, 1f);
+            ground.Scale = Vector3.one;
             chunk.Prefabs.Add(ground);
         }
 
@@ -49,7 +49,7 @@ namespace OpenWorld
         {
             foreach (var prefab in chunk.Prefabs)
             {
-                var prefabObject = Instantiate(PrefabID.GetPrefab(prefab.ID), prefab.Position, prefab.Rotation, this.transform);
+                var prefabObject = Instantiate(PrefabID.GetPrefab(prefab.PrefabID), prefab.Position, prefab.Rotation, this.transform);
                 prefabObject.transform.localScale = prefab.Scale;
             }
         }
