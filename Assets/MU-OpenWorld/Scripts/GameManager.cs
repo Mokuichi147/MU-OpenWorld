@@ -38,6 +38,7 @@ namespace OpenWorld
         public void GameStart()
         {
             TitleView.SetActive(false);
+            GameView.SetActive(true);
             WorldScript.Init();
             PlayerScript.InitPlayer();
             WorldScript.GenerateWorld(5);

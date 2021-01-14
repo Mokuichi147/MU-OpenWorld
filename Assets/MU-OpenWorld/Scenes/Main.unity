@@ -2384,6 +2384,9 @@ MonoBehaviour:
   isActive: 0
   WorldDistance: 16
   Player: {fileID: 929649732}
+  MiniMapCamera: {fileID: 800123142}
+  MiniMapMask: {fileID: 851448528}
+  MiniMapMaxSize: 200
   ChankObject: {fileID: 6677106608305203657, guid: 2e049e748f60c7346bf49aa2c161ee54, type: 3}
 --- !u!1 &437871497
 GameObject:

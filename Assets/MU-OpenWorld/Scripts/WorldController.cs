@@ -31,6 +31,11 @@ namespace OpenWorld
 
         public GameObject Player;
 
+        public Camera MiniMapCamera;
+        public RectTransform MiniMapMask;
+        public float MiniMapMaxSize;
+        private float miniMapAnimationTimeScale = 0.01f;
+
         private Vector3 referencePosition;
         public GameObject ChankObject;
         public GameObject[,] ChankObjectArray;
@@ -206,6 +211,23 @@ namespace OpenWorld
             ChankObjectArray[x, z] = Instantiate(ChankObject, position, Quaternion.identity, this.transform);
         }
 
+        private void SetMiniMapCameraSize(int i)
+        {
+            var mapSize = Mathf.Min((i/2-1)*Mathf.Min(Ground.XWidth, Ground.ZWidth), MiniMapMaxSize);
+            MiniMapCamera.orthographicSize = mapSize;
+            var miniMapSizeDelta = MiniMapCamera.orthographicSize / MiniMapMaxSize * 100f;
+            MiniMapMask.sizeDelta = new Vector2(miniMapSizeDelta, miniMapSizeDelta);
+        }
+
+        private void UpdateMiniMapCameraSize(int i)
+        {
+            var miniMapSize = MiniMapCamera.orthographicSize;
+            var mapSize = Mathf.Min((i/2-1)*Mathf.Min(Ground.XWidth, Ground.ZWidth), MiniMapMaxSize);
+            MiniMapCamera.orthographicSize = Mathf.Lerp(miniMapSize, mapSize, miniMapAnimationTimeScale);
+            var miniMapSizeDelta = MiniMapCamera.orthographicSize / MiniMapMaxSize * 100f;
+            MiniMapMask.sizeDelta = new Vector2(miniMapSizeDelta, miniMapSizeDelta);
+        }
+
         public void GenerateWorld(int maxSize)
         {
             referencePosition = new Vector3(Mathf.Floor(Player.transform.position.x/Ground.XWidth), 0f, Mathf.Floor(Player.transform.position.z/Ground.ZWidth));
@@ -245,6 +267,7 @@ namespace OpenWorld
                     CreateChunk(x, z);
                 }
             }
+            SetMiniMapCameraSize(maxSize);
             this.StartCoroutine(GenerateWorldCoroutine(maxSize+1));
         }
 
@@ -263,6 +286,7 @@ namespace OpenWorld
                         z -= 1;
                         if (WorldDistance-worldMaxArray[x] > z || z > WorldDistance+worldMaxArray[x])
                             continue;
+                        UpdateMiniMapCameraSize(i);
                         CreateChunk(x, z);
                         yield return null;
                     }
@@ -273,6 +297,7 @@ namespace OpenWorld
                     z += i%2==0 ? 1 : -1;
                     if (WorldDistance-worldMaxArray[x] > z || z > WorldDistance+worldMaxArray[x])
                         continue;
+                    UpdateMiniMapCameraSize(i);
                     CreateChunk(x, z);
                     yield return null;
                 }
@@ -281,6 +306,7 @@ namespace OpenWorld
                     x += i%2==0 ? 1 : -1;
                     if (WorldDistance-worldMaxArray[x] > z || z > WorldDistance+worldMaxArray[x])
                         continue;
+                    UpdateMiniMapCameraSize(i);
                     CreateChunk(x, z);
                     yield return null;
                 }
