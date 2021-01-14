@@ -99,7 +99,7 @@ namespace OpenWorld
             AvatarView.SetActive(true);
             TitleView.SetActive(false);
             MenuView.SetActive(false);
-            AvatarViewScript.GetAvatars();
+            AvatarViewScript.GetAvatars(true);
         }
 
         public void HideAvatarView()

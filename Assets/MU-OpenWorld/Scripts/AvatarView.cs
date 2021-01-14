@@ -53,9 +53,9 @@ namespace OpenWorld
         }
 
 
-        public void GetAvatars()
+        public void GetAvatars(bool isPreviewSet)
         {
-            string selectFilePath = selectedIndex != -1 ? contentDatas[selectedIndex].FilePath : "";
+            string selectFilePath = selectedIndex != -1 ? contentDatas[selectedIndex].FilePath : Data.AppData.AvatarPath;
 
             if (contentDatas.Count != 0)
             {
@@ -79,6 +79,10 @@ namespace OpenWorld
                 {
                     CreateContent(filePath, i, false);
                 }
+            }
+            if (isPreviewSet && selectedIndex != -1)
+            {
+                SelectAvatar(selectedIndex);
             }
         }
         
@@ -169,7 +173,7 @@ namespace OpenWorld
         public void OpenFileBrowser()
         {
             StandaloneFileBrowser.OpenFilePanelAsync("Open File", Data.AvatarDataPath, "", false, (string[] paths) => {  });
-            GetAvatars();
+            GetAvatars(false);
         }
     }
 }
