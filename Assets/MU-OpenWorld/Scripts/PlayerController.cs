@@ -9,7 +9,8 @@ namespace OpenWorld
 {
     public class PlayerController : MonoBehaviour
     {
-        public bool isActive;
+        public bool isInputActive;
+        public bool isPlayerActive;
 
         [Range(0f, 200f)]
         public float LookSensitivity = 100f;
@@ -62,13 +63,14 @@ namespace OpenWorld
         {
             PlayerRigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
-            isActive = false;
+            isInputActive = false;
+            isPlayerActive = false;
         }
 
 
         void FixedUpdate()
         {
-            if (!isActive)
+            if (!(isInputActive && isPlayerActive))
                 return;
 
             // 視点操作
@@ -218,12 +220,12 @@ namespace OpenWorld
             menuAction = playerInput.currentActionMap["Menu"];
             menuAction.performed += (callback) =>
             {
-                if (isMouseCenter && isActive)
+                if (isMouseCenter && isInputActive && isPlayerActive)
                     GameManagerScript.ShowMenuView();
             };
 
             HideCursor();
-            isActive = true;
+            isInputActive = true;
         }
 
         public void InitPlayer()
@@ -245,6 +247,8 @@ namespace OpenWorld
             }
             CameraRotate.rotation = player.CameraRotation;
             PlayerAvatarController.AvatarTransform.rotation = player.Rotation;
+
+            isPlayerActive = true;
         }
 
         private void PlayerSave()
