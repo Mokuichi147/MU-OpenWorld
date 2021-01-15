@@ -53,7 +53,7 @@ namespace OpenWorld
         }
 
 
-        public void GetAvatars(bool isPreviewSet)
+        public IEnumerator GetAvatars(bool isPreviewSet)
         {
             string selectFilePath = selectedIndex != -1 ? contentDatas[selectedIndex].FilePath : Data.AppData.AvatarPath;
 
@@ -64,6 +64,7 @@ namespace OpenWorld
                     Destroy(content.Content);
                 }
                 contentDatas.Clear();
+                yield return null;
             }
 
             string[] avatarPaths = Directory.GetFiles(Data.AvatarDataPath, "*.vrm", SearchOption.AllDirectories);
@@ -79,6 +80,7 @@ namespace OpenWorld
                 {
                     CreateContent(filePath, i, false);
                 }
+                yield return null;
             }
             if (isPreviewSet && selectedIndex != -1)
             {
@@ -173,7 +175,7 @@ namespace OpenWorld
         public void OpenFileBrowser()
         {
             StandaloneFileBrowser.OpenFilePanelAsync("Open File", Data.AvatarDataPath, "", false, (string[] paths) => {  });
-            GetAvatars(false);
+            StartCoroutine(GetAvatars(false));
         }
     }
 }

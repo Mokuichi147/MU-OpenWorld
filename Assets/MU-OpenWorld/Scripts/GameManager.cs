@@ -56,7 +56,7 @@ namespace OpenWorld
             WorldScript.Init();
             PlayerScript.InitPlayer();
             WorldScript.GenerateWorld(5);
-            PlayerScript.StartCoroutine(PlayerScript.InitInput());
+            StartCoroutine(PlayerScript.InitInput());
         }
 
         public void ShowMenuView()
@@ -99,7 +99,7 @@ namespace OpenWorld
             AvatarView.SetActive(true);
             TitleView.SetActive(false);
             MenuView.SetActive(false);
-            AvatarViewScript.GetAvatars(true);
+            StartCoroutine(AvatarViewScript.GetAvatars(true));
         }
 
         public void HideAvatarView()
