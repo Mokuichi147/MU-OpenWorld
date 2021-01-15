@@ -93,7 +93,7 @@ namespace OpenWorld
         {
             var contentData = new ScrollViewContent();
             contentData.FilePath = filePath;
-            contentData.Context = AvatarController.GetCentext(filePath);
+            contentData.Context = AvatarController.GetContext(filePath);
             contentData.Meta = contentData.Context.ReadMeta(true);
 
             contentData.Content = Instantiate(AvatarScrollViewContent, AvatarScrollView);
@@ -124,8 +124,8 @@ namespace OpenWorld
         
             contentDatas[index].BackgroundImage.color = SelectedColor;
 
-            var context = AvatarController.GetCentext(contentDatas[index].FilePath);
-            context.LoadAsync(_ => SetPreview(context));
+            var context = AvatarController.GetContext(contentDatas[index].FilePath);
+            context.LoadAsync(() => SetPreview(context));
             SetMeta(index);
 
             selectedIndex = index;

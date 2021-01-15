@@ -31,7 +31,7 @@ namespace OpenWorld
         public Transform AvatarTransform;
 
 
-        static public VRMImporterContext GetCentext(string filePath)
+        static public VRMImporterContext GetContext(string filePath)
         {
             var bytes = File.ReadAllBytes(filePath);
             var context = new VRMImporterContext();
@@ -49,7 +49,7 @@ namespace OpenWorld
         static public GameObject LoadFromPath(string filePath)
         {
             /* パスからVRMモデルを読み込む */
-            var context = GetCentext(filePath);
+            var context = GetContext(filePath);
             return GetAvatar(context);
         }
 
@@ -97,9 +97,6 @@ namespace OpenWorld
 
         public void PlayerLoad()
         {
-            Debug.Log("Player Load");
-            Debug.Log(AvatarFilePath);
-            Debug.Log(Data.AppData.AvatarPath);
             if (AvatarFilePath == Data.AppData.AvatarPath && AvatarFilePath != "")
                 return;
 
