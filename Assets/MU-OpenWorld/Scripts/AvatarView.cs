@@ -4,6 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using VRM;
 using SFB;
 
 
@@ -122,21 +123,22 @@ namespace OpenWorld
                 contentDatas[selectedIndex].BackgroundImage.color = NormalColor;
         
             contentDatas[index].BackgroundImage.color = SelectedColor;
-            
-            SetPreview(index);
+
+            var context = AvatarController.GetCentext(contentDatas[index].FilePath);
+            context.LoadAsync(_ => SetPreview(context));
             SetMeta(index);
 
             selectedIndex = index;
         }
 
-        private void SetPreview(int index)
+        private void SetPreview(VRMImporterContext context)
         {
             if (avatarObject != null)
             {
                 Destroy(avatarObject);
             }
             // モデル読み込み
-            avatarObject = AvatarController.LoadFromPath(contentDatas[index].FilePath);
+            avatarObject = context.Root;
             // 初期化
             avatarObject.transform.parent = AvatarParent;
             avatarObject.transform.localPosition = Vector3.zero;
@@ -149,6 +151,7 @@ namespace OpenWorld
             {
                 child.gameObject.layer = LayerMask.NameToLayer("UI3D");
             }
+            context.ShowMeshes();
         }
 
         private void SetMeta(int index)
