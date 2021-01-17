@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace OpenWorld
+namespace OpenWorld.World
 {
     [CustomEditor(typeof(ChunkObject))]
     public class ChunkObjectEditor : Editor

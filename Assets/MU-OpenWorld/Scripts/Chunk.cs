@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace OpenWorld
+namespace OpenWorld.World
 {
     public class Chunk : MonoBehaviour
     {
         private int x;
         private int z;
 
-        private Data.Chunk chunk;
+        private App.DataFile.Chunk chunk;
 
 
         void Awake()
@@ -17,27 +17,27 @@ namespace OpenWorld
             x = (int)Mathf.Floor(this.transform.position.x / Ground.XWidth);
             z = (int)Mathf.Floor(this.transform.position.z / Ground.ZWidth);
 
-            if (!Data.IsChunkData(x, z))
+            if (!App.DataFile.IsChunkData(x, z))
             {
-                ChunkCreate();
-                WorldController.chunkSaveList.Add(chunk);
+                Create();
+                World.ChunkController.chunkSaveList.Add(chunk);
             }
             else
             {
-                chunk = Data.ChunkLoad(x, z);
+                chunk = App.DataFile.ChunkLoad(x, z);
             }
 
             SetPrefabs();
         }
 
 
-        private void ChunkCreate()
+        private void Create()
         {
-            chunk = new Data.Chunk();
+            chunk = new App.DataFile.Chunk();
             chunk.X = x;
             chunk.Z = z;
-            chunk.Prefabs = new List<Data.PrefabData>();
-            Data.PrefabData ground = new Data.PrefabData();
+            chunk.Prefabs = new List<App.DataFile.PrefabData>();
+            App.DataFile.PrefabData ground = new App.DataFile.PrefabData();
             ground.PrefabID = "Ground";
             ground.Position = this.transform.position;
             ground.Rotation = Quaternion.identity;
@@ -49,7 +49,7 @@ namespace OpenWorld
         {
             foreach (var prefab in chunk.Prefabs)
             {
-                var prefabObject = Instantiate(PrefabID.GetPrefab(prefab.PrefabID), prefab.Position, prefab.Rotation, this.transform);
+                var prefabObject = Instantiate(App.ObjectData.FromID(prefab.PrefabID), prefab.Position, prefab.Rotation, this.transform);
                 prefabObject.transform.localScale = prefab.Scale;
             }
         }

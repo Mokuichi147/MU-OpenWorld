@@ -17,14 +17,14 @@ namespace OpenWorld
 
         // GetComponentの回避
         public Rigidbody PlayerRigidbody;
-        public AvatarController PlayerAvatarController;
+        public Avatar.Model PlayerAvatarController;
         public Transform VCamera;
         public Transform MiniMapCamera;
         public Transform CameraRotate;
         public Transform PlayerRotate;
 
         // UI関連
-        public GameManager GameManagerScript;
+        public App.GameManager GameManagerScript;
 
         // 入力関連
         private InputAction moveAction;
@@ -231,19 +231,19 @@ namespace OpenWorld
         public void InitPlayer()
         {
             PlayerRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-            Data.Player player;
-            if (Data.IsPlayerData())
+            App.DataFile.Player player;
+            if (App.DataFile.IsPlayerData())
             {
-                player = Data.PlayerLoad();
+                player = App.DataFile.PlayerLoad();
                 this.transform.position = player.Position;
                 PlayerAvatarController.PlayerLoad();
             }
             else
             {
-                player = Data.PlayerCreate();
+                player = App.DataFile.PlayerCreate();
                 this.transform.position = player.Position;
                 PlayerAvatarController.PlayerLoad();
-                AvatarController.SetHeight(this.transform);
+                Avatar.Util.SetHeight(this.transform);
             }
             CameraRotate.rotation = player.CameraRotation;
             PlayerAvatarController.AvatarTransform.rotation = player.Rotation;
@@ -253,11 +253,11 @@ namespace OpenWorld
 
         private void PlayerSave()
         {
-            var player = new Data.Player();
+            var player = new App.DataFile.Player();
             player.Position = this.transform.position;
             player.Rotation = PlayerAvatarController.AvatarTransform.rotation;
             player.CameraRotation = CameraRotate.rotation;
-            Data.PlayerSave(player);
+            App.DataFile.PlayerSave(player);
         }
 
         public void ShowCursor()

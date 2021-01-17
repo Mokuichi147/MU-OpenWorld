@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace OpenWorld
+namespace OpenWorld.App
 {
     public class GameManager : MonoBehaviour
     {
@@ -24,10 +24,10 @@ namespace OpenWorld
         public GameObject PlayerCamera;
 
         // その他
-        public PrefabID PrefabIDScript;
-        public WorldController WorldScript;
+        public App.ObjectData PrefabIDScript;
+        public World.ChunkController WorldScript;
         public PlayerController PlayerScript;
-        public AvatarController AvatarScript;
+        public Avatar.Model AvatarScript;
         public AvatarView AvatarViewScript;
 
         private Mode mode;
@@ -35,7 +35,7 @@ namespace OpenWorld
 
         void Awake()
         {
-            Data.AppLoad();
+            DataFile.AppLoad();
             PrefabIDScript.Init();
 
             mode = Mode.Title;
@@ -45,6 +45,11 @@ namespace OpenWorld
             MenuView.SetActive(false);
             LicenseView.SetActive(false);
             AvatarView.SetActive(false);
+        }
+
+        void OnApplicationQuit()
+        {
+            DataFile.AppSave();
         }
 
         public void GameStart()

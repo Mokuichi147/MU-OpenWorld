@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace OpenWorld
+namespace OpenWorld.World
 {
     public class ChunkObject : MonoBehaviour
     {
@@ -12,16 +12,16 @@ namespace OpenWorld
         {
             int x = (int)Mathf.Floor(this.transform.position.x / Ground.XWidth);
             int z = (int)Mathf.Floor(this.transform.position.z / Ground.ZWidth);
-            var chunk = Data.ChunkLoad(x, z);
+            var chunk = App.DataFile.ChunkLoad(x, z);
             chunk.X = x;
             chunk.Z = z;
-            Data.PrefabData prefab = new Data.PrefabData();
+            App.DataFile.PrefabData prefab = new App.DataFile.PrefabData();
             prefab.PrefabID = id;
             prefab.Position = this.transform.position;
             prefab.Rotation = this.transform.rotation;
             prefab.Scale = this.transform.localScale;
             chunk.Prefabs.Add(prefab);
-            Data.ChunkSave(chunk);
+            App.DataFile.ChunkSave(chunk);
         }
     }
 }

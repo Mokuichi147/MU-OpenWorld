@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace OpenWorld
+namespace OpenWorld.App
 {
-    public class PrefabID : MonoBehaviour
+    public class ObjectData : MonoBehaviour
     {
         [System.Serializable]
         public struct PrefabData
@@ -26,7 +26,7 @@ namespace OpenWorld
                 idDict[Prefabs[i].ID] = i;
         }
 
-        static public GameObject GetPrefab(string id)
+        static public GameObject FromID(string id)
         {
             return Prefabs[idDict[id]].PrefabObject;
         }

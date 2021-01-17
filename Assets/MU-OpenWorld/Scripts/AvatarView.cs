@@ -43,7 +43,7 @@ namespace OpenWorld
         public TextMeshProUGUI LicenseType;
         public TextMeshProUGUI OtherLicenseUrl;
 
-        public AvatarController AvatarControllerScript;
+        public Avatar.Model AvatarControllerScript;
 
         private List<ScrollViewContent> contentDatas;
         private int selectedIndex = -1;
@@ -56,7 +56,7 @@ namespace OpenWorld
 
         public IEnumerator GetAvatars(bool isPreviewSet)
         {
-            string selectFilePath = selectedIndex != -1 ? contentDatas[selectedIndex].FilePath : Data.AppData.AvatarPath;
+            string selectFilePath = selectedIndex != -1 ? contentDatas[selectedIndex].FilePath : App.DataFile.AppData.AvatarPath;
 
             if (contentDatas.Count != 0)
             {
@@ -68,10 +68,10 @@ namespace OpenWorld
                 yield return null;
             }
 
-            string[] avatarPaths = Directory.GetFiles(Data.AvatarDataPath, "*.vrm", SearchOption.AllDirectories);
+            string[] avatarPaths = Directory.GetFiles(App.DataFile.AvatarDataPath, "*.vrm", SearchOption.AllDirectories);
             for (int i=0; i<avatarPaths.Length; i++)
             {
-                var filePath = Data.Separator(avatarPaths[i]);
+                var filePath = App.DataFile.Separator(avatarPaths[i]);
                 if (selectFilePath == filePath)
                 {
                     selectedIndex = i;
@@ -93,7 +93,7 @@ namespace OpenWorld
         {
             var contentData = new ScrollViewContent();
             contentData.FilePath = filePath;
-            contentData.Context = AvatarController.GetContext(filePath);
+            contentData.Context = Avatar.Util.GetContext(filePath);
             contentData.Meta = contentData.Context.ReadMeta(true);
 
             contentData.Content = Instantiate(AvatarScrollViewContent, AvatarScrollView);
@@ -124,7 +124,7 @@ namespace OpenWorld
         
             contentDatas[index].BackgroundImage.color = SelectedColor;
 
-            var context = AvatarController.GetContext(contentDatas[index].FilePath);
+            var context = Avatar.Util.GetContext(contentDatas[index].FilePath);
             context.LoadAsync(() => SetPreview(context));
             SetMeta(index);
 
@@ -145,7 +145,7 @@ namespace OpenWorld
             avatarObject.transform.localRotation = Quaternion.identity;
             avatarObject.transform.localScale = Vector3.one;
             // アニメーターの設定
-            AvatarController.InitAnimator(avatarObject, AvatarControllerScript.PlayerAvatar, AvatarControllerScript.PlayerAnimator);
+            Avatar.Util.InitAnimator(avatarObject, AvatarControllerScript.PlayerAvatar, AvatarControllerScript.PlayerAnimator);
             // レイヤーの変更
             foreach (var child in avatarObject.GetComponentsInChildren<Transform>())
             {
@@ -172,12 +172,12 @@ namespace OpenWorld
             if (selectedIndex == -1)
                 return;
 
-            Data.SetAvatar(contentDatas[selectedIndex].FilePath);
+            App.DataFile.SetAvatar(contentDatas[selectedIndex].FilePath);
         }
 
         public void OpenFileBrowser()
         {
-            StandaloneFileBrowser.OpenFilePanelAsync("Open File", Data.AvatarDataPath, "", false, (string[] paths) => {  });
+            StandaloneFileBrowser.OpenFilePanelAsync("Open File", App.DataFile.AvatarDataPath, "", false, (string[] paths) => {  });
             StartCoroutine(GetAvatars(false));
         }
     }

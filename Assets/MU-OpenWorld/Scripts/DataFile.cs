@@ -5,9 +5,9 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace OpenWorld
+namespace OpenWorld.App
 {
-    public class Data : MonoBehaviour
+    public class DataFile : MonoBehaviour
     {
         [System.Serializable]
         public struct App
@@ -60,11 +60,6 @@ namespace OpenWorld
         static public App AppData;
 
 
-        void OnApplicationQuit()
-        {
-            AppSave();
-        }
-
         static public string Separator(string path)
         {
             return path.Replace("\\", "/");
@@ -103,7 +98,7 @@ namespace OpenWorld
 
 
         // アプリケーション関連
-        static private void AppSave()
+        static public void AppSave()
         {
             Save(AppDataPath, AppData);
             Debug.Log("App Saved!");

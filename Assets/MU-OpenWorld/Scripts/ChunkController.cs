@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace OpenWorld
+namespace OpenWorld.World
 {
     enum Axis
     {
@@ -20,7 +20,7 @@ namespace OpenWorld
         public int Index;
     }
 
-    public class WorldController : MonoBehaviour
+    public class ChunkController : MonoBehaviour
     {
         public bool isActive = false;
 
@@ -41,7 +41,7 @@ namespace OpenWorld
         public GameObject[,] ChankObjectArray;
 
         private List<WorldShift> worldShiftList;
-        static public List<Data.Chunk> chunkSaveList;
+        static public List<App.DataFile.Chunk> chunkSaveList;
 
 
         public void Init()
@@ -50,16 +50,16 @@ namespace OpenWorld
             InitWorld();
 
             worldShiftList = new List<WorldShift>();
-            chunkSaveList = new List<Data.Chunk>();
+            chunkSaveList = new List<App.DataFile.Chunk>();
         }
 
         public void InitWorld()
         {
-            Data.World world;
-            if (Data.AppData.WorldPath != "")
-                world = Data.WorldLoad(Data.AppData.WorldPath);
+            App.DataFile.World world;
+            if (App.DataFile.AppData.WorldPath != "")
+                world = App.DataFile.WorldLoad(App.DataFile.AppData.WorldPath);
             else
-                world = Data.WorldCreate();
+                world = App.DataFile.WorldCreate();
             Ground.WorldSeed = world.Seed;
             Ground.WorldScale = world.Scale;
             worldSize = WorldDistance * 2 + 1;
@@ -130,7 +130,7 @@ namespace OpenWorld
                     return;
                 var chunkSave = chunkSaveList[0];
                 chunkSaveList.RemoveAt(0);
-                Data.ChunkSave(chunkSave);
+                App.DataFile.ChunkSave(chunkSave);
                 return;
             }
 
