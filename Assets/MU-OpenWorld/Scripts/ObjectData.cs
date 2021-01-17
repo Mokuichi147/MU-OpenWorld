@@ -7,14 +7,17 @@ namespace OpenWorld.App
     public class ObjectData : MonoBehaviour
     {
         [System.Serializable]
-        public struct PrefabData
+        public struct PrefabInfo
         {
             public string ID;
             public GameObject PrefabObject;
+            public string Name;
+            public bool IsStatic;
+            public bool IsItem;
         }
 
-        public PrefabData[] PrefabsInspector;
-        static public PrefabData[] Prefabs;
+        public PrefabInfo[] PrefabsInspector;
+        static public PrefabInfo[] Prefabs;
         static private Dictionary<string, int> idDict;
 
         public void Init()

@@ -11,6 +11,8 @@ namespace OpenWorld.World
 
         private App.DataFile.Chunk chunk;
 
+        public App.DataFile.PrefabData[] DefaultObjects;
+
 
         void Awake()
         {
@@ -37,19 +39,22 @@ namespace OpenWorld.World
             chunk.X = x;
             chunk.Z = z;
             chunk.Prefabs = new List<App.DataFile.PrefabData>();
-            App.DataFile.PrefabData ground = new App.DataFile.PrefabData();
-            ground.PrefabID = "Ground";
-            ground.Position = this.transform.position;
-            ground.Rotation = Quaternion.identity;
-            ground.Scale = Vector3.one;
-            chunk.Prefabs.Add(ground);
+            for (int i=0; i<DefaultObjects.Length; i++)
+            {
+                var prefabObject = DefaultObjects[i];
+                if (prefabObject.IsLocalPosition)
+                {
+                    prefabObject.Position += this.transform.position;
+                }
+                chunk.Prefabs.Add(prefabObject);
+            }
         }
 
         private void SetPrefabs()
         {
             foreach (var prefab in chunk.Prefabs)
             {
-                var prefabObject = Instantiate(App.ObjectData.FromID(prefab.PrefabID), prefab.Position, prefab.Rotation, this.transform);
+                var prefabObject = Instantiate(App.ObjectData.FromID(prefab.PrefabID), prefab.Position, Quaternion.Euler(prefab.Rotation), this.transform);
                 prefabObject.transform.localScale = prefab.Scale;
             }
         }

@@ -82,7 +82,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c9f7e0c126d4c41bace7e7db6cf4c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: Rock
+  id: rock
 --- !u!1001 &1634154049436948524
 PrefabInstance:
   m_ObjectHideFlags: 0

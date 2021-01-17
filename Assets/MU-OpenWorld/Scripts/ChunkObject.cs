@@ -18,7 +18,7 @@ namespace OpenWorld.World
             App.DataFile.PrefabData prefab = new App.DataFile.PrefabData();
             prefab.PrefabID = id;
             prefab.Position = this.transform.position;
-            prefab.Rotation = this.transform.rotation;
+            prefab.Rotation = this.transform.eulerAngles;
             prefab.Scale = this.transform.localScale;
             chunk.Prefabs.Add(prefab);
             App.DataFile.ChunkSave(chunk);

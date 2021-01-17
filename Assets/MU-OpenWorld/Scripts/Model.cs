@@ -34,7 +34,7 @@ namespace OpenWorld.Avatar
             /* VRMモデルを配置する */
             GameObject avatarObject;
             if (filePath == "" || filePath == null)
-                avatarObject = Instantiate(App.ObjectData.FromID("DefaultAvatar"), this.transform);
+                avatarObject = Instantiate(App.ObjectData.FromID("default_avatar"), this.transform);
             else
                 avatarObject = Util.GetAvatarFromPath(filePath);
 

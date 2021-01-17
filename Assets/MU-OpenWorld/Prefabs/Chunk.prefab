@@ -43,3 +43,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2f7f3828e7ae8a49b2310431cb97369, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DefaultObjects:
+  - PrefabID: ground
+    IsLocalPosition: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}

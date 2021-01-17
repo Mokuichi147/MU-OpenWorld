@@ -30,15 +30,17 @@ namespace OpenWorld.App
         public struct Player
         {
             public Vector3 Position;
-            public Quaternion Rotation;
-            public Quaternion CameraRotation;
+            public Vector3 Rotation;
+            public Vector3 CameraRotation;
         }
 
+        [System.Serializable]
         public struct PrefabData
         {
             public string PrefabID;
+            public bool IsLocalPosition;
             public Vector3 Position;
-            public Quaternion Rotation;
+            public Vector3 Rotation;
             public Vector3 Scale;
         }
 
@@ -182,8 +184,8 @@ namespace OpenWorld.App
         {
             var player = new Player();
             player.Position = Vector3.zero;
-            player.Rotation = Quaternion.identity;
-            player.CameraRotation = Quaternion.identity;
+            player.Rotation = Vector3.zero;
+            player.CameraRotation = Vector3.zero;
 
             Debug.Log("Player Created!");
             return player;
@@ -206,20 +208,20 @@ namespace OpenWorld.App
         // チャンク関連
         static public bool IsChunkData(int x, int z)
         {
-            string chunkName = x.ToString("x8") + "-" + z.ToString("x8");
+            string chunkName = $"{x}.{z}";
             return File.Exists($"{AppData.WorldPath}/chunks/{chunkName}.xml");
         }
 
         static public Chunk ChunkLoad(int x, int z)
         {
-            string chunkName = x.ToString("x8") + "-" + z.ToString("x8");
+            string chunkName = $"{x}.{z}";
             Chunk chunk = Load($"{AppData.WorldPath}/chunks/{chunkName}.xml", new Chunk());
             return chunk;
         }
 
         static public void ChunkSave(Chunk chunk)
         {
-            string chunkName = chunk.X.ToString("x8") + "-" + chunk.Z.ToString("x8");
+            string chunkName = $"{chunk.X}.{chunk.Z}";
 
             if (!Directory.Exists($"{AppData.WorldPath}/chunks"))
                 Directory.CreateDirectory($"{AppData.WorldPath}/chunks");

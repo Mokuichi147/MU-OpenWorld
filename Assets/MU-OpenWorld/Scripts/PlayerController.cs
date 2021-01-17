@@ -245,8 +245,8 @@ namespace OpenWorld
                 PlayerAvatarController.PlayerLoad();
                 Avatar.Util.SetHeight(this.transform);
             }
-            CameraRotate.rotation = player.CameraRotation;
-            PlayerAvatarController.AvatarTransform.rotation = player.Rotation;
+            CameraRotate.rotation = Quaternion.Euler(player.CameraRotation);
+            PlayerAvatarController.AvatarTransform.rotation = Quaternion.Euler(player.Rotation);
 
             isPlayerActive = true;
         }
@@ -255,8 +255,8 @@ namespace OpenWorld
         {
             var player = new App.DataFile.Player();
             player.Position = this.transform.position;
-            player.Rotation = PlayerAvatarController.AvatarTransform.rotation;
-            player.CameraRotation = CameraRotate.rotation;
+            player.Rotation = PlayerAvatarController.AvatarTransform.eulerAngles;
+            player.CameraRotation = CameraRotate.eulerAngles;
             App.DataFile.PlayerSave(player);
         }
 
