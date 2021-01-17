@@ -5730,7 +5730,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8554ea7225127c642b17ed22f22bb267, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isActive: 0
+  isInputActive: 0
+  isPlayerActive: 0
   LookSensitivity: 100
   PlayerRigidbody: {fileID: 929649736}
   PlayerAvatarController: {fileID: 929649733}
@@ -10876,16 +10877,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabsInspector:
-  - ID: DefaultAvatar
+  - ID: default_avatar
     PrefabObject: {fileID: 6446477057859327339, guid: 1a8ba19b6dee6c84b9c8189df40be2a2, type: 3}
-  - ID: Ground
+    Name: Moyu
+    IsStatic: 0
+    IsItem: 0
+  - ID: ground
     PrefabObject: {fileID: 1395065153941191014, guid: d602c95c065b22c47b960145bed7944e, type: 3}
-  - ID: Watar
+    Name: "\u5730\u9762"
+    IsStatic: 1
+    IsItem: 0
+  - ID: watar
     PrefabObject: {fileID: 3448391514385853938, guid: e873b80db5288564fbf9039966272fa0, type: 3}
-  - ID: Ball
+    Name: "\u6C34"
+    IsStatic: 1
+    IsItem: 0
+  - ID: ball
     PrefabObject: {fileID: 1613085947769263005, guid: 1d3db45a4533b414f857d98c31b963ba, type: 3}
-  - ID: Rock
+    Name: "\u30DC\u30FC\u30EB"
+    IsStatic: 0
+    IsItem: 1
+  - ID: rock
     PrefabObject: {fileID: 5976570376031995475, guid: a02f00e042e1c7348a4cebf2cdded3bb, type: 3}
+    Name: "\u5CA9"
+    IsStatic: 0
+    IsItem: 1
 --- !u!1 &1940991061
 GameObject:
   m_ObjectHideFlags: 0
